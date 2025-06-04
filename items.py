@@ -44,3 +44,26 @@ ITEMS = {
     )
 }
 
+class ItemManager:
+    """Helper-Klasse für Item-Operationen"""
+    
+    @staticmethod
+    def item_exists(item_id: int) -> bool:
+        """Prüft ob Item existiert"""
+        return item_id in ITEMS
+
+    @staticmethod
+    def get_item(item_id: int) -> Optional[Item]:
+        """Holt Item-Definition aus dem ITEMS Dict"""
+        if ItemManager.item_exists(item_id):
+            return ITEMS.get(item_id)
+    
+    @staticmethod
+    def get_items_by_rarity(rarity: Rarity) -> List[Item]:
+        """Holt alle Items einer Kategorie"""
+        return [item for item in ITEMS.values() if item.rarity == rarity]
+    
+    @staticmethod
+    def get_all_items() -> List[Item]:
+        """Holt alle verfügbaren Items"""
+        return list(ITEMS.values())
