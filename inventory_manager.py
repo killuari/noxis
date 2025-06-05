@@ -1,10 +1,10 @@
 from items import *
 
 class InventoryManager:
-    async def add_item(self):
+    async def add_item(self, user_id: int, item_id: int, quantity: int = 1):
         pass
 
-    async def remove_item(self):
+    async def remove_item(self, user_id: int, item_id: int, quantity: int = 1):
         pass
 
     async def get_inventory(self):
