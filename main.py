@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from dataclasses import dataclass
 from items import *
 from database_manager import DatabaseManager
+from inventory_manager import InventoryManager
+from user_manager import UserManager
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
