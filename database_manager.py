@@ -1,10 +1,11 @@
-import sqlite3
+import aiosqlite
 
 class DatabaseManager:
     
-    async def init_database(self):
+    @staticmethod
+    async def init_database():
         """Initialisiert die Datenbank mit allen benötigten Tabellen"""
-        async with sqlite3.connect("database.db") as db:
+        async with aiosqlite.connect("database.db") as db:
             # Users Tabelle für Grunddaten
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS users (
@@ -28,3 +29,7 @@ class DatabaseManager:
                     acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+
+            await db.commit()
+
+            print("Database initialized!")
