@@ -18,7 +18,6 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def on_ready():
     await DatabaseManager.init_database()
 
-    await UserManager.add_user(10)
     await UserManager.add_user(5)
 
     print(await InventoryManager.user_has_item(5, 1))
@@ -27,5 +26,10 @@ async def on_ready():
     print(await InventoryManager.user_has_item(5, 1, 5))
     await InventoryManager.add_item(5, 1, 4)
     print(await InventoryManager.user_has_item(5, 1, 5))
-    
+    await InventoryManager.remove_item(5, 1, 2)
+    print(await InventoryManager.user_has_item(5, 1, 5))
+    print(await InventoryManager.user_has_item(5, 1, 3))
+    await InventoryManager.add_item(5, 2, 10)
+    await InventoryManager.remove_item(5, 1, 3)
+
 client.run(TOKEN)

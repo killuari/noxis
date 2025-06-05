@@ -32,7 +32,24 @@ class InventoryManager:
 
     @staticmethod
     async def remove_item(user_id: int, item_id: int, quantity: int = 1):
-        pass
+        """Entfernt anzahl an item von einem user inv"""
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+
+            # TODO: wird erst hinzugefügt wenn non stackable items eindeutig sind
+            if not (await ItemManager.get_item(item_id)).stackable:
+                return
+            
+            if await InventoryManager.user_has_item(user_id, item_id, quantity):
+                await cursor.execute("UPDATE inventory SET quantity = quantity - ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
+                
+                # Entfern ganzen Eintrag aus Inventory wenn quantity = 0
+                await cursor.execute("SELECT quantity FROM inventory WHERE (user_id, item_id) = (?, ?)", (user_id, item_id))
+                remaining = (await cursor.fetchone())[0]
+                if remaining == 0:
+                    await cursor.execute("DELETE FROM inventory WHERE (user_id, item_id) = (?, ?)", (user_id, item_id))
+                
+                await db.commit()
 
     @staticmethod
     async def user_has_item(user_id: int, item_id: int, quantity: int = 1) -> bool:
@@ -44,6 +61,7 @@ class InventoryManager:
             cursor = await db.cursor()
             await cursor.execute("SELECT quantity FROM inventory WHERE (user_id, item_id) = (?, ?)", (user_id, item_id))
             
+            # TODO: für non stackable anpassen
             if (await ItemManager.get_item(item_id)).stackable:
                 result = await cursor.fetchone()
                 if result:
