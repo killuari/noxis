@@ -18,4 +18,14 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def on_ready():
     await DatabaseManager.init_database()
 
+    await UserManager.add_user(10)
+    await UserManager.add_user(5)
+
+    print(await InventoryManager.user_has_item(5, 1))
+    await InventoryManager.add_item(5, 1)
+    print(await InventoryManager.user_has_item(5, 1))
+    print(await InventoryManager.user_has_item(5, 1, 5))
+    await InventoryManager.add_item(5, 1, 4)
+    print(await InventoryManager.user_has_item(5, 1, 5))
+    
 client.run(TOKEN)
