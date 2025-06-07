@@ -25,13 +25,13 @@ class EconomyManager:
                 if not bank:
                     await cursor.execute("UPDATE users SET balance=balance+? WHERE user_id=?", (abs(amount), user_id))
                     await db.commit()
-                    total = await EconomyManager.update_total_balance(user_id)
+                    total = await EconomyManager.get_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()
                 else:
                     await cursor.execute("UPDATE users SET bank_balance=bank_balance+? WHERE user_id=?", (abs(amount), user_id))
                     await db.commit()
-                    total = await EconomyManager.update_total_balance(user_id)
+                    total = await EconomyManager.get_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()
             else:
@@ -57,7 +57,7 @@ class EconomyManager:
                     else:
                         await cursor.execute("UPDATE users SET balance=balance-? WHERE user_id=?", (abs(amount), user_id))
                         await db.commit()
-                    total = await EconomyManager.update_total_balance(user_id)
+                    total = await EconomyManager.get_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit() 
                 else:
@@ -73,7 +73,7 @@ class EconomyManager:
                     else:
                         await cursor.execute("UPDATE users SET bank_balance=bank_balance-? WHERE user_id=?", (abs(amount), user_id))
                         await db.commit()
-                    total = await EconomyManager.update_total_balance(user_id)
+                    total = await EconomyManager.get_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()                                   
             else:
