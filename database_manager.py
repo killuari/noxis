@@ -12,6 +12,7 @@ class DatabaseManager:
                     user_id INTEGER NOT NULL,
                     balance INTEGER DEFAULT 0,
                     bank_balance INTEGER DEFAULT 0,
+                    total_balance INTEGER DEFAULT 0,
                     level INTEGER DEFAULT 1,
                     experience INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
