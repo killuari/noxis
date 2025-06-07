@@ -25,21 +25,13 @@ class EconomyManager:
                 if not bank:
                     await cursor.execute("UPDATE users SET balance=balance+? WHERE user_id=?", (abs(amount), user_id))
                     await db.commit()
-                    await cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-                    balance = await cursor.fetchone()
-                    await cursor.execute("SELECT bank_balance FROM users WHERE user_id=?", (user_id,)) 
-                    bank_balance = await cursor.fetchone()    
-                    total = balance[0]+ bank_balance[0]
+                    total = await EconomyManager.update_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()
                 else:
                     await cursor.execute("UPDATE users SET bank_balance=bank_balance+? WHERE user_id=?", (abs(amount), user_id))
                     await db.commit()
-                    await cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-                    balance = await cursor.fetchone()
-                    await cursor.execute("SELECT bank_balance FROM users WHERE user_id=?", (user_id,)) 
-                    bank_balance = await cursor.fetchone()
-                    total = balance[0]+ bank_balance[0]
+                    total = await EconomyManager.update_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()
             else:
@@ -65,11 +57,7 @@ class EconomyManager:
                     else:
                         await cursor.execute("UPDATE users SET balance=balance-? WHERE user_id=?", (abs(amount), user_id))
                         await db.commit()
-                    await cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-                    balance = await cursor.fetchone()
-                    await cursor.execute("SELECT bank_balance FROM users WHERE user_id=?", (user_id,)) 
-                    bank_balance = await cursor.fetchone()                       
-                    total = balance[0]+ bank_balance[0]
+                    total = await EconomyManager.update_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit() 
                 else:
@@ -85,12 +73,19 @@ class EconomyManager:
                     else:
                         await cursor.execute("UPDATE users SET bank_balance=bank_balance-? WHERE user_id=?", (abs(amount), user_id))
                         await db.commit()
-                    await cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-                    balance = await cursor.fetchone()
-                    await cursor.execute("SELECT bank_balance FROM users WHERE user_id=?", (user_id,)) 
-                    bank_balance = await cursor.fetchone()    
-                    total = balance[0]+ bank_balance[0]
+                    total = await EconomyManager.update_total_balance(user_id)
                     await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
                     await db.commit()                                   
             else:
                 print("User not found") 
+
+
+    @staticmethod
+    async def update_total_balance(user_id: int):
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user_id,)) 
+            balance, bank_balance = await cursor.fetchone()
+            total = balance + bank_balance
+            
+        return total 
