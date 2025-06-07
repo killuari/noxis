@@ -81,7 +81,7 @@ class EconomyManager:
 
 
     @staticmethod
-    async def update_total_balance(user_id: int):
+    async def get_total_balance(user_id: int):
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user_id,)) 
