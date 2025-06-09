@@ -7,6 +7,7 @@ class EconomyManager:
     # Get the balance and bank_balance
     @staticmethod
     async def get_balance(user_id: int) -> Tuple[int, int]:
+        """Get a tuple of balance, bank_balance"""
         if not UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
@@ -33,7 +34,8 @@ class EconomyManager:
     
     # Add money to a specific users balance/bank_balance
     @staticmethod
-    async def add_money(user_id: int, amount: int, bank: bool=False) -> int: # returns amount of money which would be over the max_bank_limit of user
+    async def add_money(user_id: int, amount: int, bank: bool=False) -> int:
+        """Adds money to specified user and returns amount of money which would be over the max_bank_limit of user if money added to bank"""
         if not UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
@@ -51,7 +53,7 @@ class EconomyManager:
                 await db.commit()
             else:
                 current_bank_balance = (await EconomyManager.get_balance(user_id))[1]
-                max_bank_balance = EconomyManager.get_max_bank_capacity(user_id)
+                max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
                 if max_bank_balance <= current_bank_balance + amount:
                     money_left = current_bank_balance + amount - max_bank_balance
                     await cursor.execute("UPDATE users SET bank_balance=? WHERE user_id=?", (max_bank_balance, user_id))
@@ -117,16 +119,16 @@ class EconomyManager:
     
     @staticmethod
     async def get_max_bank_capacity(user_id: int) -> int:
-        if not UserManager.user_exists(user_id):
+        if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
         
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             await cursor.execute("SELECT level FROM users WHERE user_id=?", (user_id,)) 
-            level = await cursor.fetchone()
+            level = (await cursor.fetchone())[0]
 
         # Option 2: Exponential scaling
-        base_capacity = 10000
+        base_capacity = 1000
         scaling_factor = 1.2
         return int(base_capacity * (level ** scaling_factor))
