@@ -118,7 +118,7 @@ class BasicCommands(commands.Cog):
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrew {amount}$", description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrawn {amount}$", description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
