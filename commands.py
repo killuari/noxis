@@ -77,11 +77,48 @@ class BasicCommands(commands.Cog):
                 return
 
             money_left = await EconomyManager.add_money(interaction.user.id, amount, bank=True)
+
+            if amount == money_left:
+                await interaction.response.send_message(embed=discord.Embed(title="Your bank is already full!", color=discord.Color.red()), ephemeral=True)
+                return
+            
             await EconomyManager.remove_money(interaction.user.id, amount-money_left)
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited {amount-money_left}$", description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited {amount-money_left}$" + (" (Max bank capacity reached)" if money_left > 0 else ""), description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+
+        except ValueError:
+            await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
+            return
+        
+    @app_commands.command(name="withdraw", description="Withdraws given amount from bank")
+    async def withdraw(self, interaction: discord.Interaction, amount: str):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        if amount == "max":
+            amount = (await EconomyManager.get_balance(interaction.user.id))[1]
+
+        # if amount != "max" try to convert it to integer
+        try:
+            amount = int(amount)
+            if amount <= 0:
+                await interaction.response.send_message(embed=discord.Embed(title="Amount must be greater than 0.", color=discord.Color.red()), ephemeral=True)
+                return
+            
+            bank_balance = (await EconomyManager.get_balance(interaction.user.id))[1]
+            if amount > bank_balance:
+                await interaction.response.send_message(embed=discord.Embed(title="You don't have enough money in bank!", color=discord.Color.red()), ephemeral=True)
+                return
+
+            await EconomyManager.add_money(interaction.user.id, amount)
+            await EconomyManager.remove_money(interaction.user.id, amount, bank=True)
+
+            balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
+            max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrew {amount}$", description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)

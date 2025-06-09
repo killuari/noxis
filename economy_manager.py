@@ -8,7 +8,7 @@ class EconomyManager:
     @staticmethod
     async def get_balance(user_id: int) -> Tuple[int, int]:
         """Get a tuple of balance, bank_balance"""
-        if not UserManager.user_exists(user_id):
+        if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
         
@@ -19,7 +19,7 @@ class EconomyManager:
     
     @staticmethod
     async def get_total_balance(user_id: int):
-        if not UserManager.user_exists(user_id):
+        if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
 
@@ -36,7 +36,7 @@ class EconomyManager:
     @staticmethod
     async def add_money(user_id: int, amount: int, bank: bool=False) -> int:
         """Adds money to specified user and returns amount of money which would be over the max_bank_limit of user if money added to bank"""
-        if not UserManager.user_exists(user_id):
+        if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
         
@@ -72,7 +72,7 @@ class EconomyManager:
     # Remove money from a specific users balance/bank_balance, balance/bank_balance can not go below zero    
     @staticmethod
     async def remove_money(user_id: int, amount: int, bank: bool=False):
-        if not UserManager.user_exists(user_id):
+        if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
         
@@ -128,7 +128,6 @@ class EconomyManager:
             await cursor.execute("SELECT level FROM users WHERE user_id=?", (user_id,)) 
             level = (await cursor.fetchone())[0]
 
-        # Option 2: Exponential scaling
         base_capacity = 1000
         scaling_factor = 1.2
         return int(base_capacity * (level ** scaling_factor))
