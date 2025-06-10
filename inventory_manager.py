@@ -99,10 +99,14 @@ class InventoryManager:
 
     @staticmethod
     async def update_item_metadata(inv_id: int, new_metadata: dict) -> None:
-        pass
+        """Update metadata of specific item by inventory id"""
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("UPDATE inventory SET item_metadata = ? WHERE (inv_id) = ?", (json.dumps(new_metadata), inv_id))
+            await db.commit()
 
     @staticmethod
-    async def get_inventory():
+    async def get_inventory(user_id: int) -> List[Item]:
         pass
 
     @staticmethod
