@@ -1,4 +1,4 @@
-import discord, aiosqlite, typing
+import discord, aiosqlite, typing, time, datetime
 from discord import app_commands
 from discord.ext import commands
 from user_manager import *
@@ -123,3 +123,64 @@ class BasicCommands(commands.Cog):
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
             return
+        
+    @app_commands.command(name="daily", description="Your daily reward")
+    async def daily(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return        
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT daily FROM users WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_daily = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+            
+            if result is None or result[0] is None:
+                claim_available = True
+            else:
+                last_daily = datetime.datetime.strptime(last_daily, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_daily + datetime.timedelta(days=1))
+                
+            if claim_available:
+                await cursor.execute("UPDATE users SET daily=? WHERE user_id=?", (current_time, interaction.user.id))
+                await db.commit()
+                await EconomyManager.add_money(interaction.user.id, 1000)
+                await interaction.response.send_message(embed=discord.Embed(title="You successfully claimed your daily Reward!", description="1,000$ have been added to your Wallet", color=discord.Color.green()))
+            else:
+                next_daily_time = last_daily + datetime.timedelta(days=1)
+                timestamp = int(next_daily_time.timestamp())
+                await interaction.response.send_message(embed=discord.Embed(title="You already claimed your daily.", description=f"Time left until available: <t:{timestamp}:R>", color=discord.Color.red()))
+
+    @app_commands.command(name="weekly", description="Your weekly reward")
+    async def weekly(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return        
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT weekly FROM users WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_daily = result[0]
+
+            claim_available = False
+            current_time = datetime.datetime.now()
+
+            if result is None or result[0] is None:
+                claim_available = True
+            else:
+                last_daily = datetime.datetime.strptime(last_daily, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_daily + datetime.timedelta(weeks=1))
+            
+            if claim_available:
+                await cursor.execute("UPDATE users SET weekly=? WHERE user_id=?", (current_time, interaction.user.id))
+                await db.commit()
+                await EconomyManager.add_money(interaction.user.id, 15000)
+                await interaction.response.send_message(embed=discord.Embed(title="You successfully claimed your weekly Reward!", description="15,000$ have been added to your Wallet", color=discord.Color.green()))
+            else:
+                next_daily_time = last_daily + datetime.timedelta(weeks=1)
+                timestamp = int(next_daily_time.timestamp())
+                await interaction.response.send_message(embed=discord.Embed(title="You already claimed your weekly.", description=f"Time left until available: <t:{timestamp}:R>", color=discord.Color.red()))
