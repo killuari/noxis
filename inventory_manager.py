@@ -14,8 +14,6 @@ class InventoryManager:
             cursor = await db.cursor()
             item = await ItemManager.get_item(item_id)
 
-
-
             # Add item if not stackable
             if item.max_stack == 1:
                 for i in range(quantity):
@@ -39,25 +37,23 @@ class InventoryManager:
             await db.commit()
 
     @staticmethod
-    async def remove_item(user_id: int, item_id: int, quantity: int = 1):
+    async def remove_item(inv_id: int = None, quantity: int = 1):
         """Entfernt anzahl an item von einem user inv"""
+        if not await InventoryManager.record_exists(inv_id):
+            print("Inventory record not found")
+            return
+        
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
+            await cursor.execute("SELECT quantity FROM inventory WHERE (inv_id) = (?)", (inv_id,))
+            remaining = (await cursor.fetchone())[0]
 
-            # TODO: wird erst hinzugefügt wenn non stackable items eindeutig sind
-            if not (await ItemManager.get_item(item_id)).stackable:
-                return
-            
-            if await InventoryManager.user_has_item(user_id, item_id, quantity):
-                await cursor.execute("UPDATE inventory SET quantity = quantity - ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
+            if remaining <= quantity:
+                await cursor.execute("DELETE FROM inventory WHERE (inv_id) = (?)", (inv_id,))
+            else:
+                await cursor.execute("UPDATE inventory SET quantity = quantity - ? WHERE inv_id = ?", (quantity, inv_id))
                 
-                # Entfern ganzen Eintrag aus Inventory wenn quantity = 0
-                await cursor.execute("SELECT quantity FROM inventory WHERE (user_id, item_id) = (?, ?)", (user_id, item_id))
-                remaining = (await cursor.fetchone())[0]
-                if remaining == 0:
-                    await cursor.execute("DELETE FROM inventory WHERE (user_id, item_id) = (?, ?)", (user_id, item_id))
-                
-                await db.commit()
+            await db.commit()
                 
     @staticmethod
     async def get_user_item_quantity(user_id: int, item_id: int) -> int:
@@ -73,6 +69,18 @@ class InventoryManager:
                 return result[0]
             
             return 0
+        
+    @staticmethod
+    async def record_exists(inv_id: int) -> bool:
+        """Checks for specific inventory record"""
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT 1 FROM inventory WHERE (inv_id) = (?)", (inv_id,))
+            
+            result = await cursor.fetchone()
+            if result:
+                return True
+            return False
 
     @staticmethod
     async def get_inventory():
