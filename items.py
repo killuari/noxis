@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any, Tuple
 from enum import Enum
+from datetime import datetime
 
 class Rarity(Enum):
     COMMON = 1
@@ -15,14 +16,16 @@ class Rarity(Enum):
 @dataclass
 class Item:
     """Item-Definition als Python Dataclass"""
-    id: int
+    item_id: int
     name: str
     description: str
     rarity: Rarity
+    inv_id: int = 0
     value: int = 0
     max_stack: int = 99
     usable: bool = False
     metadata: Dict = None
+    acquired_at: float = 0
 
     def __post_init__(self):
         if self.metadata is None:
@@ -32,27 +35,25 @@ class Item:
 # Hier sind ein paar items zum testen
 ITEMS = {
     1: Item(
-        id=1,
+        item_id=1,
         name="Alkohol",
         description="Alkohol zum Trinken",
         rarity=Rarity.COMMON,
         value=100,
         max_stack=50,
         usable=True,
-        metadata={"damage": 15}
     ),
     2: Item(
-        id=2,
+        item_id=2,
         name="Apfel",
         description="Ein solides Essen für Anfänger",
         rarity=Rarity.UNCOMMON,
         value=5,
         max_stack=999,
         usable=True,
-        metadata={"saturation": 15}
     ),
     3: Item(
-        id=3,
+        item_id=3,
         name="Eisenschwert",
         description="Ein solides Eisenschwert für Anfänger",
         rarity=Rarity.RARE,
