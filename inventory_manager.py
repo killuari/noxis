@@ -1,4 +1,4 @@
-import aiosqlite
+import aiosqlite, json
 from items import *
 from user_manager import UserManager
 
@@ -14,22 +14,29 @@ class InventoryManager:
             cursor = await db.cursor()
             item = await ItemManager.get_item(item_id)
 
+
+
             # Add item if not stackable
             if item.max_stack == 1:
-                await cursor.execute("INSERT INTO inventory (user_id, item_id, item_metadata) VALUES (?, ?, ?)", (user_id, item_id, item.metadata))
+                for i in range(quantity):
+                    await cursor.execute("INSERT INTO inventory (user_id, item_id, item_metadata) VALUES (?, ?, ?)", (user_id, item_id, json.dumps(item.metadata)))
+                await db.commit()
                 return
 
+            item_quantity = await InventoryManager.get_user_item_quantity(user_id, item_id)
+            max_stack = (await ItemManager.get_item(item_id)).max_stack
+            
             # Add quantity if user already has item
-            # if await InventoryManager.user_has_item(user_id, item_id):
-            #     # check if user has already reached max_stack
-            #     if await InventoryManager.user_has_item(user_id, item_id, (await ItemManager.get_item(item_id)).max_stack):
-            #         print("User already has max stack of specified item")
-            #     else:
-            #         await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
-            # else:
-            #     await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
+            if item_quantity + quantity > max_stack:
+                print("Quantity would exceed max stack of specified item")
+                return
+            
+            if item_quantity > 0:
+                await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
+            else:
+                await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
 
-            # await db.commit()
+            await db.commit()
 
     @staticmethod
     async def remove_item(user_id: int, item_id: int, quantity: int = 1):
