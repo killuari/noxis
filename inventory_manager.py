@@ -107,7 +107,27 @@ class InventoryManager:
 
     @staticmethod
     async def get_inventory(user_id: int) -> List[Item]:
-        pass
+        """Get List of all Items of an Inventory"""
+        items = []
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT * FROM inventory WHERE user_id = ?", (user_id,))
+            result = await cursor.fetchall()
+            
+            if not result:
+                print("User doesnt have items")
+                return []
+            
+            for item_values in result:
+                item = await ItemManager.get_item(item_values[2])
+                item.inv_id = item_values[0]
+                item.acquired_at = datetime.strptime(item_values[-1], "%Y-%m-%d %H:%M:%S").timestamp()
+                item.metadata = json.loads(item_values[-2]) if item_values[-2] else {}
+
+                items.append(item)
+
+        return items
+
 
     @staticmethod
     async def get_inventory_value():

@@ -26,6 +26,8 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
+    print(await InventoryManager.get_inventory(1))
+
 @client.event
 async def on_guild_join(guild: discord.Guild):
     all_channels = await guild.fetch_channels()
