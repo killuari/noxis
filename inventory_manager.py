@@ -83,6 +83,14 @@ class InventoryManager:
             return False
 
     @staticmethod
+    async def get_item_metadata(inv_id: int) -> dict:
+        pass
+
+    @staticmethod
+    async def update_item_metadata(inv_id: int, new_metadata: dict) -> None:
+        pass
+
+    @staticmethod
     async def get_inventory():
         pass
 
