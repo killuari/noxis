@@ -4,8 +4,8 @@ from user_manager import UserManager
 
 class InventoryManager:
     @staticmethod
-    async def add_item(user_id: int, item_id: int, quantity: int = 1):
-        """Fügt anzahl an item einem user inventar hinzu"""
+    async def add_item(user_id: int, item_id: int, quantity: int = 1) -> int: # returns quantity that would exceed the max stack of specified item
+        """Fügt anzahl an item einem user inventar hinzu"""                   # returns 0 if operation was successful
         # Check if item and user exists
         if not await ItemManager.item_exists(item_id) or not await UserManager.user_exists(user_id):
             return
@@ -26,8 +26,8 @@ class InventoryManager:
             
             # Add quantity if user already has item
             if item_quantity + quantity > max_stack:
-                print("Quantity would exceed max stack of specified item")
-                return
+                print("Quantity exceeds max stack of specified item")
+                return item_quantity + quantity - max_stack
             
             if item_quantity > 0:
                 await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
@@ -35,6 +35,7 @@ class InventoryManager:
                 await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
 
             await db.commit()
+            return 0
 
     @staticmethod
     async def remove_item(inv_id: int = None, quantity: int = 1):
@@ -84,7 +85,17 @@ class InventoryManager:
 
     @staticmethod
     async def get_item_metadata(inv_id: int) -> dict:
-        pass
+        """Get metadata of specific item by inventory id"""
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT item_metadata FROM inventory WHERE (inv_id) = ?", (inv_id,))
+
+            result = await cursor.fetchone()
+            if result:
+                if result[0]:
+                    return json.loads(result[0])
+            
+            return {}
 
     @staticmethod
     async def update_item_metadata(inv_id: int, new_metadata: dict) -> None:
