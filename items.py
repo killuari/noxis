@@ -20,7 +20,6 @@ class Item:
     description: str
     rarity: Rarity
     value: int = 0
-    stackable: bool = True
     max_stack: int = 99
     usable: bool = False
     metadata: Dict = None
@@ -38,7 +37,6 @@ ITEMS = {
         description="Alkohol zum Trinken",
         rarity=Rarity.COMMON,
         value=100,
-        stackable=True,
         max_stack=50,
         usable=True,
         metadata={"damage": 15}
@@ -49,7 +47,6 @@ ITEMS = {
         description="Ein solides Essen für Anfänger",
         rarity=Rarity.UNCOMMON,
         value=5,
-        stackable=True,
         max_stack=999,
         usable=True,
         metadata={"saturation": 15}
@@ -60,10 +57,9 @@ ITEMS = {
         description="Ein solides Eisenschwert für Anfänger",
         rarity=Rarity.RARE,
         value=100,
-        stackable=False,
         max_stack=1,
         usable=False,
-        metadata={"damage": 15, "durability": 100, "type": "sword"}
+        metadata={"damage": 15, "durability": 100}
     )
 }
 
