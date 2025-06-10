@@ -24,9 +24,11 @@ class DatabaseManager:
             # Inventory Tabelle
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS inventory (
+                    inv_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
                     item_id INTEGER NOT NULL,
                     quantity INTEGER DEFAULT 1,
+                    item_metadata JSON DEFAULT NULL,
                     acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
