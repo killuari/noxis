@@ -10,6 +10,7 @@ from user_manager import UserManager
 from economy_manager import EconomyManager
 from commands import BasicCommands
 from buttons import *
+from level_manager import LevelManager
 
 
 intents = discord.Intents.all()
@@ -26,7 +27,6 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
-    print(await InventoryManager.get_inventory(1))
 
 @client.event
 async def on_guild_join(guild: discord.Guild):
