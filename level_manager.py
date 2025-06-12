@@ -8,7 +8,7 @@ class LevelManager:
     @staticmethod
     def calculate_exp_for_level(level: int) -> int:
         base_exp = 100
-        scaling_factor = 1.25
+        scaling_factor = 1.5
         return int(base_exp * level * scaling_factor)
 
     # calculates the level and remaining experience from a given total experience
@@ -32,14 +32,18 @@ class LevelManager:
         
         async with aiosqlite.connect("database.db") as db: 
             cursor = await db.cursor()
-            await cursor.execute("SELECT experience, level FROM users WHERE user_id=?", (user_id,))
+            await cursor.execute("SELECT level, experience FROM users WHERE user_id=?", (user_id,))
             data = await cursor.fetchone()
-            cur_experience, cur_level = data
+            cur_level, cur_experience = data
             total_exp = cur_experience + abs(amount)
-            new_level, new_exp = LevelManager.calculate_level_from_exp(total_exp)
             
-            await cursor.execute("UPDATE users SET experience=?, level=? WHERE user_id=?", (new_exp, new_level, user_id))
-            await db.commit()    
+            for lvl in range(1, cur_level):
+                total_exp += LevelManager.calculate_exp_for_level(lvl)
+
+            new_level, new_exp = LevelManager.calculate_level_from_exp(total_exp)
+
+            await cursor.execute("UPDATE users SET level=?, experience=? WHERE user_id=?", (new_level, new_exp, user_id))
+            await db.commit()
             
     # sets the experience of a user to a specific amount and updates their level           
     @staticmethod
