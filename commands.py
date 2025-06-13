@@ -281,3 +281,76 @@ class BasicCommands(commands.Cog):
                     description=f"🛑 You're still tired from your last search!\n⏰ Next scavenge: <t:{timestamp}:R>", 
                     color=discord.Color.red()
                     ).set_footer(text="💡 Try /work or /daily while you wait!"))
+                
+    @app_commands.command(name="rob", description="Try your luck and rob someone.")
+    async def rob(self, interaction: discord.Interaction, user: discord.User):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return        
+
+        if not await UserManager.user_exists(user.id) or not (await EconomyManager.get_balance(user.id))[0] >= 15000:
+            await interaction.response.send_message(embed=discord.Embed(title="The user must at least have 15000$ in their wallet!", color=discord.Color.red()), ephemeral=True)
+            return
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT rob FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_rob = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+            
+            if result is None or last_rob is None:
+                claim_available = True
+            else:
+                last_rob = datetime.datetime.strptime(last_rob, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_rob + datetime.timedelta(minutes=5))
+                
+            if claim_available:
+                last_used = current_time
+                rob_chance = random.random()
+                experience = 50
+                robbed_percentage = random.randint(5, 15) * 0.01
+                robbed_money = int((await EconomyManager.get_balance(user.id))[0] * robbed_percentage)
+
+                # 60% chance to get nothing
+                if rob_chance <= 0.6:
+                    lost_money = int(robbed_money * 0.4)
+                    # add 3 hours to last_used so that the cooldown is 3 hours
+                    last_used = current_time + datetime.timedelta(hours=3)
+                    money_left = await EconomyManager.remove_money(interaction.user.id, lost_money)
+
+                    # if user doesnt have enough money in wallet, try to take it from bank
+                    if money_left > 0: 
+                        money_left = await EconomyManager.remove_money(interaction.user.id, lost_money, bank=True)
+                    # TODO: add functionality if user also doesnt have enough money in bank
+                    
+                    await interaction.response.send_message(embed=discord.Embed(
+                    title="🚨 Robbery Failed!", 
+                    description=f"""You got caught and now you have to pay a fine.\n\n
+                                Penalty paid: {lost_money:,}$\n
+                                You've been given a 3-hour suspension for robbery.\n""",
+                    color=discord.Color.red()
+                    ).set_footer(text="Better luck next time, but be careful!"))
+                
+                # 40% chance for success
+                else:
+                    await EconomyManager.remove_money(user.id, robbed_money)
+                    await interaction.response.send_message(embed=discord.Embed(
+                    title="💰 Robbery Successful!", 
+                    description=f"Stolen amount: {robbed_money:,}$",
+                    color=discord.Color.green()
+                    ).set_footer(text="Stay cautious — word might spread!"))
+                
+                await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
+                await cursor.execute("UPDATE last_used SET rob=? WHERE user_id=?", (last_used, interaction.user.id))
+                await db.commit()
+
+            else:
+                next_rob_time = last_rob + datetime.timedelta(minutes=5)
+                timestamp = int(next_rob_time.timestamp())
+                await interaction.response.send_message(embed=discord.Embed(
+                    title="⏰ Robbery Cooldown", 
+                    description=f"🛑 You're still tired from your last robbery!\n⏰ Next robbery: <t:{timestamp}:R>", 
+                    color=discord.Color.red()
+                    ).set_footer(text="💡 Try /work or /daily while you wait!"))

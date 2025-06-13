@@ -71,51 +71,34 @@ class EconomyManager:
     
     # Remove money from a specific users balance/bank_balance, balance/bank_balance can not go below zero    
     @staticmethod
-    async def remove_money(user_id: int, amount: int, bank: bool=False):
+    async def remove_money(user_id: int, amount: int, bank: bool=False) -> int: #returns amount of money that couldnt be removed
         if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
             return None
         
+        money_left = 0
+        current_balance = await EconomyManager.get_balance(user_id)
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             if not bank:
-                await cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-                current_balance = await cursor.fetchone()
-                
-                if current_balance is None:
-                    print("balance not found")
-                    return
-                
-                if (current_balance[0] - amount) < 0:
-                    new_balance = 0
-                    await cursor.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
-                    await db.commit()
-                else:
-                    await cursor.execute("UPDATE users SET balance=balance-? WHERE user_id=?", (abs(amount), user_id))
-                    await db.commit()
-
-                total = await EconomyManager.get_total_balance(user_id)
-                await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
-                await db.commit() 
+                current_balance = current_balance[0]
+                balance = "balance"
             else:
-                await cursor.execute("SELECT bank_balance FROM users WHERE user_id=?", (user_id,))
-                current_balance = await cursor.fetchone()
+                current_balance = current_balance[1]
+                balance = "bank_balance"
 
-                if current_balance is None:
-                    print("bank_balance not found")
-                    return  
-                
-                if (current_balance[0]  - amount) < 0:
-                    new_balance = 0
-                    await cursor.execute("UPDATE users SET bank_balance=? WHERE user_id=?", (new_balance, user_id))
-                    await db.commit()    
-                else:
-                    await cursor.execute("UPDATE users SET bank_balance=bank_balance-? WHERE user_id=?", (abs(amount), user_id))
-                    await db.commit()
+            if (current_balance - amount) < 0:
+                new_balance = 0
+                money_left = abs(current_balance - amount)
+                await cursor.execute(f"UPDATE users SET {balance}=? WHERE user_id=?", (new_balance, user_id))
+            else:
+                await cursor.execute(f"UPDATE users SET {balance}={balance}-? WHERE user_id=?", (abs(amount), user_id))
+            await db.commit()
 
-                total = await EconomyManager.get_total_balance(user_id)
-                await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
-                await db.commit()                                    
+            total = await EconomyManager.get_total_balance(user_id)
+            await cursor.execute("UPDATE users SET total_balance=? WHERE user_id=?", (total, user_id)) 
+            await db.commit()
+        return money_left                              
     
     @staticmethod
     async def get_max_bank_capacity(user_id: int) -> int:
