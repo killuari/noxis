@@ -34,7 +34,7 @@ class BasicCommands(commands.Cog):
                     if user_id == interaction.user.id:
                         rank = idx
                         max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name} balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+                        await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
                         return
                     
             # get balance of other user
@@ -48,7 +48,7 @@ class BasicCommands(commands.Cog):
                     if user_id == user.id:                
                         rank = idx
                         max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{user.name} balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+                        await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
                         return
                     else:
                         user_found = False
@@ -86,7 +86,7 @@ class BasicCommands(commands.Cog):
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited {amount-money_left}$" + (" (Max bank capacity reached)" if money_left > 0 else ""), description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited {(amount-money_left):,}$" + (" (Max bank capacity reached)" if money_left > 0 else ""), description=f"💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
@@ -118,7 +118,7 @@ class BasicCommands(commands.Cog):
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrawn {amount}$", description=f"💵: {balance}\n\n🏦: {bank_balance} / {max_bank_balance}", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrawn {amount:,}$", description=f"💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
