@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Any, Tuple
 from enum import Enum
-from datetime import datetime
 
 class Rarity(Enum):
     COMMON = 1
