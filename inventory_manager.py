@@ -1,4 +1,4 @@
-import aiosqlite, json
+import aiosqlite, json, datetime
 from items import *
 from user_manager import UserManager
 
@@ -121,7 +121,7 @@ class InventoryManager:
             for item_values in result:
                 item = await ItemManager.get_item(item_values[2])
                 item.inv_id = item_values[0]
-                item.acquired_at = datetime.strptime(item_values[-1], "%Y-%m-%d %H:%M:%S").timestamp()
+                item.acquired_at = datetime.datetime.strptime(item_values[-1], "%Y-%m-%d %H:%M:%S").timestamp()
                 item.metadata = json.loads(item_values[-2]) if item_values[-2] else {}
 
                 items.append(item)

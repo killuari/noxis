@@ -6,6 +6,7 @@ from buttons import *
 from items import *
 from inventory_manager import InventoryManager
 from economy_manager import EconomyManager
+from level_manager import LevelManager
 
 
 # This function creates an account through button interaction
@@ -150,7 +151,11 @@ class BasicCommands(commands.Cog):
                 await cursor.execute("UPDATE users SET daily=? WHERE user_id=?", (current_time, interaction.user.id))
                 await db.commit()
                 await EconomyManager.add_money(interaction.user.id, 1000)
-                await interaction.response.send_message(embed=discord.Embed(title="You successfully claimed your daily Reward!", description="1,000$ have been added to your Wallet", color=discord.Color.green()))
+                await interaction.response.send_message(embed=discord.Embed(
+                    title="You successfully claimed your daily Reward!", 
+                    description="1,000$ have been added to your Wallet", 
+                    color=discord.Color.green()))
+                await LevelManager.add_experience(interaction.user.id, 100, interaction.followup.url)
             else:
                 next_daily_time = last_daily + datetime.timedelta(days=1)
                 timestamp = int(next_daily_time.timestamp())
@@ -181,7 +186,11 @@ class BasicCommands(commands.Cog):
                 await cursor.execute("UPDATE users SET weekly=? WHERE user_id=?", (current_time, interaction.user.id))
                 await db.commit()
                 await EconomyManager.add_money(interaction.user.id, 15000)
-                await interaction.response.send_message(embed=discord.Embed(title="You successfully claimed your weekly Reward!", description="15,000$ have been added to your Wallet", color=discord.Color.green()))
+                await interaction.response.send_message(embed=discord.Embed(
+                    title="You successfully claimed your weekly Reward!", 
+                    description="15,000$ have been added to your Wallet", 
+                    color=discord.Color.green()))
+                await LevelManager.add_experience(interaction.user.id, 500, interaction.followup.url)
             else:
                 next_daily_time = last_daily + datetime.timedelta(weeks=1)
                 timestamp = int(next_daily_time.timestamp())
@@ -216,19 +225,26 @@ class BasicCommands(commands.Cog):
 
                 reward_chance = random.random()
                 found_msg = ""
+                experience = 0
                 # 40% chance to get nothing
                 if reward_chance <= 0.4:
                     found_msg = "😔 **Found nothing valuable this time**"
+                    experience = 5
+
                 # 25% chance to get some money
                 elif reward_chance <= 0.65:
                     money = random.randint(100, 500)
                     found_msg = f"💰 **Found {money}$!**"
                     await EconomyManager.add_money(interaction.user.id, money)
+                    experience = 15
+
                 # 20% chance to get more money 
                 elif reward_chance <= 0.85:
                     money = random.randint(500, 1500)
                     found_msg = f"💰 **Found {money}$!**"
                     await EconomyManager.add_money(interaction.user.id, money)
+                    experience = 25
+
                 # 10% chance to get money and a common item
                 elif reward_chance <= 0.95:
                     money = random.randint(750, 2000)
@@ -238,11 +254,14 @@ class BasicCommands(commands.Cog):
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
                     found_msg += f"\n🍎 ** Also found one {item.name}!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
+                    experience = 50
+
                 # 5% change to get rare item
                 else:
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
                     found_msg = f"🍎 ** Found one {item.name}!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
+                    experience = 100
 
                 await interaction.response.send_message(embed=discord.Embed(
                     title="🔍 Scavenging Results", 
@@ -252,6 +271,8 @@ class BasicCommands(commands.Cog):
                                 "🗑️ You dig through some dumpsters..."])}\n
                     {found_msg}""", 
                     color=discord.Color.green()))
+                
+                await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
             else:
                 next_scavenge_time = last_scavenge + datetime.timedelta(seconds=35)
                 timestamp = int(next_scavenge_time.timestamp())
