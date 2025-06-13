@@ -17,6 +17,7 @@ class DatabaseManager:
                     experience INTEGER DEFAULT 0,
                     daily TIMESTAMP,
                     weekly TIMESTAMP,
+                    last_scavenge TIMESTAMP,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (user_id)
