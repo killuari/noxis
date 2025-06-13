@@ -17,4 +17,5 @@ class UserManager:
             async with aiosqlite.connect("database.db") as db:
                 cursor = await db.cursor()
                 await cursor.execute("INSERT INTO users (user_id) VALUES (?)", (user_id,))
+                await cursor.execute("INSERT INTO last_used (user_id) VALUES (?)", (user_id,))
                 await db.commit()

@@ -135,7 +135,7 @@ class BasicCommands(commands.Cog):
 
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("SELECT daily FROM users WHERE user_id=?", (interaction.user.id,))
+            await cursor.execute("SELECT daily FROM last_used WHERE user_id=?", (interaction.user.id,))
             result = await cursor.fetchone()
             last_daily = result[0]
             claim_available = False
@@ -148,7 +148,7 @@ class BasicCommands(commands.Cog):
                 claim_available = current_time >= (last_daily + datetime.timedelta(days=1))
                 
             if claim_available:
-                await cursor.execute("UPDATE users SET daily=? WHERE user_id=?", (current_time, interaction.user.id))
+                await cursor.execute("UPDATE last_used SET daily=? WHERE user_id=?", (current_time, interaction.user.id))
                 await db.commit()
                 await EconomyManager.add_money(interaction.user.id, 1000)
                 await interaction.response.send_message(embed=discord.Embed(
@@ -169,7 +169,7 @@ class BasicCommands(commands.Cog):
 
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("SELECT weekly FROM users WHERE user_id=?", (interaction.user.id,))
+            await cursor.execute("SELECT weekly FROM last_used WHERE user_id=?", (interaction.user.id,))
             result = await cursor.fetchone()
             last_daily = result[0]
 
@@ -183,7 +183,7 @@ class BasicCommands(commands.Cog):
                 claim_available = current_time >= (last_daily + datetime.timedelta(weeks=1))
             
             if claim_available:
-                await cursor.execute("UPDATE users SET weekly=? WHERE user_id=?", (current_time, interaction.user.id))
+                await cursor.execute("UPDATE last_used SET weekly=? WHERE user_id=?", (current_time, interaction.user.id))
                 await db.commit()
                 await EconomyManager.add_money(interaction.user.id, 15000)
                 await interaction.response.send_message(embed=discord.Embed(
@@ -207,7 +207,7 @@ class BasicCommands(commands.Cog):
 
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("SELECT last_scavenge FROM users WHERE user_id=?", (interaction.user.id,))
+            await cursor.execute("SELECT scavenge FROM last_used WHERE user_id=?", (interaction.user.id,))
             result = await cursor.fetchone()
             last_scavenge = result[0]
             claim_available = False
@@ -220,7 +220,7 @@ class BasicCommands(commands.Cog):
                 claim_available = current_time >= (last_scavenge + datetime.timedelta(seconds=35))
                 
             if claim_available:
-                await cursor.execute("UPDATE users SET last_scavenge=? WHERE user_id=?", (current_time, interaction.user.id))
+                await cursor.execute("UPDATE last_used SET scavenge=? WHERE user_id=?", (current_time, interaction.user.id))
                 await db.commit()
 
                 reward_chance = random.random()

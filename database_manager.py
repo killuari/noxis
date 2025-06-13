@@ -15,11 +15,18 @@ class DatabaseManager:
                     total_balance INTEGER DEFAULT 0,
                     level INTEGER DEFAULT 1,
                     experience INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (user_id)
+                )
+            """)
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS last_used (
+                    user_id INTEGER NOT NULL,
                     daily TIMESTAMP,
                     weekly TIMESTAMP,
-                    last_scavenge TIMESTAMP,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    scavenge TIMESTAMP,
+                    rob TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)
