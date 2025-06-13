@@ -27,8 +27,6 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
-    await LevelManager.add_experience(257591194031226881, 900)
-
 
 @client.event
 async def on_guild_join(guild: discord.Guild):

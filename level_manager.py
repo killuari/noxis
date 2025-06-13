@@ -17,8 +17,8 @@ class LevelManager:
         level = 1
         remaining_exp = exp
         
-        while remaining_exp >= LevelManager.calculate_exp_for_level(level):
-            remaining_exp -= LevelManager.calculate_exp_for_level(level)
+        while remaining_exp >= LevelManager.calculate_exp_for_level(level+1):
+            remaining_exp -= LevelManager.calculate_exp_for_level(level+1)
             level += 1
             
         return (level, remaining_exp)
