@@ -11,6 +11,7 @@ from economy_manager import EconomyManager
 from commands import BasicCommands
 from buttons import *
 from level_manager import LevelManager
+from knowledge_manager import KnowledgeManager
 
 
 intents = discord.Intents.all()
@@ -26,7 +27,6 @@ async def on_ready():
     await DatabaseManager.init_database()
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
-
 
 @client.event
 async def on_guild_join(guild: discord.Guild):

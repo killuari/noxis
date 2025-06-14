@@ -15,6 +15,7 @@ class DatabaseManager:
                     total_balance INTEGER DEFAULT 0,
                     level INTEGER DEFAULT 1,
                     experience INTEGER DEFAULT 0,
+                    knowledge JSON DEFAULT NULL,
                     daily TIMESTAMP,
                     weekly TIMESTAMP,
                     last_scavenge TIMESTAMP,

@@ -1,4 +1,4 @@
-import aiosqlite
+import aiosqlite, json
 
 class UserManager:
 
@@ -16,5 +16,5 @@ class UserManager:
         if not await UserManager.user_exists(user_id):
             async with aiosqlite.connect("database.db") as db:
                 cursor = await db.cursor()
-                await cursor.execute("INSERT INTO users (user_id) VALUES (?)", (user_id,))
+                await cursor.execute("INSERT INTO users (user_id, knowledge) VALUES (?, ?)", (user_id, json.dumps({"science": 0, "medicine": 0, "economics": 0, "literature": 0})))
                 await db.commit()
