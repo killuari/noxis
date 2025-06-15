@@ -7,6 +7,7 @@ from items import *
 from inventory_manager import InventoryManager
 from economy_manager import EconomyManager
 from level_manager import LevelManager
+from knowledge_manager import KnowledgeManager
 
 
 # This function creates an account through button interaction
@@ -354,3 +355,109 @@ class BasicCommands(commands.Cog):
                     description=f"🛑 You're still tired from your last robbery!\n⏰ Next robbery: <t:{timestamp}:R>", 
                     color=discord.Color.red()
                     ).set_footer(text="💡 Try /work or /daily while you wait!"))
+    
+    @app_commands.command(name="study", description="Choose a category for extra points")
+    @app_commands.choices(category=[
+        app_commands.Choice(name="Science", value="science"),
+        app_commands.Choice(name="Medicine", value="medicine"),
+        app_commands.Choice(name="Economics", value="economics"),
+        app_commands.Choice(name="Literature", value="literature")
+    ])
+    async def study(self, interaction: discord.Interaction, category: app_commands.Choice[str]): #  mini_game: str = None für die mini_game implementierung
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        current_time = datetime.datetime.now()
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT study FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_study = result[0]
+            claim_available = False
+
+            if result is None or last_study is None:
+                claim_available = True
+            else:
+                last_study = datetime.datetime.strptime(last_study, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_study + datetime.timedelta(minutes=15))
+
+            if not claim_available:
+                next_study_time = last_study + datetime.timedelta(minutes=15)
+                timestamp = int(next_study_time.timestamp())
+                await interaction.response.send_message(embed=discord.Embed(
+                    title="⏰ Study Cooldown",
+                    description=f"🛑 You need to take a break before studying again!\n\n⏰ Next study: <t:{timestamp}:R>",
+                    color=discord.Color.red()))
+                return
+
+            # Update last used time for study
+            await cursor.execute("UPDATE last_used SET study=? WHERE user_id=?", (current_time, interaction.user.id))
+            await db.commit()
+        
+        award = 10
+        experience = 45
+        
+        # TO_DO: Call mini-game logic here to award bonus XP            
+
+        bonus_xp = 0
+        total_xp = experience + bonus_xp
+
+
+        # Add knowledge based on selected category
+        if category.value == "science":
+            await KnowledgeManager.add_knowledge(interaction.user.id, science=award)
+            total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+            embed = discord.Embed(
+                title="📖 Study complete!",
+                description=f"🪙 You gained {award} Science Knowledge!\n\nYour total Science Knowledge is now **{total_knowledge['science']:,}** 🪙",
+                color=discord.Color.green()
+            )
+            embed.set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
+            await interaction.response.send_message(embed=embed)
+            await LevelManager.add_experience(interaction.user.id, total_xp)
+            
+        elif category.value == "medicine":
+            await KnowledgeManager.add_knowledge(interaction.user.id, medicine=award)
+            total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+            embed = discord.Embed(
+                title="📖 Study complete!",
+                description=f"🪙 You gained {award} Medicine Knowledge!\n\nYour total Medicine Knowledge is now **{total_knowledge['medicine']:,}** 🪙",
+                color=discord.Color.green()
+            )
+            embed.set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
+            await interaction.response.send_message(embed=embed)
+            await LevelManager.add_experience(interaction.user.id, total_xp)
+            
+        elif category.value == "economics":
+            await KnowledgeManager.add_knowledge(interaction.user.id, economics=award)
+            total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+            embed = discord.Embed(
+                title="📖 Study complete!",
+                description=f"🪙 You gained {award} Economics Knowledge!\n\nYour total Economics Knowledge is now **{total_knowledge['economics']:,}** 🪙",
+                color=discord.Color.green()
+            )
+            embed.set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")            
+            await interaction.response.send_message(embed=embed)
+            await LevelManager.add_experience(interaction.user.id, total_xp)
+            
+        elif category.value == "literature":
+            await KnowledgeManager.add_knowledge(interaction.user.id, literature=award)
+            total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+            embed = discord.Embed(
+                title="📖 Study complete!",
+                description=f"🪙 You gained {award} Literature Knowledge!\n\nYour total Literature Knowledge is now **{total_knowledge['literature']:,}** 🪙",
+                color=discord.Color.green()
+            )
+            embed.set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")            
+            await interaction.response.send_message(embed=embed)
+            await LevelManager.add_experience(interaction.user.id, total_xp)
+            
+        else:
+            await interaction.response.send_message(embed=discord.Embed(
+                                                    title="❌Invalid category",
+                                                    description="Try one of these options: science, medicince, economics or literature", 
+                                                    color=discord.Color.red()),
+                                                    ephemeral=True
+                                                    )
+                                                    
