@@ -1,5 +1,5 @@
 import aiosqlite, json
-from user_manager import UserManager
+from user_manager import *
 
 class KnowledgeManager:
     @staticmethod

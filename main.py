@@ -1,17 +1,10 @@
-import discord, os, aiosqlite
+import discord, os
 from discord.ext import commands
-from discord import app_commands
 from dotenv import load_dotenv
-from dataclasses import dataclass
 from items import *
 from database_manager import DatabaseManager
-from inventory_manager import InventoryManager
-from user_manager import UserManager
-from economy_manager import EconomyManager
 from commands import BasicCommands
 from buttons import *
-from level_manager import LevelManager
-from knowledge_manager import KnowledgeManager
 
 
 intents = discord.Intents.all()
@@ -25,7 +18,6 @@ TOKEN = os.getenv("BOT_TOKEN")
 @client.event
 async def on_ready():
     await DatabaseManager.init_database()
-    await DatabaseManager.add_column_to_table("database.db", "last_used", "study", "TIMESTAMP", None)
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
