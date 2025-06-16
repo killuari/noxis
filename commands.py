@@ -417,5 +417,5 @@ class BasicCommands(commands.Cog):
                 color=discord.Color.green()
             ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
         await interaction.response.send_message(embed=embed)
-        await LevelManager.add_experience(interaction.user.id, total_xp)
+        await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
                                                     
