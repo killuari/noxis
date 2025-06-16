@@ -5,7 +5,7 @@ from items import *
 from database_manager import DatabaseManager
 from commands import BasicCommands
 from buttons import *
-from knowledge_manager import KnowledgeManager
+from inventory_manager import InventoryManager
 
 
 intents = discord.Intents.all()

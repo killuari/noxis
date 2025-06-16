@@ -127,7 +127,53 @@ class BasicCommands(commands.Cog):
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
             return
+
+    async def autocomplete_items_in_inventory(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        if not await UserManager.user_exists(interaction.user.id):
+            return []
         
+        # wir müssens btw mit autocomplete statt richtigen choices hier machen
+        # weil wir ja live wissen müssen was der jeweilige user im inv hat
+        # also kann mans nicht vordefinieren, auch nicht mit nem Literal oder so
+        # dank memer hats hier in dem fall auch mit autocomplete gelöst
+
+        suggestions = [ # diesmal die comprehension auf mehrere zeilen aufgeteilt
+            app_commands.Choice(name=item.name, value=item.name) 
+            for item in await InventoryManager.get_inventory(interaction.user.id) 
+            if current.lower() in item.name.lower()
+        ]
+
+        # Discord erlaubt max. 25 Vorschläge
+        return suggestions[:25]
+
+    @app_commands.command(name="sell", description="Sell items from your inventory")
+    @app_commands.autocomplete(item=autocomplete_items_in_inventory)
+    async def sell(self, interaction: discord.Interaction, item: str, quantity: int = 1):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        item = await ItemManager.get_item_by_name(item)
+        if not item:
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()))
+            return
+        
+        user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
+        if user_item_quantity == 0:
+            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()))
+            return
+        elif user_item_quantity < quantity:
+            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough {item.name}!", color=discord.Color.red()))
+            return
+        
+        percentage_range = (0.8, 2)
+        sell_value = random.randint(int(percentage_range[0]*item.value), int(percentage_range[1]*item.value))
+
+        await EconomyManager.add_money(interaction.user.id, sell_value * quantity)
+        await InventoryManager.remove_item(interaction.user.id, item.item_id, quantity=quantity)
+
+        await interaction.response.send_message(embed=discord.Embed(title="💸 Item sold!", description=f"Sold {quantity:,} {item.name} for: {sell_value*quantity:,}$", color=discord.Color.gold()))
+
     @app_commands.command(name="daily", description="Your daily reward")
     async def daily(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
