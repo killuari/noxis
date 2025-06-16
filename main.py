@@ -5,7 +5,7 @@ from items import *
 from database_manager import DatabaseManager
 from commands import BasicCommands
 from buttons import *
-from inventory_manager import InventoryManager
+from knowledge_manager import KnowledgeManager
 
 
 intents = discord.Intents.all()
@@ -18,11 +18,6 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 @client.event
 async def on_ready():
-    async with aiosqlite.connect("database.db") as db:
-        cursor = await db.cursor()
-        await cursor.execute("DROP TABLE IF EXISTS inventory")
-        await db.commit()
-
     await DatabaseManager.init_database()
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
