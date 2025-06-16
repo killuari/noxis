@@ -38,7 +38,7 @@ ITEMS = {
         name="Bread",
         description="A fresh piece of bread for sustenance",
         rarity=Rarity.COMMON,
-        value=3,
+        value=100,
         max_stack=50,
         usable=True,
         metadata={
@@ -50,8 +50,8 @@ ITEMS = {
         name="Water Bottle",
         description="A bottle of drinking water",
         rarity=Rarity.COMMON,
-        value=5,
-        max_stack=20,
+        value=100,
+        max_stack=30,
         usable=True,
     ),
     3: Item(
@@ -59,7 +59,7 @@ ITEMS = {
         name="Rope",
         description="Sturdy rope useful for climbing or securing",
         rarity=Rarity.UNCOMMON,
-        value=15,
+        value=250,
         max_stack=40,
         usable=False,
     ),
@@ -68,7 +68,7 @@ ITEMS = {
         name="Iron Sword",
         description="A solid iron sword",
         rarity=Rarity.UNCOMMON,
-        value=75,
+        value=1000,
         max_stack=5,
         usable=False,
         metadata={
@@ -98,7 +98,7 @@ ITEMS = {
         name="Nails Pack",
         description="A bundle of nails for building and repairs",
         rarity=Rarity.COMMON,
-        value=5,
+        value=50,
         max_stack=100,
         usable=False,
     ),
@@ -107,7 +107,7 @@ ITEMS = {
         name="Tent",
         description="A simple tent for overnight stays outdoors",
         rarity=Rarity.RARE,
-        value=200,
+        value=5000,
         max_stack=5,
         usable=True,
     ),
@@ -116,8 +116,8 @@ ITEMS = {
         name="Blanket",
         description="Keeps you warm during cold nights",
         rarity=Rarity.COMMON,
-        value=20,
-        max_stack=5,
+        value=200,
+        max_stack=20,
         usable=False,
     ),
     10: Item(
@@ -125,7 +125,7 @@ ITEMS = {
         name="Cooking Pot",
         description="Pot for cooking over an open fire",
         rarity=Rarity.UNCOMMON,
-        value=45,
+        value=500,
         max_stack=1,
         usable=False,
     ),
@@ -134,7 +134,7 @@ ITEMS = {
         name="Food Rations",
         description="Prepackaged rations for traveling",
         rarity=Rarity.UNCOMMON,
-        value=25,
+        value=500,
         max_stack=20,
         usable=True,
     ),
@@ -143,7 +143,7 @@ ITEMS = {
         name="Flint and Steel",
         description="Used to start a fire",
         rarity=Rarity.UNCOMMON,
-        value=30,
+        value=200,
         max_stack=10,
         usable=True,
     ),
@@ -152,7 +152,7 @@ ITEMS = {
         name="Backpack",
         description="qdh",
         rarity=Rarity.RARE,
-        value=150,
+        value=2000,
         max_stack=10,
         usable=False,
     ),
@@ -161,7 +161,7 @@ ITEMS = {
         name="Map",
         description="Map of the surrounding area",
         rarity=Rarity.COMMON,
-        value=10,
+        value=200,
         max_stack=10,
         usable=False,
     ),
@@ -170,7 +170,7 @@ ITEMS = {
         name="Compass",
         description="Shows cardinal directions",
         rarity=Rarity.UNCOMMON,
-        value=40,
+        value=400,
         max_stack=15,
         usable=False,
     ),
@@ -179,7 +179,7 @@ ITEMS = {
         name="Lantern",
         description="Oil lantern for dark areas",
         rarity=Rarity.UNCOMMON,
-        value=50,
+        value=500,
         max_stack=20,
         usable=True,
     ),
@@ -188,7 +188,7 @@ ITEMS = {
         name="Bow",
         description="A simple bow for ranged combat",
         rarity=Rarity.UNCOMMON,
-        value=80,
+        value=800,
         max_stack=5,
         usable=False,
     ),
@@ -197,7 +197,7 @@ ITEMS = {
         name="Arrows",
         description="Standard arrows for the bow",
         rarity=Rarity.COMMON,
-        value=3,
+        value=30,
         max_stack=100,
         usable=False,
     ),
@@ -206,7 +206,7 @@ ITEMS = {
         name="Torch",
         description="A torch that provides light for a while",
         rarity=Rarity.COMMON,
-        value=10,
+        value=300,
         max_stack=20,
         usable=True,
     ),
@@ -215,7 +215,7 @@ ITEMS = {
         name="Mystery Box",
         description="Contains a random reward (mostly practical items)",
         rarity=Rarity.EPIC,
-        value=200,
+        value=2000,
         max_stack=5,
         usable=True,
         metadata={
@@ -239,6 +239,14 @@ class ItemManager:
         """Holt Item-Definition aus dem ITEMS Dict"""
         if await ItemManager.item_exists(item_id):
             return ITEMS.get(item_id)
+        
+    @staticmethod
+    async def get_item_by_name(name: str) -> Optional[Item]:
+        """Holt das komplette Item-Objekt anhand des Namens"""
+        for item in ITEMS.values():
+            if item.name.lower() == name.lower():
+                return item
+        return None
     
     @staticmethod
     async def get_items_by_rarity(rarity: Rarity) -> List[Item]:
