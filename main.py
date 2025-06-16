@@ -25,6 +25,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 @client.event
 async def on_ready():
     await DatabaseManager.init_database()
+    await DatabaseManager.add_column_to_table("database.db", "last_used", "study", "TIMESTAMP", None)
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
