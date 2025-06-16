@@ -64,6 +64,10 @@ class InventoryManager:
     @staticmethod
     async def get_inventory(user_id: int) -> List[Item]:
         """Get List of all Items of an Inventory"""
+        if not await UserManager.user_exists(user_id):
+            print("User doesnt exist")
+            return
+        
         items = []
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
@@ -84,5 +88,9 @@ class InventoryManager:
 
 
     @staticmethod
-    async def get_inventory_value():
-        pass
+    async def get_inventory_value(user_id: int):
+        if not await UserManager.user_exists(user_id):
+            print("User doesnt exist")
+            return
+         
+        return sum(item.value * item.quantity for item in await InventoryManager.get_inventory(user_id))
