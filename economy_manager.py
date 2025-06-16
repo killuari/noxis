@@ -1,4 +1,4 @@
-import aiosqlite, discord
+import aiosqlite, discord, math
 from typing import Tuple
 from user_manager import UserManager
 
@@ -101,6 +101,25 @@ class EconomyManager:
         return money_left                              
     
     @staticmethod
+    async def round_one_significant(n: int) -> int:
+        """ Rundet einen int auf eine signifikante Stelle."""
+        if n == 0:
+            return 0
+        
+        # Anzahl der Stellen bestimmen
+        digits = int(math.floor(math.log10(n))) + 1
+        factor = 10 ** (digits - 1)
+        leading = n / factor
+        floored = math.floor(leading)
+
+        if (leading - floored) >= 0.5:
+            rounded_leading = floored + 1
+        else:
+            rounded_leading = floored
+
+        return rounded_leading * factor
+
+    @staticmethod
     async def get_max_bank_capacity(user_id: int) -> int:
         if not await UserManager.user_exists(user_id):
             print("User doesnt exist")
@@ -112,5 +131,5 @@ class EconomyManager:
             level = (await cursor.fetchone())[0]
 
         base_capacity = 1000
-        scaling_factor = 1.2
-        return int(base_capacity * (level ** scaling_factor))
+        scaling_factor = 2
+        return await EconomyManager.round_one_significant(int(base_capacity * (level ** scaling_factor)))
