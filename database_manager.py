@@ -135,7 +135,7 @@ class DatabaseManager:
             return False
         
     @staticmethod
-    async def get_ranking(user: discord.User, table: str, sort_by: str) -> Tuple[int, int]:
+    async def get_ranking(player_id: discord.User, table: str, sort_by: str) -> Tuple[int, int]:
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             await cursor.execute(f"SELECT user_id FROM {table} ORDER BY {sort_by} DESC")
@@ -144,7 +144,7 @@ class DatabaseManager:
                 print("No ranking found")
                 return
             for idx, (user_id,) in enumerate(leaderboard, start=1):
-                if user_id == user.id:
+                if user_id == player_id:
                     rank = idx
                     
         return (rank, len(leaderboard))

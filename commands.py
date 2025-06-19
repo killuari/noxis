@@ -29,33 +29,24 @@ class BasicCommands(commands.Cog):
             cursor = await db.cursor()
             # get balance of user who used the command
             if user is None:
-                await cursor.execute("SELECT user_id, balance, bank_balance FROM users ORDER BY total_balance DESC")
-                leaderboard = await cursor.fetchall()                             
-                if not leaderboard:
-                    await interaction.response.send_message(embed=discord.Embed(title="No ranking found.", color=discord.Color.red()), ephemeral=True)
-                    return
-                for idx, (user_id, balance, bank_balance) in enumerate(leaderboard, start=1):
-                    if user_id == interaction.user.id:
-                        rank = idx
-                        max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
-                        return
+                await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (interaction.user.id,))
+                balance, bank_balance = await cursor.fetchone()                             
+                rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
+                max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
+                return
                     
             # get balance of other user
             else:
-                await cursor.execute("SELECT user_id, balance, bank_balance FROM users ORDER BY total_balance DESC")
-                leaderboard = await cursor.fetchall()                             
-                if not leaderboard:
-                    await interaction.response.send_message(embed=discord.Embed(title="No ranking found.", color=discord.Color.red()), ephemeral=True)
-                    return
-                for idx, (user_id, balance, bank_balance) in enumerate(leaderboard, start=1):
-                    if user_id == user.id:                
-                        rank = idx
-                        max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
-                        return
-                    else:
-                        user_found = False
+                await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user.id,))
+                result = await cursor.fetchone()  
+                if result is not None or result[0] is not None:
+                    balance, bank_balance = result                        
+                    rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
+                    max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
+                else:
+                    user_found = False
                 if not user_found:
                     await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
 
@@ -541,13 +532,13 @@ class BasicCommands(commands.Cog):
                               title=f"{user.name}"
         ).set_thumbnail(url=user.avatar.url.split("?")[0])
         
-        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "level")                  
-        embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}` `({experience}/{req_exp}XP)`", inline=True)
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
+        embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nExperience: `{experience}/{req_exp}`", inline=True)
         
-        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "total_balance")                  
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
         embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
                        
-        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "inv_value")                  
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
         embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total[0] if total != [] else 0}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
                         
         embed.add_field(name="", value="", inline=True)                        
