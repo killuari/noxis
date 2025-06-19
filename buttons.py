@@ -53,20 +53,20 @@ class HigherLower(discord.ui.View):
         if self.user_id != interaction.user.id:
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
             
-        if self.comparison_num in range(1,101) or self.comparison_num in range(900, 1001):
-            difficulty_factor = random.randint(4, 5)
-        elif self.comparison_num in range(400,601):
-            difficulty_factor = random.randint(2, 3)     
+        if self.comparison_num in range(1,201):
+            difficulty_factor = 0.8
+        elif self.comparison_num in self.comparison_num in range(800, 1001):
+            difficulty_factor = random.randint(4, 5) 
         else:
-            difficulty_factor = random.randint(1,2)
+            difficulty_factor = random.randint(1, 2)
             
         if self.secret_num > self.comparison_num:
-            money = difficulty_factor * self.money
+            self.money *= difficulty_factor
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
-            await EconomyManager.add_money(self.user_id, money, False)
+            await EconomyManager.add_money(self.user_id, self.money, False)
             
             embed=discord.Embed(title="Correct! It was higher!",
-                                description=f"You gained:\n{money:,}$",
+                                description=f"You gained:\n{self.money:,}$",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")
             
@@ -109,12 +109,12 @@ class HigherLower(discord.ui.View):
         if self.user_id != interaction.user.id:
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
             
-        if self.comparison_num in range(1,101) or self.comparison_num in range(900, 1001):
-            difficulty_factor = random.randint(3, 5)
-        elif self.comparison_num in range(400,601):
-            difficulty_factor = random.randint(1, 2)   
+        if self.comparison_num in range(1,201):
+            difficulty_factor = random.randint(4, 5) 
+        elif self.comparison_num in self.comparison_num in range(800, 1001):
+            difficulty_factor = 0.8
         else:
-            difficulty_factor = random.randint(1,2)
+            difficulty_factor = random.randint(1, 2)
             
         if self.secret_num < self.comparison_num:
             money = difficulty_factor * self.money
@@ -167,7 +167,7 @@ class HigherLower(discord.ui.View):
                                 
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
             money = 6.5 * self.exp_award
-            await LevelManager.add_experience(self.user_id, self.money, self.webhook_url)                
+            await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
             await EconomyManager.add_money(self.user_id, money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
             quantity = random.randint(1,5)

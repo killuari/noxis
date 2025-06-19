@@ -473,7 +473,7 @@ class BasicCommands(commands.Cog):
         
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("SELECT study FROM last_used WHERE user_id=?", (interaction.user.id,))
+            await cursor.execute("SELECT higherlower FROM last_used WHERE user_id=?", (interaction.user.id,))
             result = await cursor.fetchone()
             last_game = result[0]
             claim_available = False
@@ -488,10 +488,10 @@ class BasicCommands(commands.Cog):
             if not claim_available:
                 next_available = current_time + datetime.timedelta(seconds=25)
                 timestamp = int(next_available.timestamp())
-                await interaction.response.send_message(embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's avaible in: <t:{timestamp}:R>", color=discord.Color.yellow()))
+                await interaction.response.send_message(embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()))
                 return
             
-            await cursor.execute("UPDATE last_used SET study=? WHERE user_id=?", (current_time, interaction.user.id))
+            await cursor.execute("UPDATE last_used SET higherlower=? WHERE user_id=?", (current_time, interaction.user.id))
             await db.commit()
 
         secret_num = random.randint(1,1000)
