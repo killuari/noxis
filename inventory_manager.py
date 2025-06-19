@@ -104,5 +104,5 @@ class InventoryManager:
         
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            cursor.execute("UPDATE users SET inv_value=? WHERE user_id=?", (value, user_id))
+            await cursor.execute("UPDATE users SET inv_value=? WHERE user_id=?", (value, user_id))
             await db.commit()
