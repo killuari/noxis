@@ -555,7 +555,18 @@ class BasicCommands(commands.Cog):
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
         embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total[0] if total != [] else 0}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
-                        
+                       
+        knowledge = await KnowledgeManager.get_knowledge(user.id)
+        science = knowledge["science"]
+        stat_science = await KnowledgeManager.get_knowledge_threshold(science)
+        medicine = knowledge["medicine"]
+        stat_medicine = await KnowledgeManager.get_knowledge_threshold(medicine)
+        economics = knowledge["economics"]
+        stat_economics = await KnowledgeManager.get_knowledge_threshold(economics)
+        literature = knowledge["literature"]
+        stat_literature = await KnowledgeManager.get_knowledge_threshold(literature)
+        embed.add_field(name="Knowledge", value=f"\nScience: `{science}` -> {stat_science}\nMedicine: `{medicine}` -> {stat_medicine}\nEconomics: `{economics}` -> {stat_economics}\nLiterature: `{literature}` -> {stat_literature}", inline=True)
+                              
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             await cursor.execute("SELECT cmd_used FROM users WHERE user_id=?", (user.id,))
