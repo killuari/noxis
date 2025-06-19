@@ -1,4 +1,5 @@
-import aiosqlite, os
+import aiosqlite, os, discord
+from typing import Tuple
 
 class DatabaseManager:
     
@@ -17,6 +18,7 @@ class DatabaseManager:
                     experience INTEGER DEFAULT 0,
                     knowledge JSON DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    inv_value INTEGER DEFAULT 0,
                     PRIMARY KEY (user_id)
                 )
             """)
@@ -131,3 +133,18 @@ class DatabaseManager:
             if 'conn' in locals():
                 await conn.close()
             return False
+        
+    @staticmethod
+    async def get_ranking(user: discord.User, table: str, sort_by: str) -> Tuple[int, int]:
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute(f"SELECT user_id FROM {table} ORDER BY {sort_by} DESC")
+            leaderboard = await cursor.fetchall()                           
+            if not leaderboard:
+                print("No ranking found")
+                return
+            for idx, (user_id,) in enumerate(leaderboard, start=1):
+                if user_id == user.id:
+                    rank = idx
+                    
+        return (rank, len(leaderboard))

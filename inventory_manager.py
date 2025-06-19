@@ -27,6 +27,7 @@ class InventoryManager:
                 await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
 
             await db.commit()
+            await InventoryManager.update_inventory_value(user_id)
             return 0
 
     @staticmethod
@@ -44,6 +45,7 @@ class InventoryManager:
             else:
                 await cursor.execute("UPDATE inventory SET quantity = quantity - ? WHERE (user_id, item_id) = (?, ?)", (quantity, user_id, item_id))
                 
+            await InventoryManager.update_inventory_value(user_id)
             await db.commit()
                 
     @staticmethod
@@ -94,3 +96,13 @@ class InventoryManager:
             return
          
         return sum(item.value * item.quantity for item in await InventoryManager.get_inventory(user_id))
+    
+    
+    @staticmethod
+    async def update_inventory_value(user_id: int):
+        value = await InventoryManager.get_inventory_value(user_id)
+        
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            cursor.execute("UPDATE users SET inv_value=? WHERE user_id=?", (value, user_id))
+            await db.commit()

@@ -518,3 +518,38 @@ class BasicCommands(commands.Cog):
         view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
         await interaction.response.send_message(embed=embed, view=view)
 
+    @app_commands.command(name="profile", description="Show your or someones profile")
+    async def profile(self, interaction: discord.Interaction, player: discord.User=None):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return        
+        
+        user = interaction.user
+         
+        if player is not None:
+            user = player
+            
+        level, experience = await LevelManager.get_lvl_exp(user.id)
+        inv = await InventoryManager.get_inventory(user.id)
+        total = [item.quantity + item.quantity for item in inv]
+        inv_value = await InventoryManager.get_inventory_value(user.id)
+        balance, bank_balance = await EconomyManager.get_balance(user.id)
+        total_balance = await EconomyManager.get_total_balance(user.id)
+        req_exp = LevelManager.calculate_exp_for_level(level+1)
+
+        embed = discord.Embed(
+                              title=f"{user.name}"
+        ).set_thumbnail(url=user.avatar.url.split("?")[0])
+        
+        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "level")                  
+        embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}` `({experience}/{req_exp}XP)`", inline=True)
+        
+        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "total_balance")                  
+        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
+                       
+        rank, leaderboard = await DatabaseManager.get_ranking(user, "users", "inv_value")                  
+        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total[0] if total != [] else 0}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
+                        
+        embed.add_field(name="", value="", inline=True)                        
+        
+        await interaction.response.send_message(embed=embed)
