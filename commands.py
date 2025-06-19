@@ -534,9 +534,9 @@ class BasicCommands(commands.Cog):
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
-        progess_curr = int(progess_curr * 5) 
+        progess_curr = round(progess_curr * 5) 
         green_bars = progess_curr * "🟩"
-        progress_left = 5 - progess_curr
+        progress_left = int(5 - progess_curr)
         black_bars = progress_left * "⬛"
         progress_bar = green_bars + black_bars
         embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nXP: `{experience}/{req_exp}`\n{progress_bar}", inline=True)
