@@ -175,7 +175,7 @@ class HigherLower(discord.ui.View):
             answer_choice = random.choice(["Very good", "Nice guess", "Good job"])
             
             embed=discord.Embed(title=f"CORRECT! {answer_choice}! It was in the range of +-50!",
-                                description=f"You gained:\n{money:,}$\n{item.name}",
+                                description=f"You gained:\n{money:,}$\n{quantity}x {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
@@ -229,7 +229,7 @@ class HigherLower(discord.ui.View):
             answer_choice = random.choice(["Big Win", "Lucky guess"])
 
             embed=discord.Embed(title=f"INSANE! {answer_choice}! The numbers were the same!",
-                                description=f"You gained:\n{money:,}$\n{item.name}",
+                                description=f"You gained:\n{money:,}$\n{quantity}x {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
