@@ -20,6 +20,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def on_ready():
     await DatabaseManager.init_database()
     # await DatabaseManager.add_column_to_table("database.db", "users", "inv_value", "INTEGER", None)
+    # await DatabaseManager.add_column_to_table("database.db", "users", "cmd_used", "INTEGER", 0)
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 

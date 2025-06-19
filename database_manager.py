@@ -19,6 +19,7 @@ class DatabaseManager:
                     knowledge JSON DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     inv_value INTEGER DEFAULT 0,
+                    cmd_used INTEGER DEFAULT 0,
                     PRIMARY KEY (user_id)
                 )
             """)
@@ -148,3 +149,10 @@ class DatabaseManager:
                     rank = idx
                     
         return (rank, len(leaderboard))
+    
+    @staticmethod
+    async def update_cmd_used(user_id: int):
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("UPDATE users SET cmd_used=cmd_used+? WHERE user_id=?", (1, user_id))
+            await db.commit()
