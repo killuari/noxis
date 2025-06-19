@@ -383,6 +383,7 @@ class BasicCommands(commands.Cog):
                 # 40% chance for success
                 else:
                     await EconomyManager.remove_money(user.id, robbed_money)
+                    await EconomyManager.add_money(interaction.user.id, robbed_money)
                     await interaction.response.send_message(embed=discord.Embed(
                     title="💰 Robbery Successful!", 
                     description=f"Stolen amount: {robbed_money:,}$",
