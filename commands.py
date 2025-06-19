@@ -465,3 +465,56 @@ class BasicCommands(commands.Cog):
         await interaction.response.send_message(embed=embed)
         await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
                                                     
+    @app_commands.command(name="higherlower", description="Play higher or lower")
+    async def highlower(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT study FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_game = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+
+            if result is None or last_game is None:
+                claim_available = True
+            else:
+                last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_game + datetime.timedelta(seconds=25))
+            
+            if not claim_available:
+                next_available = current_time + datetime.timedelta(seconds=25)
+                timestamp = int(next_available.timestamp())
+                await interaction.response.send_message(embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's avaible in: <t:{timestamp}:R>", color=discord.Color.yellow()))
+                return
+            
+            await cursor.execute("UPDATE last_used SET study=? WHERE user_id=?", (current_time, interaction.user.id))
+            await db.commit()
+
+        secret_num = random.randint(1,1000)
+        comparison_num = random.randint(1, 1000)
+    
+        embed = discord.Embed(title="Higher or Lower",
+                        color=discord.Color.dark_teal())
+        
+        embed.add_field(name="Game instruction:",
+                        value="""You are given a comparison number.
+                        Your task is to decide whether the secret number is **higher** or **lower** than the comparison number.
+                        The secret number is randomly chosen between 1 to 1000.""",
+                        inline=False)
+        
+        embed.add_field(name="The **secret** number is:",
+                        value=f"⬛",
+                        inline=True)
+
+        embed.add_field(name="The **comp-number** is:",
+                        value=f"{comparison_num}",
+                        inline=True)      
+
+        webhook_url = interaction.followup.url
+        view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
+        await interaction.response.send_message(embed=embed, view=view)
+
