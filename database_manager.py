@@ -29,6 +29,7 @@ class DatabaseManager:
                     scavenge TIMESTAMP,
                     rob TIMESTAMP,
                     study TIMESTAMP,
+                    higherlower TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)

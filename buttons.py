@@ -117,12 +117,12 @@ class HigherLower(discord.ui.View):
             difficulty_factor = random.randint(1, 2)
             
         if self.secret_num < self.comparison_num:
-            money = difficulty_factor * self.money
+            self.money *= difficulty_factor 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
-            await EconomyManager.add_money(self.user_id, money, False)
+            await EconomyManager.add_money(self.user_id, self.money, False)
                 
             embed=discord.Embed(title="Correct! It was lower!",
-                                description=f"You gained:\n{money:,}$",
+                                description=f"You gained:\n{self.money:,}$",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")
                 
@@ -166,16 +166,16 @@ class HigherLower(discord.ui.View):
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
                                 
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
-            money = 6.5 * self.exp_award
+            self.money = 6.5 * self.exp_award
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
-            await EconomyManager.add_money(self.user_id, money, False)
+            await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
             quantity = random.randint(1,5)
             await InventoryManager.add_item(self.user_id, item.item_id, quantity)
             answer_choice = random.choice(["Very good", "Nice guess", "Good job"])
             
             embed=discord.Embed(title=f"CORRECT! {answer_choice}! It was in the range of +-50!",
-                                description=f"You gained:\n{money:,}$\n{quantity}x {item.name}",
+                                description=f"You gained:\n{self.money:,}$\n{quantity}x {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
@@ -220,16 +220,16 @@ class HigherLower(discord.ui.View):
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
             
         if self.secret_num == self.comparison_num:
-            money = 10 * self.money
+            self.money = 10 * self.money
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
-            await EconomyManager.add_money(self.user_id, money, False)
+            await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.EPIC))
             quantity = random.randint(1,3)            
             await InventoryManager.add_item(self.user_id, item.item_id, quantity)
             answer_choice = random.choice(["Big Win", "Lucky guess"])
 
             embed=discord.Embed(title=f"INSANE! {answer_choice}! The numbers were the same!",
-                                description=f"You gained:\n{money:,}$\n{quantity}x {item.name}",
+                                description=f"You gained:\n{self.money:,}$\n{quantity}x {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
