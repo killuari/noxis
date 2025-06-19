@@ -166,7 +166,7 @@ class HigherLower(discord.ui.View):
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
                                 
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
-            self.money = 6.5 * self.exp_award
+            self.money *= 6.5 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
@@ -220,7 +220,7 @@ class HigherLower(discord.ui.View):
             interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
             
         if self.secret_num == self.comparison_num:
-            self.money = 10 * self.money
+            self.money *= 10 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.EPIC))
