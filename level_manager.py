@@ -1,15 +1,31 @@
-import aiosqlite, discord, aiohttp
+import aiosqlite, discord, aiohttp, math
 from user_manager import UserManager
 from typing import Tuple
 
 
 class LevelManager:
+    @staticmethod
+    def round_level_requirement(n: int) -> int:
+        """ Rundet einen int, dass die letzten beiden stellen 0 werden"""
+        if n < 100:
+            return 100
+        
+        leading = n / 100
+        floored = math.floor(leading)
+
+        if (leading - floored) >= 0.5:
+            rounded_leading = floored + 1
+        else:
+            rounded_leading = floored
+
+        return rounded_leading * 100
+
     # calculates the experience required for a given level
     @staticmethod
     def calculate_exp_for_level(level: int) -> int:
         base_exp = 100
         scaling_factor = 1.5
-        return int(base_exp * level * scaling_factor)
+        return LevelManager.round_level_requirement(base_exp * (level ** scaling_factor))
 
     # calculates the level and remaining experience from a given total experience
     @staticmethod
@@ -39,8 +55,8 @@ class LevelManager:
             total_exp = cur_experience + abs(amount)
             new_exp, new_level = total_exp, cur_level
             
-            if total_exp >= LevelManager.calculate_exp_for_level(cur_level+1):
-                new_exp -= LevelManager.calculate_exp_for_level(cur_level+1)
+            while new_exp >= LevelManager.calculate_exp_for_level(new_level+1):
+                new_exp -= LevelManager.calculate_exp_for_level(new_level+1)
                 new_level += 1
             
             await cursor.execute("UPDATE users SET level=?, experience=? WHERE user_id=?", (new_level, new_exp, user_id))
@@ -49,7 +65,9 @@ class LevelManager:
             if new_level > cur_level and webhook_url:
                 async with aiohttp.ClientSession() as session:
                     webhook = discord.Webhook.from_url(webhook_url, session=session)
-                    await webhook.send(embed=discord.Embed(title="Level Up", description=f"You reached level **{new_level}**!", color=discord.Color.gold()))
+                    while new_level > cur_level:
+                        cur_level += 1
+                        await webhook.send(embed=discord.Embed(title="Level Up", description=f"You reached level **{cur_level}**!", color=discord.Color.gold()))
             
     # sets the experience of a user to a specific amount and updates their level           
     @staticmethod
