@@ -1,4 +1,5 @@
-import aiosqlite, os
+import aiosqlite, os, discord
+from typing import Tuple
 
 class DatabaseManager:
     
@@ -17,6 +18,9 @@ class DatabaseManager:
                     experience INTEGER DEFAULT 0,
                     knowledge JSON DEFAULT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    inv_value INTEGER DEFAULT 0,
+                    cmd_used INTEGER DEFAULT 0,
+                    total_knowledge DEFAULT 0,
                     PRIMARY KEY (user_id)
                 )
             """)
@@ -113,7 +117,7 @@ class DatabaseManager:
                 
                 # Tabellenschema anzeigen zur Bestätigung
                 await cursor.execute(f"PRAGMA table_info({table_name})")
-                columns_info = cursor.fetchall()
+                columns_info = await cursor.fetchall()
                 print("\nAktuelles Tabellenschema:")
                 for col in columns_info:
                     print(f"  {col[1]} ({col[2]})")
@@ -131,3 +135,25 @@ class DatabaseManager:
             if 'conn' in locals():
                 await conn.close()
             return False
+        
+    @staticmethod
+    async def get_ranking(player_id: discord.User, table: str, sort_by: str) -> Tuple[int, int]:
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute(f"SELECT user_id FROM {table} ORDER BY {sort_by} DESC")
+            leaderboard = await cursor.fetchall()                           
+            if not leaderboard:
+                print("No ranking found")
+                return
+            for idx, (user_id,) in enumerate(leaderboard, start=1):
+                if user_id == player_id:
+                    rank = idx
+                    
+        return (rank, len(leaderboard))
+    
+    @staticmethod
+    async def update_cmd_used(user_id: int):
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("UPDATE users SET cmd_used=cmd_used+? WHERE user_id=?", (1, user_id))
+            await db.commit()

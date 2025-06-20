@@ -29,33 +29,25 @@ class BasicCommands(commands.Cog):
             cursor = await db.cursor()
             # get balance of user who used the command
             if user is None:
-                await cursor.execute("SELECT user_id, balance, bank_balance FROM users ORDER BY total_balance DESC")
-                leaderboard = await cursor.fetchall()                             
-                if not leaderboard:
-                    await interaction.response.send_message(embed=discord.Embed(title="No ranking found.", color=discord.Color.red()), ephemeral=True)
-                    return
-                for idx, (user_id, balance, bank_balance) in enumerate(leaderboard, start=1):
-                    if user_id == interaction.user.id:
-                        rank = idx
-                        max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
-                        return
+                await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (interaction.user.id,))
+                balance, bank_balance = await cursor.fetchone()                             
+                rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
+                max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+                return
                     
             # get balance of other user
             else:
-                await cursor.execute("SELECT user_id, balance, bank_balance FROM users ORDER BY total_balance DESC")
-                leaderboard = await cursor.fetchall()                             
-                if not leaderboard:
-                    await interaction.response.send_message(embed=discord.Embed(title="No ranking found.", color=discord.Color.red()), ephemeral=True)
-                    return
-                for idx, (user_id, balance, bank_balance) in enumerate(leaderboard, start=1):
-                    if user_id == user.id:                
-                        rank = idx
-                        max_bank_balance = await EconomyManager.get_max_bank_capacity(user_id)
-                        await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: {rank} out of {len(leaderboard)}\n\n💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
-                        return
-                    else:
-                        user_found = False
+                await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user.id,))
+                result = await cursor.fetchone()  
+                if result is None or result[0] is None:
+                    user_found = False
+                else:
+                    balance, bank_balance = result                        
+                    rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
+                    max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+                    await DatabaseManager.update_cmd_used(interaction.user.id)
                 if not user_found:
                     await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
 
@@ -90,7 +82,8 @@ class BasicCommands(commands.Cog):
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited {(amount-money_left):,}$" + (" (Max bank capacity reached)" if money_left > 0 else ""), description=f"💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully deposited `{(amount-money_left):,}$`" + (" (Max bank capacity reached)" if money_left > 0 else ""), description=f"💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+            await DatabaseManager.update_cmd_used(interaction.user.id)
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
@@ -122,7 +115,8 @@ class BasicCommands(commands.Cog):
 
             balance, bank_balance = await EconomyManager.get_balance(interaction.user.id)
             max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrawn {amount:,}$", description=f"💵: {balance:,}$\n\n🏦: {bank_balance:,}$ / {max_bank_balance:,}$", color=discord.Color.green()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"Successfully withdrawn `{amount:,}$`", description=f"💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+            await DatabaseManager.update_cmd_used(interaction.user.id)
 
         except ValueError:
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
@@ -155,15 +149,15 @@ class BasicCommands(commands.Cog):
         
         item = await ItemManager.get_item_by_name(item)
         if not item:
-            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
             return
         
         user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
         if user_item_quantity == 0:
-            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
             return
         elif user_item_quantity < quantity:
-            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough {item.name}!", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough `{item.name}!`", color=discord.Color.red()), ephemeral=True)
             return
         
         percentage_range = (0.8, 2)
@@ -171,8 +165,8 @@ class BasicCommands(commands.Cog):
 
         await EconomyManager.add_money(interaction.user.id, sell_value * quantity)
         await InventoryManager.remove_item(interaction.user.id, item.item_id, quantity=quantity)
-
-        await interaction.response.send_message(embed=discord.Embed(title="💸 Item sold!", description=f"Sold {quantity:,} {item.name} for: {sell_value*quantity:,}$", color=discord.Color.gold()))
+        await interaction.response.send_message(embed=discord.Embed(title="💸 Item sold!", description=f"Sold `{quantity:,} {item.name} for: {sell_value*quantity:,}$`", color=discord.Color.gold()))
+        await DatabaseManager.update_cmd_used(interaction.user.id)
 
     @app_commands.command(name="daily", description="Your daily reward")
     async def daily(self, interaction: discord.Interaction):
@@ -200,9 +194,10 @@ class BasicCommands(commands.Cog):
                 await EconomyManager.add_money(interaction.user.id, 1000)
                 await interaction.response.send_message(embed=discord.Embed(
                     title="You successfully claimed your daily Reward!", 
-                    description="1,000$ have been added to your Wallet", 
+                    description="`1,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
                 await LevelManager.add_experience(interaction.user.id, 100, interaction.followup.url)
+                await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(days=1)
                 timestamp = int(next_daily_time.timestamp())
@@ -235,9 +230,10 @@ class BasicCommands(commands.Cog):
                 await EconomyManager.add_money(interaction.user.id, 15000)
                 await interaction.response.send_message(embed=discord.Embed(
                     title="You successfully claimed your weekly Reward!", 
-                    description="15,000$ have been added to your Wallet", 
+                    description="`15,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
                 await LevelManager.add_experience(interaction.user.id, 500, interaction.followup.url)
+                await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(weeks=1)
                 timestamp = int(next_daily_time.timestamp())
@@ -281,32 +277,32 @@ class BasicCommands(commands.Cog):
                 # 25% chance to get some money
                 elif reward_chance <= 0.65:
                     money = random.randint(100, 500)
-                    found_msg = f"💰 **Found {money}$!**"
+                    found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
                     experience = 15
 
                 # 20% chance to get more money 
                 elif reward_chance <= 0.85:
                     money = random.randint(500, 1500)
-                    found_msg = f"💰 **Found {money}$!**"
+                    found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
                     experience = 25
 
                 # 10% chance to get money and a common item
                 elif reward_chance <= 0.95:
                     money = random.randint(750, 2000)
-                    found_msg = f"💰 **Found {money}$!**"
+                    found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
 
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
-                    found_msg += f"\n🍎 ** Also found one {item.name}!**"
+                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 50
 
                 # 5% change to get rare item
                 else:
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
-                    found_msg = f"🍎 ** Found one {item.name}!**"
+                    found_msg = f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
 
@@ -320,6 +316,8 @@ class BasicCommands(commands.Cog):
                     color=discord.Color.green()))
                 
                 await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
+                await DatabaseManager.update_cmd_used(interaction.user.id)
+                
             else:
                 next_scavenge_time = last_scavenge + datetime.timedelta(seconds=35)
                 timestamp = int(next_scavenge_time.timestamp())
@@ -375,10 +373,11 @@ class BasicCommands(commands.Cog):
                     await interaction.response.send_message(embed=discord.Embed(
                     title="🚨 Robbery Failed!", 
                     description=f"""You got caught and now you have to pay a fine.\n\n
-                                Penalty paid: {lost_money:,}$\n
+                                Penalty paid: `{lost_money:,}$`\n
                                 You've been given a 3-hour suspension for robbery.\n""",
                     color=discord.Color.red()
                     ).set_footer(text="Better luck next time, but be careful!"))
+                    await DatabaseManager.update_cmd_used(interaction.user.id)
                 
                 # 40% chance for success
                 else:
@@ -386,13 +385,14 @@ class BasicCommands(commands.Cog):
                     await EconomyManager.add_money(interaction.user.id, robbed_money)
                     await interaction.response.send_message(embed=discord.Embed(
                     title="💰 Robbery Successful!", 
-                    description=f"Stolen amount: {robbed_money:,}$",
+                    description=f"Stolen amount: `{robbed_money:,}$`",
                     color=discord.Color.green()
                     ).set_footer(text="Stay cautious — word might spread!"))
                 
                 await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
                 await cursor.execute("UPDATE last_used SET rob=? WHERE user_id=?", (last_used, interaction.user.id))
                 await db.commit()
+                await DatabaseManager.update_cmd_used(interaction.user.id)
 
             else:
                 next_rob_time = last_rob + datetime.timedelta(minutes=5)
@@ -460,11 +460,12 @@ class BasicCommands(commands.Cog):
 
         embed = discord.Embed(
                 title="📖 Study complete!",
-                description=f"🪙 You gained {award} Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: **{total_knowledge[category.value]:,}** 🪙",
+                description=f"🪙 You gained `{award}` Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: `{total_knowledge[category.value]:,}` 🪙",
                 color=discord.Color.green()
             ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
         await interaction.response.send_message(embed=embed)
         await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
+        await DatabaseManager.update_cmd_used(interaction.user.id)        
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
@@ -507,15 +508,81 @@ class BasicCommands(commands.Cog):
                         The secret number is randomly chosen between 1 to 1000.""",
                         inline=False)
         
-        embed.add_field(name="The **secret** number is:",
-                        value=f"⬛",
+        embed.add_field(name="**Secret number**",
+                        value=f"`   `",
                         inline=True)
 
-        embed.add_field(name="The **comp-number** is:",
-                        value=f"{comparison_num}",
+        embed.add_field(name="**Comparison number**:",
+                        value=f"`{comparison_num}`",
                         inline=True)      
 
         webhook_url = interaction.followup.url
         view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
         await interaction.response.send_message(embed=embed, view=view)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
 
+    @app_commands.command(name="profile", description="Show your or someones profile")
+    async def profile(self, interaction: discord.Interaction, player: discord.User=None):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return        
+        
+        user = interaction.user
+         
+        if player is not None:
+            user = player
+            
+        level, experience = await LevelManager.get_lvl_exp(user.id)
+        inv = await InventoryManager.get_inventory(user.id)
+        total = sum([item.quantity for item in inv])
+        inv_value = await InventoryManager.get_inventory_value(user.id)
+        balance, bank_balance = await EconomyManager.get_balance(user.id)
+        total_balance = await EconomyManager.get_total_balance(user.id)
+        req_exp = LevelManager.calculate_exp_for_level(level+1)
+
+        embed = discord.Embed(title=f"{user.name}").set_thumbnail(url=user.avatar.url.split("?")[0])
+        
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
+        progess_curr = round(experience/req_exp, 1)
+        progess_curr = round(progess_curr * 5) 
+        green_bars = progess_curr * "🟩"
+        progress_left = int(5 - progess_curr)
+        black_bars = progress_left * "⬛"
+        progress_bar = green_bars + black_bars
+        embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nXP: `{experience}/{req_exp}`\n{progress_bar}", inline=True)
+        
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
+        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
+                       
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
+        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
+                       
+        knowledge = await KnowledgeManager.get_knowledge(user.id)
+        science = knowledge["science"]
+        stat_science = (await KnowledgeManager.get_knowledge_threshold(science)).capitalize()
+        medicine = knowledge["medicine"]
+        stat_medicine = (await KnowledgeManager.get_knowledge_threshold(medicine)).capitalize()
+        economics = knowledge["economics"]
+        stat_economics = (await KnowledgeManager.get_knowledge_threshold(economics)).capitalize()
+        literature = knowledge["literature"]
+        stat_literature = (await KnowledgeManager.get_knowledge_threshold(literature)).capitalize()
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_knowledge")  
+        embed.add_field(name="Knowledge", value=f"""
+                        Rank: `{rank}/{leaderboard}`
+                        Science: `{stat_science}`
+                        Medicine: `{stat_medicine}`
+                        Economics: `{stat_economics}`
+                        Literature: `{stat_literature}`""",
+                        inline=True)
+                              
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT cmd_used FROM users WHERE user_id=?", (user.id,))
+            result = await cursor.fetchone()
+            if result is None or result[0] is None:
+                result = [0]
+            
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "cmd_used")                  
+        embed.add_field(name="Commands", value=f"Rank: `{rank}/{leaderboard}`\nTotal used: `{result[0]}`", inline=True)
+          
+        await interaction.response.send_message(embed=embed)

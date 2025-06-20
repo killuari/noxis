@@ -38,12 +38,12 @@ class HigherLower(discord.ui.View):
         ).set_footer(text="You have to be faster!")          
             
         
-        embed.add_field(name="The **secret** number is:",
-                        value=f"{self.secret_num}",
+        embed.add_field(name="**Secret number:**",
+                        value=f"`{self.secret_num}`",
                         inline=True)
 
-        embed.add_field(name="The **comp-number** is:",
-                        value=f"{self.comparison_num}",
+        embed.add_field(name="**Comparison number:**",
+                        value=f"`{self.comparison_num}`",
                         inline=True)
         
         await self.interaction.edit_original_response(embed=embed, view=None)
@@ -66,16 +66,16 @@ class HigherLower(discord.ui.View):
             await EconomyManager.add_money(self.user_id, self.money, False)
             
             embed=discord.Embed(title="Correct! It was higher!",
-                                description=f"You gained:\n{self.money:,}$",
+                                description=f"You gained:\n`{self.money:,}$`",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")
             
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -93,12 +93,12 @@ class HigherLower(discord.ui.View):
                                 color=discord.Color.red()
             ).set_footer(text="Good luck next time!")          
                 
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -122,16 +122,16 @@ class HigherLower(discord.ui.View):
             await EconomyManager.add_money(self.user_id, self.money, False)
                 
             embed=discord.Embed(title="Correct! It was lower!",
-                                description=f"You gained:\n{self.money:,}$",
+                                description=f"You gained:\n`{self.money:,}$`",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")
                 
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -149,12 +149,12 @@ class HigherLower(discord.ui.View):
                                 color=discord.Color.red()
             ).set_footer(text="Good luck next time!")          
                 
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -175,17 +175,17 @@ class HigherLower(discord.ui.View):
             answer_choice = random.choice(["Very good", "Nice guess", "Good job"])
             
             embed=discord.Embed(title=f"CORRECT! {answer_choice}! It was in the range of +-50!",
-                                description=f"You gained:\n{self.money:,}$\n{quantity}x {item.name}",
+                                description=f"You gained:\n`{self.money:,}$`\n`{quantity}x {item.name}`",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
             
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -203,12 +203,12 @@ class HigherLower(discord.ui.View):
                                 color=discord.Color.red()
             ).set_footer(text="Good luck next time!")          
             
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()
@@ -229,16 +229,16 @@ class HigherLower(discord.ui.View):
             answer_choice = random.choice(["Big Win", "Lucky guess"])
 
             embed=discord.Embed(title=f"INSANE! {answer_choice}! The numbers were the same!",
-                                description=f"You gained:\n{self.money:,}$\n{quantity}x {item.name}",
+                                description=f"You gained:\n`{self.money:,}$`\n`{quantity}x {item.name}`",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             self.stop()
             await interaction.response.edit_message(embed=embed, view=None)
@@ -255,12 +255,12 @@ class HigherLower(discord.ui.View):
                                 color=discord.Color.red()
             ).set_footer(text="Good luck next time!")          
                 
-            embed.add_field(name="The **secret** number is:",
-                            value=f"{self.secret_num}",
+            embed.add_field(name="**Secret number:**",
+                            value=f"`{self.secret_num}`",
                             inline=True)
 
-            embed.add_field(name="The **comp-number** is:",
-                            value=f"{self.comparison_num}",
+            embed.add_field(name="**Comparison number:**",
+                            value=f"`{self.comparison_num}`",
                             inline=True)
             
             self.stop()

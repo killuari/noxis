@@ -64,3 +64,13 @@ class LevelManager:
 
             await cursor.execute("UPDATE users SET experience=?, level=? WHERE user_id=?", (new_exp, new_level, user_id))
             await db.commit()            
+
+            
+    @staticmethod
+    async def get_lvl_exp(user_id: int) -> Tuple[int, int]:
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT level, experience FROM users WHERE user_id=?", (user_id,))            
+            level, experience = await cursor.fetchone()
+            
+        return (level, experience)
