@@ -149,15 +149,15 @@ class BasicCommands(commands.Cog):
         
         item = await ItemManager.get_item_by_name(item)
         if not item:
-            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
             return
         
         user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
         if user_item_quantity == 0:
-            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
             return
         elif user_item_quantity < quantity:
-            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough `{item.name}!`", color=discord.Color.red()))
+            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough `{item.name}!`", color=discord.Color.red()), ephemeral=True)
             return
         
         percentage_range = (0.8, 2)
@@ -533,7 +533,7 @@ class BasicCommands(commands.Cog):
             
         level, experience = await LevelManager.get_lvl_exp(user.id)
         inv = await InventoryManager.get_inventory(user.id)
-        total = [item.quantity + item.quantity for item in inv]
+        total = sum([item.quantity for item in inv])
         inv_value = await InventoryManager.get_inventory_value(user.id)
         balance, bank_balance = await EconomyManager.get_balance(user.id)
         total_balance = await EconomyManager.get_total_balance(user.id)
@@ -554,19 +554,25 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
-        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total[0] if total != [] else 0}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
+        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
                        
         knowledge = await KnowledgeManager.get_knowledge(user.id)
         science = knowledge["science"]
-        stat_science = await KnowledgeManager.get_knowledge_threshold(science)
+        stat_science = (await KnowledgeManager.get_knowledge_threshold(science)).capitalize()
         medicine = knowledge["medicine"]
-        stat_medicine = await KnowledgeManager.get_knowledge_threshold(medicine)
+        stat_medicine = (await KnowledgeManager.get_knowledge_threshold(medicine)).capitalize()
         economics = knowledge["economics"]
-        stat_economics = await KnowledgeManager.get_knowledge_threshold(economics)
+        stat_economics = (await KnowledgeManager.get_knowledge_threshold(economics)).capitalize()
         literature = knowledge["literature"]
-        stat_literature = await KnowledgeManager.get_knowledge_threshold(literature)
+        stat_literature = (await KnowledgeManager.get_knowledge_threshold(literature)).capitalize()
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_knowledge")  
-        embed.add_field(name="Knowledge", value=f"Rank: `{rank}/{leaderboard}`\nScience: `{science}` -> {stat_science}\nMedicine: `{medicine}` -> {stat_medicine}\nEconomics: `{economics}` -> {stat_economics}\nLiterature: `{literature}` -> {stat_literature}", inline=True)
+        embed.add_field(name="Knowledge", value=f"""
+                        Rank: `{rank}/{leaderboard}`
+                        Science: `{stat_science}`
+                        Medicine: `{stat_medicine}`
+                        Economics: `{stat_economics}`
+                        Literature: `{stat_literature}`""",
+                        inline=True)
                               
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()

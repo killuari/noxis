@@ -45,8 +45,8 @@ class InventoryManager:
             else:
                 await cursor.execute("UPDATE inventory SET quantity = quantity - ? WHERE (user_id, item_id) = (?, ?)", (quantity, user_id, item_id))
                 
-            await InventoryManager.update_inventory_value(user_id)
             await db.commit()
+            await InventoryManager.update_inventory_value(user_id)
                 
     @staticmethod
     async def get_item_quantity(user_id: int, item_id: int) -> int:

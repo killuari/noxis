@@ -117,7 +117,7 @@ class DatabaseManager:
                 
                 # Tabellenschema anzeigen zur Bestätigung
                 await cursor.execute(f"PRAGMA table_info({table_name})")
-                columns_info = cursor.fetchall()
+                columns_info = await cursor.fetchall()
                 print("\nAktuelles Tabellenschema:")
                 for col in columns_info:
                     print(f"  {col[1]} ({col[2]})")
