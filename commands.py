@@ -489,7 +489,7 @@ class BasicCommands(commands.Cog):
                 claim_available = current_time >= (last_game + datetime.timedelta(seconds=25))
             
             if not claim_available:
-                next_available = current_time + datetime.timedelta(seconds=25)
+                next_available = last_game + datetime.timedelta(seconds=25)
                 timestamp = int(next_available.timestamp())
                 await interaction.response.send_message(embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()))
                 return
@@ -541,7 +541,7 @@ class BasicCommands(commands.Cog):
         total_balance = await EconomyManager.get_total_balance(user.id)
         req_exp = LevelManager.calculate_exp_for_level(level+1)
 
-        embed = discord.Embed(title=f"{user.name}").set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{user.name}", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
