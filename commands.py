@@ -565,7 +565,8 @@ class BasicCommands(commands.Cog):
         stat_economics = await KnowledgeManager.get_knowledge_threshold(economics)
         literature = knowledge["literature"]
         stat_literature = await KnowledgeManager.get_knowledge_threshold(literature)
-        embed.add_field(name="Knowledge", value=f"\nScience: `{science}` -> {stat_science}\nMedicine: `{medicine}` -> {stat_medicine}\nEconomics: `{economics}` -> {stat_economics}\nLiterature: `{literature}` -> {stat_literature}", inline=True)
+        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_knowledge")  
+        embed.add_field(name="Knowledge", value=f"Rank: `{rank}/{leaderboard}`\nScience: `{science}` -> {stat_science}\nMedicine: `{medicine}` -> {stat_medicine}\nEconomics: `{economics}` -> {stat_economics}\nLiterature: `{literature}` -> {stat_literature}", inline=True)
                               
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()

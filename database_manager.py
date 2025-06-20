@@ -20,6 +20,7 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     inv_value INTEGER DEFAULT 0,
                     cmd_used INTEGER DEFAULT 0,
+                    total_knowledge DEFAULT 0,
                     PRIMARY KEY (user_id)
                 )
             """)

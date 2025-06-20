@@ -34,6 +34,7 @@ class KnowledgeManager:
             new_knowledge = {i: current_knowledge[i] + knowledge[i] for i in current_knowledge} # sehr geile dict comprehension wow
             await cursor.execute("UPDATE users SET knowledge=? WHERE user_id=?", (json.dumps(new_knowledge), user_id))
             await db.commit()
+            await KnowledgeManager.update_total_knowledge(user_id)
 
     @staticmethod
     async def get_knowledge(user_id: int) -> dict:
@@ -68,3 +69,12 @@ class KnowledgeManager:
 
         int_requirements = {category: KnowledgeManager.KNOWLEDGE_THRESHOLDS[requirements[category]] for category in requirements}
         return await KnowledgeManager.has_knowledge_requirements_int(user_id, int_requirements)
+
+    @staticmethod
+    async def update_total_knowledge(user_id):
+        knowledge = await KnowledgeManager.get_knowledge(user_id)
+        total_knowledge = knowledge["science"] + knowledge["medicine"] + knowledge["economics"] + knowledge["literature"] 
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("UPDATE users SET total_knowledge=total_knowledge+? WHERE user_id=?", (total_knowledge, user_id))
+            await db.commit()
