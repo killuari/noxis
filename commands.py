@@ -196,7 +196,7 @@ class BasicCommands(commands.Cog):
                     title="You successfully claimed your daily Reward!", 
                     description="`1,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
-                await LevelManager.add_experience(interaction.user.id, 100, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, 200, interaction.followup.url)
                 await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(days=1)
@@ -232,7 +232,7 @@ class BasicCommands(commands.Cog):
                     title="You successfully claimed your weekly Reward!", 
                     description="`15,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
-                await LevelManager.add_experience(interaction.user.id, 500, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, 1000, interaction.followup.url)
                 await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(weeks=1)
@@ -272,7 +272,7 @@ class BasicCommands(commands.Cog):
                 # 40% chance to get nothing
                 if reward_chance <= 0.4:
                     found_msg = "😔 **Found nothing valuable this time**"
-                    experience = 5
+                    experience = 10
 
                 # 25% chance to get some money
                 elif reward_chance <= 0.65:
@@ -354,12 +354,14 @@ class BasicCommands(commands.Cog):
             if claim_available:
                 last_used = current_time
                 rob_chance = random.random()
-                experience = 50
+                experience = 100
                 robbed_percentage = random.randint(5, 15) * 0.01
                 robbed_money = int((await EconomyManager.get_balance(user.id))[0] * robbed_percentage)
 
                 # 60% chance to get nothing
                 if rob_chance <= 0.6:
+                    experience = 50
+
                     lost_money = int(robbed_money * 0.4)
                     # add 3 hours to last_used so that the cooldown is 3 hours
                     last_used = current_time + datetime.timedelta(hours=3)
@@ -377,7 +379,6 @@ class BasicCommands(commands.Cog):
                                 You've been given a 3-hour suspension for robbery.\n""",
                     color=discord.Color.red()
                     ).set_footer(text="Better luck next time, but be careful!"))
-                    await DatabaseManager.update_cmd_used(interaction.user.id)
                 
                 # 40% chance for success
                 else:
@@ -444,7 +445,7 @@ class BasicCommands(commands.Cog):
         
         
         award = random.randint(10, 25)
-        experience = random.randint(40, 70)
+        experience = random.randint(100, 250)
 
         # TODO: Call mini-game logic here to award bonus XP       
         bonus_award = 0
