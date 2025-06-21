@@ -581,6 +581,6 @@ class BasicCommands(commands.Cog):
             created_at= (await cursor.fetchone())[0]
         
         timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
-        embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nPlaying since: <t:{timestamp}:R>", inline=True)   
+        embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
         
         await interaction.response.send_message(embed=embed)
