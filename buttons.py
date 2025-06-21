@@ -320,7 +320,11 @@ class Quiz(discord.ui.View):
                 
                 await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
                 await DatabaseManager.update_cmd_used(interaction.user.id)  
-                await interaction.response.edit_message(embed=discord.Embed(title=f"✅ Correct! **{self.answer}** is the right answer", description=f"📖 You gained {self.award} + {bonus_award} Bonus Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})", color=discord.Color.green()), view=None)
+                await interaction.response.edit_message(
+                    embed=discord.Embed(
+                    title=f"✅ Correct! **{self.answer}** is the right answer", 
+                    description=f"📖 You gained {self.award} + {bonus_award} Bonus Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
+                    color=discord.Color.green()), view=None)
             else:
                 bonus_award = 0
                 bonus_xp = 0
@@ -333,7 +337,11 @@ class Quiz(discord.ui.View):
                 await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
                 await KnowledgeManager.update_total_knowledge(self.user_id)
                 total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
-                await interaction.response.edit_message(embed=discord.Embed(title=f"❌ Incorrect. The correct answer was: {self.answer}", description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})", color=discord.Color.red()), view=None)
+                await interaction.response.edit_message(
+                    embed=discord.Embed(
+                    title=f"❌ Incorrect. The correct answer was: {self.answer}",
+                    description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})", 
+                    color=discord.Color.red()), view=None)
                 
         return move
     
