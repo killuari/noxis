@@ -461,28 +461,9 @@ class BasicCommands(commands.Cog):
             answer = questions["correct"]
             view = Quiz(interaction.user.id, question, answer_choices, answer, category.value, interaction)
             
-            await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
-                                                                        description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)    
-
-        # bonus_award = 0
-        # bonus_xp = 0
-        
-        # total_award = award + bonus_award
-        # total_xp = experience + bonus_xp
-
-        # knowledge = DEFAULT_KNOWLEDGE.copy()
-        # knowledge[category.value] = total_award
-        # await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
-        # total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
-
-        # embed = discord.Embed(
-        #         title="📖 Study complete!",
-        #         description=f"🪙 You gained `{award}` Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: `{total_knowledge[category.value]:,}` 🪙",
-        #         color=discord.Color.green()
-        #     ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
-        # await interaction.response.send_message(embed=embed)
-        # await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
-        # await DatabaseManager.update_cmd_used(interaction.user.id)        
+            await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value.capitalize()}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
+                                                                        description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)           
+                                                    
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
@@ -596,10 +577,10 @@ class BasicCommands(commands.Cog):
             cursor = await db.cursor()
             await cursor.execute("SELECT cmd_used FROM users WHERE user_id=?", (user.id,))
             result = await cursor.fetchone()
-            if result is None or result[0] is None:
-                result = [0]
-            
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "cmd_used")                  
-        embed.add_field(name="Commands", value=f"Rank: `{rank}/{leaderboard}`\nTotal used: `{result[0]}`", inline=True)
-          
+            await cursor.execute("SELECT created_at FROM users WHERE user_id=?", (user.id,))
+            created_at= (await cursor.fetchone())[0]
+        
+        timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
+        embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nPlaying since: <t:{timestamp}:R>", inline=True)   
+        
         await interaction.response.send_message(embed=embed)
