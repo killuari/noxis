@@ -17,7 +17,7 @@ class DatabaseManager:
                     level INTEGER DEFAULT 1,
                     experience INTEGER DEFAULT 0,
                     knowledge JSON DEFAULT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT (datetime('now', 'localtime')),
                     inv_value INTEGER DEFAULT 0,
                     cmd_used INTEGER DEFAULT 0,
                     total_knowledge DEFAULT 0,
