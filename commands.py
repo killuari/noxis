@@ -295,8 +295,8 @@ class BasicCommands(commands.Cog):
                     await EconomyManager.add_money(interaction.user.id, money)
 
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
-                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     quantity = random.randint(1,3)
+                    found_msg += f"\n🍎 ** Also found** `{quantity} {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
                     experience = 50
 
