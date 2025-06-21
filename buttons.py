@@ -51,8 +51,9 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Higher", style=discord.ButtonStyle.green, disabled=False)
     async def higher(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-            
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+        
         if self.comparison_num in range(1,201):
             difficulty_factor = 0.8
         elif self.comparison_num in range(800, 1001):
@@ -107,8 +108,9 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Lower", style=discord.ButtonStyle.red, disabled=False)
     async def lower(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-            
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return  
+                    
         if self.comparison_num in range(1,201):
             difficulty_factor = random.randint(4, 5) 
         elif self.comparison_num in range(800, 1001):
@@ -163,8 +165,9 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Close Range (+-50)", style=discord.ButtonStyle.secondary, disabled=False)
     async def close_range(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-                                
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+                                        
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
             self.money = int(self.money * 6.5) 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
@@ -217,8 +220,9 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Same", style=discord.ButtonStyle.primary, disabled=False)
     async def same_num(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
-            
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+                    
         if self.secret_num == self.comparison_num:
             self.money = int(self.money * 10) 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
