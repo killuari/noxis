@@ -290,19 +290,23 @@ class BasicCommands(commands.Cog):
 
                 # 10% chance to get money and a common item
                 elif reward_chance <= 0.95:
-                    money = random.randint(750, 2000)
+                    money = random.randint(1500, 2500)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
 
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
                     found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
-                    await InventoryManager.add_item(interaction.user.id, item.item_id)
+                    quantity = random.randint(1,3)
+                    await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
                     experience = 50
 
                 # 5% change to get rare item
                 else:
+                    money = random.randint(2000, 3000)
+                    found_msg = f"💰 **Found** `{money}$`**!**"
+                    await EconomyManager.add_money(interaction.user.id, money)
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
-                    found_msg = f"\n🍎 ** Also found** `one {item.name}`**!**"
+                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
 
