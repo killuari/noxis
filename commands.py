@@ -1,4 +1,4 @@
-import discord, aiosqlite, typing, time, random, datetime
+import discord, aiosqlite, typing, time, random, datetime, aiofiles
 from discord import app_commands
 from discord.ext import commands
 from user_manager import *
@@ -12,7 +12,7 @@ from knowledge_manager import KnowledgeManager
 
 # This function creates an account through button interaction
 async def get_started(interaction: discord.Interaction, user_id: int):       
-    await interaction.response.send_message(embed=discord.Embed(title="You don't have an account yet.",description="Click on **Get Started** to create one!", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
+    await interaction.response.send_message(embed=discord.Embed(title="Wait something's wrong... Noxis is thinking...\n", description="Seems like you have never used a command of this bot before. If you want to start playing click on **Get Started** to create an account", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
 
 class BasicCommands(commands.Cog):
     def __init__(self, bot):
@@ -448,29 +448,41 @@ class BasicCommands(commands.Cog):
             await db.commit()
         
         
-        award = random.randint(10, 25)
-        experience = random.randint(100, 250)
+        async with aiofiles.open("study_questions.json", "r", encoding="UTF-8") as file:
+            content = await file.read()
+            questions = json.loads(content)
+            num = random.randint(0,50)
+            
+            questions = [question for question in questions if question["category"] == category.value]
+            
+            questions = questions[num]
+            question = questions["question"]
+            answer_choices = questions["options"] 
+            answer = questions["correct"]
+            view = Quiz(interaction.user.id, question, answer_choices, answer, category.value, interaction)
+            
+            await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
+                                                                        description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)    
 
-        # TODO: Call mini-game logic here to award bonus XP       
-        bonus_award = 0
-        bonus_xp = 0
+        # bonus_award = 0
+        # bonus_xp = 0
         
-        total_award = award + bonus_award
-        total_xp = experience + bonus_xp
+        # total_award = award + bonus_award
+        # total_xp = experience + bonus_xp
 
-        knowledge = DEFAULT_KNOWLEDGE.copy()
-        knowledge[category.value] = total_award
-        await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
-        total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+        # knowledge = DEFAULT_KNOWLEDGE.copy()
+        # knowledge[category.value] = total_award
+        # await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
+        # total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
 
-        embed = discord.Embed(
-                title="📖 Study complete!",
-                description=f"🪙 You gained `{award}` Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: `{total_knowledge[category.value]:,}` 🪙",
-                color=discord.Color.green()
-            ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
-        await interaction.response.send_message(embed=embed)
-        await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
-        await DatabaseManager.update_cmd_used(interaction.user.id)        
+        # embed = discord.Embed(
+        #         title="📖 Study complete!",
+        #         description=f"🪙 You gained `{award}` Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: `{total_knowledge[category.value]:,}` 🪙",
+        #         color=discord.Color.green()
+        #     ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
+        # await interaction.response.send_message(embed=embed)
+        # await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
+        # await DatabaseManager.update_cmd_used(interaction.user.id)        
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
