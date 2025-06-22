@@ -1,0 +1,1202 @@
+[
+  {
+    "question": "What is the chemical symbol for gold?",
+    "options": ["Go", "Gd", "Au", "Ag"],
+    "correct": "Au",
+    "category": "science"
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+    "correct": "Mars",
+    "category": "science"
+  },
+  {
+    "question": "What is the speed of light in vacuum?",
+    "options": ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+    "correct": "300,000 km/s",
+    "category": "science"
+  },
+  {
+    "question": "Which gas makes up approximately 78% of Earth's atmosphere?",
+    "options": ["Oxygen", "Carbon dioxide", "Nitrogen", "Argon"],
+    "correct": "Nitrogen",
+    "category": "science"
+  },
+  {
+    "question": "What is the hardest natural substance on Earth?",
+    "options": ["Quartz", "Diamond", "Graphite", "Corundum"],
+    "correct": "Diamond",
+    "category": "science"
+  },
+  {
+    "question": "Which scientist developed the theory of relativity?",
+    "options": ["Isaac Newton", "Albert Einstein", "Niels Bohr", "Max Planck"],
+    "correct": "Albert Einstein",
+    "category": "science"
+  },
+  {
+    "question": "What is the smallest unit of matter?",
+    "options": ["Molecule", "Atom", "Electron", "Proton"],
+    "correct": "Atom",
+    "category": "science"
+  },
+  {
+    "question": "Which force keeps planets in orbit around the sun?",
+    "options": ["Electromagnetic force", "Strong nuclear force", "Gravitational force", "Weak nuclear force"],
+    "correct": "Gravitational force",
+    "category": "science"
+  },
+  {
+    "question": "What is the pH value of pure water?",
+    "options": ["6", "7", "8", "9"],
+    "correct": "7",
+    "category": "science"
+  },
+  {
+    "question": "Which element has the atomic number 1?",
+    "options": ["Helium", "Hydrogen", "Lithium", "Carbon"],
+    "correct": "Hydrogen",
+    "category": "science"
+  },
+  {
+    "question": "What is the process by which plants make their own food?",
+    "options": ["Respiration", "Photosynthesis", "Transpiration", "Fermentation"],
+    "correct": "Photosynthesis",
+    "category": "science"
+  },
+  {
+    "question": "Which law states that energy cannot be created or destroyed?",
+    "options": ["Newton's First Law", "Law of Conservation of Energy", "Boyle's Law", "Ohm's Law"],
+    "correct": "Law of Conservation of Energy",
+    "category": "science"
+  },
+  {
+    "question": "What is the most abundant element in the universe?",
+    "options": ["Oxygen", "Carbon", "Hydrogen", "Helium"],
+    "correct": "Hydrogen",
+    "category": "science"
+  },
+  {
+    "question": "Which particle has no electric charge?",
+    "options": ["Proton", "Electron", "Neutron", "Positron"],
+    "correct": "Neutron",
+    "category": "science"
+  },
+  {
+    "question": "What is the study of earthquakes called?",
+    "options": ["Meteorology", "Seismology", "Geology", "Volcanology"],
+    "correct": "Seismology",
+    "category": "science"
+  },
+  {
+    "question": "Which type of electromagnetic radiation has the shortest wavelength?",
+    "options": ["Radio waves", "Visible light", "X-rays", "Gamma rays"],
+    "correct": "Gamma rays",
+    "category": "science"
+  },
+  {
+    "question": "What is the chemical formula for methane?",
+    "options": ["CH4", "CO2", "H2O", "NH3"],
+    "correct": "CH4",
+    "category": "science"
+  },
+  {
+    "question": "Which scientist is known for the laws of motion?",
+    "options": ["Galileo Galilei", "Johannes Kepler", "Isaac Newton", "Albert Einstein"],
+    "correct": "Isaac Newton",
+    "category": "science"
+  },
+  {
+    "question": "What is the boiling point of water at sea level?",
+    "options": ["90°C", "95°C", "100°C", "105°C"],
+    "correct": "100°C",
+    "category": "science"
+  },
+  {
+    "question": "Which organ in the human body produces insulin?",
+    "options": ["Liver", "Kidney", "Pancreas", "Stomach"],
+    "correct": "Pancreas",
+    "category": "science"
+  },
+  {
+    "question": "What is the largest planet in our solar system?",
+    "options": ["Saturn", "Jupiter", "Neptune", "Uranus"],
+    "correct": "Jupiter",
+    "category": "science"
+  },
+  {
+    "question": "Which gas is essential for photosynthesis?",
+    "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+    "correct": "Carbon dioxide",
+    "category": "science"
+  },
+  {
+    "question": "What is the study of heredity called?",
+    "options": ["Ecology", "Genetics", "Botany", "Zoology"],
+    "correct": "Genetics",
+    "category": "science"
+  },
+  {
+    "question": "Which metal is liquid at room temperature?",
+    "options": ["Lead", "Mercury", "Tin", "Zinc"],
+    "correct": "Mercury",
+    "category": "science"
+  },
+  {
+    "question": "What is the unit of electric current?",
+    "options": ["Volt", "Watt", "Ampere", "Ohm"],
+    "correct": "Ampere",
+    "category": "science"
+  },
+  {
+    "question": "Which layer of the atmosphere contains the ozone layer?",
+    "options": ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"],
+    "correct": "Stratosphere",
+    "category": "science"
+  },
+  {
+    "question": "What is the chemical symbol for sodium?",
+    "options": ["So", "S", "Na", "N"],
+    "correct": "Na",
+    "category": "science"
+  },
+  {
+    "question": "Which type of bond holds water molecules together?",
+    "options": ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+    "correct": "Hydrogen bond",
+    "category": "science"
+  },
+  {
+    "question": "What is the fundamental particle that carries electric charge?",
+    "options": ["Neutron", "Proton", "Electron", "Photon"],
+    "correct": "Electron",
+    "category": "science"
+  },
+  {
+    "question": "Which process converts liquid water to water vapor?",
+    "options": ["Condensation", "Sublimation", "Evaporation", "Precipitation"],
+    "correct": "Evaporation",
+    "category": "science"
+  },
+  {
+    "question": "What is the center of an atom called?",
+    "options": ["Electron cloud", "Nucleus", "Orbital", "Shell"],
+    "correct": "Nucleus",
+    "category": "science"
+  },
+  {
+    "question": "Which scientist proposed the atomic theory?",
+    "options": ["John Dalton", "Ernest Rutherford", "Niels Bohr", "J.J. Thomson"],
+    "correct": "John Dalton",
+    "category": "science"
+  },
+  {
+    "question": "What is the most common type of star in the universe?",
+    "options": ["Red giant", "White dwarf", "Red dwarf", "Blue giant"],
+    "correct": "Red dwarf",
+    "category": "science"
+  },
+  {
+    "question": "Which element is essential for all organic compounds?",
+    "options": ["Oxygen", "Hydrogen", "Carbon", "Nitrogen"],
+    "correct": "Carbon",
+    "category": "science"
+  },
+  {
+    "question": "What is the study of the behavior of matter and energy called?",
+    "options": ["Chemistry", "Biology", "Physics", "Geology"],
+    "correct": "Physics",
+    "category": "science"
+  },
+  {
+    "question": "Which planet has the most moons?",
+    "options": ["Jupiter", "Saturn", "Uranus", "Neptune"],
+    "correct": "Saturn",
+    "category": "science"
+  },
+  {
+    "question": "What is the chemical formula for table salt?",
+    "options": ["NaCl", "KCl", "CaCl2", "MgCl2"],
+    "correct": "NaCl",
+    "category": "science"
+  },
+  {
+    "question": "Which type of energy is stored in food?",
+    "options": ["Kinetic energy", "Potential energy", "Chemical energy", "Thermal energy"],
+    "correct": "Chemical energy",
+    "category": "science"
+  },
+  {
+    "question": "What is the smallest bone in the human body?",
+    "options": ["Femur", "Stapes", "Radius", "Tibia"],
+    "correct": "Stapes",
+    "category": "science"
+  },
+  {
+    "question": "Which gas is produced during photosynthesis?",
+    "options": ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
+    "correct": "Oxygen",
+    "category": "science"
+  },
+  {
+    "question": "What is the unit of frequency?",
+    "options": ["Hertz", "Newton", "Joule", "Pascal"],
+    "correct": "Hertz",
+    "category": "science"
+  },
+  {
+    "question": "Which scientist discovered penicillin?",
+    "options": ["Louis Pasteur", "Alexander Fleming", "Marie Curie", "Gregor Mendel"],
+    "correct": "Alexander Fleming",
+    "category": "science"
+  },
+  {
+    "question": "What is the main component of natural gas?",
+    "options": ["Propane", "Butane", "Methane", "Ethane"],
+    "correct": "Methane",
+    "category": "science"
+  },
+  {
+    "question": "Which part of the cell contains genetic material?",
+    "options": ["Cytoplasm", "Nucleus", "Mitochondria", "Ribosome"],
+    "correct": "Nucleus",
+    "category": "science"
+  },
+  {
+    "question": "What is the process of cell division called?",
+    "options": ["Meiosis", "Mitosis", "Both A and B", "Osmosis"],
+    "correct": "Both A and B",
+    "category": "science"
+  },
+  {
+    "question": "Which type of radiation is used in medical X-rays?",
+    "options": ["Alpha radiation", "Beta radiation", "Gamma radiation", "X-ray radiation"],
+    "correct": "X-ray radiation",
+    "category": "science"
+  },
+  {
+    "question": "What is the chemical symbol for iron?",
+    "options": ["Ir", "In", "Fe", "Fr"],
+    "correct": "Fe",
+    "category": "science"
+  },
+  {
+    "question": "Which force opposes motion between surfaces?",
+    "options": ["Gravity", "Friction", "Magnetism", "Tension"],
+    "correct": "Friction",
+    "category": "science"
+  },
+  {
+    "question": "What is the largest organ in the human body?",
+    "options": ["Liver", "Brain", "Lungs", "Skin"],
+    "correct": "Skin",
+    "category": "science"
+  },
+  {
+    "question": "Which blood type is considered the universal donor?",
+    "options": ["A", "B", "AB", "O"],
+    "correct": "O",
+    "category": "science"
+  },
+  {
+    "question": "What is the main function of red blood cells?",
+    "options": ["Fight infection", "Clot blood", "Transport oxygen", "Produce hormones"],
+    "correct": "Transport oxygen",
+    "category": "medicine"
+  },
+  {
+    "question": "Which vitamin is produced when skin is exposed to sunlight?",
+    "options": ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K"],
+    "correct": "Vitamin D",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the normal resting heart rate for adults?",
+    "options": ["40-50 bpm", "60-100 bpm", "120-140 bpm", "160-180 bpm"],
+    "correct": "60-100 bpm",
+    "category": "medicine"
+  },
+  {
+    "question": "Which organ filters waste from the blood?",
+    "options": ["Liver", "Kidneys", "Lungs", "Heart"],
+    "correct": "Kidneys",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for high blood pressure?",
+    "options": ["Hypotension", "Hypertension", "Bradycardia", "Tachycardia"],
+    "correct": "Hypertension",
+    "category": "medicine"
+  },
+  {
+    "question": "Which hormone regulates blood sugar levels?",
+    "options": ["Adrenaline", "Insulin", "Cortisol", "Thyroxine"],
+    "correct": "Insulin",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the strongest muscle in the human body?",
+    "options": ["Bicep", "Quadriceps", "Masseter", "Gluteus maximus"],
+    "correct": "Masseter",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the brain controls balance?",
+    "options": ["Cerebrum", "Cerebellum", "Brainstem", "Hypothalamus"],
+    "correct": "Cerebellum",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for a heart attack?",
+    "options": ["Myocardial infarction", "Angina pectoris", "Arrhythmia", "Cardiac arrest"],
+    "correct": "Myocardial infarction",
+    "category": "medicine"
+  },
+  {
+    "question": "Which vitamin deficiency causes scurvy?",
+    "options": ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"],
+    "correct": "Vitamin C",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the normal body temperature in Celsius?",
+    "options": ["35°C", "36°C", "37°C", "38°C"],
+    "correct": "37°C",
+    "category": "medicine"
+  },
+  {
+    "question": "Which bone protects the brain?",
+    "options": ["Skull", "Vertebrae", "Ribs", "Sternum"],
+    "correct": "Skull",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for difficulty swallowing?",
+    "options": ["Dyspnea", "Dysphagia", "Dysuria", "Dysphonia"],
+    "correct": "Dysphagia",
+    "category": "medicine"
+  },
+  {
+    "question": "Which gland produces growth hormone?",
+    "options": ["Thyroid", "Adrenal", "Pituitary", "Pancreas"],
+    "correct": "Pituitary",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the main function of white blood cells?",
+    "options": ["Transport oxygen", "Clot blood", "Fight infection", "Regulate temperature"],
+    "correct": "Fight infection",
+    "category": "medicine"
+  },
+  {
+    "question": "Which artery supplies blood to the heart muscle?",
+    "options": ["Aorta", "Coronary artery", "Carotid artery", "Pulmonary artery"],
+    "correct": "Coronary artery",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for loss of appetite?",
+    "options": ["Anorexia", "Bulimia", "Dyspepsia", "Nausea"],
+    "correct": "Anorexia",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the eye controls the amount of light entering?",
+    "options": ["Cornea", "Lens", "Iris", "Retina"],
+    "correct": "Iris",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of the liver?",
+    "options": ["Hepatitis", "Nephritis", "Gastritis", "Arthritis"],
+    "correct": "Hepatitis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which hormone is responsible for the fight-or-flight response?",
+    "options": ["Insulin", "Cortisol", "Adrenaline", "Melatonin"],
+    "correct": "Adrenaline",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the normal range for blood pressure?",
+    "options": ["90/60 to 120/80", "100/70 to 140/90", "110/80 to 160/100", "120/90 to 180/110"],
+    "correct": "90/60 to 120/80",
+    "category": "medicine"
+  },
+  {
+    "question": "Which organ produces bile?",
+    "options": ["Pancreas", "Liver", "Gallbladder", "Stomach"],
+    "correct": "Liver",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of joints?",
+    "options": ["Arthritis", "Osteoporosis", "Myalgia", "Neuralgia"],
+    "correct": "Arthritis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which vitamin is essential for blood clotting?",
+    "options": ["Vitamin A", "Vitamin C", "Vitamin E", "Vitamin K"],
+    "correct": "Vitamin K",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the largest chamber of the heart?",
+    "options": ["Right atrium", "Left atrium", "Right ventricle", "Left ventricle"],
+    "correct": "Left ventricle",
+    "category": "medicine"
+  },
+  {
+    "question": "Which condition is characterized by high blood sugar?",
+    "options": ["Hypoglycemia", "Diabetes", "Hypothyroidism", "Anemia"],
+    "correct": "Diabetes",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for difficulty breathing?",
+    "options": ["Dysphagia", "Dyspnea", "Dysuria", "Dystonia"],
+    "correct": "Dyspnea",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the nervous system includes the brain and spinal cord?",
+    "options": ["Peripheral nervous system", "Central nervous system", "Autonomic nervous system", "Sympathetic nervous system"],
+    "correct": "Central nervous system",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for chest pain?",
+    "options": ["Angina", "Myalgia", "Neuralgia", "Cephalgia"],
+    "correct": "Angina",
+    "category": "medicine"
+  },
+  {
+    "question": "Which hormone regulates sleep-wake cycles?",
+    "options": ["Cortisol", "Insulin", "Melatonin", "Thyroxine"],
+    "correct": "Melatonin",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the normal number of chromosomes in human cells?",
+    "options": ["23", "44", "46", "48"],
+    "correct": "46",
+    "category": "medicine"
+  },
+  {
+    "question": "Which organ is affected by pneumonia?",
+    "options": ["Heart", "Liver", "Lungs", "Kidneys"],
+    "correct": "Lungs",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for low blood pressure?",
+    "options": ["Hypertension", "Hypotension", "Bradycardia", "Tachycardia"],
+    "correct": "Hypotension",
+    "category": "medicine"
+  },
+  {
+    "question": "Which type of diabetes typically develops in childhood?",
+    "options": ["Type 1", "Type 2", "Gestational", "Prediabetes"],
+    "correct": "Type 1",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of the stomach lining?",
+    "options": ["Gastritis", "Hepatitis", "Colitis", "Enteritis"],
+    "correct": "Gastritis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which mineral is essential for strong bones and teeth?",
+    "options": ["Iron", "Calcium", "Potassium", "Sodium"],
+    "correct": "Calcium",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for fainting?",
+    "options": ["Syncope", "Vertigo", "Ataxia", "Aphasia"],
+    "correct": "Syncope",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the brain controls memory?",
+    "options": ["Frontal lobe", "Parietal lobe", "Hippocampus", "Medulla"],
+    "correct": "Hippocampus",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of the appendix?",
+    "options": ["Appendicitis", "Peritonitis", "Diverticulitis", "Cholecystitis"],
+    "correct": "Appendicitis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which blood component helps in clotting?",
+    "options": ["Red blood cells", "White blood cells", "Platelets", "Plasma"],
+    "correct": "Platelets",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for excessive thirst?",
+    "options": ["Polydipsia", "Polyuria", "Polyphagia", "Polycythemia"],
+    "correct": "Polydipsia",
+    "category": "medicine"
+  },
+  {
+    "question": "Which organ produces red blood cells?",
+    "options": ["Liver", "Spleen", "Bone marrow", "Kidneys"],
+    "correct": "Bone marrow",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of the brain?",
+    "options": ["Meningitis", "Encephalitis", "Myelitis", "Neuritis"],
+    "correct": "Encephalitis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which hormone is produced by the thyroid gland?",
+    "options": ["Insulin", "Cortisol", "Thyroxine", "Adrenaline"],
+    "correct": "Thyroxine",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for rapid heart rate?",
+    "options": ["Bradycardia", "Tachycardia", "Arrhythmia", "Fibrillation"],
+    "correct": "Tachycardia",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the digestive system absorbs most nutrients?",
+    "options": ["Stomach", "Large intestine", "Small intestine", "Liver"],
+    "correct": "Small intestine",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for inflammation of the kidneys?",
+    "options": ["Nephritis", "Cystitis", "Urethritis", "Pyelonephritis"],
+    "correct": "Nephritis",
+    "category": "medicine"
+  },
+  {
+    "question": "Which vitamin deficiency causes night blindness?",
+    "options": ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+    "correct": "Vitamin A",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the medical term for difficulty speaking?",
+    "options": ["Dysphonia", "Dysarthria", "Aphasia", "Dysphagia"],
+    "correct": "Dysarthria",
+    "category": "medicine"
+  },
+  {
+    "question": "Which part of the ear is responsible for hearing?",
+    "options": ["Outer ear", "Middle ear", "Inner ear", "Eardrum"],
+    "correct": "Inner ear",
+    "category": "medicine"
+  },
+  {
+    "question": "What is the basic economic problem?",
+    "options": ["Inflation", "Unemployment", "Scarcity", "Recession"],
+    "correct": "Scarcity",
+    "category": "economics"
+  },
+  {
+    "question": "What does GDP stand for?",
+    "options": ["Gross Domestic Product", "General Development Plan", "Global Distribution Process", "Government Debt Policy"],
+    "correct": "Gross Domestic Product",
+    "category": "economics"
+  },
+  {
+    "question": "Which economic system is based on private ownership?",
+    "options": ["Socialism", "Communism", "Capitalism", "Mixed economy"],
+    "correct": "Capitalism",
+    "category": "economics"
+  },
+  {
+    "question": "What is inflation?",
+    "options": ["Decrease in prices", "Increase in unemployment", "General rise in prices", "Economic growth"],
+    "correct": "General rise in prices",
+    "category": "economics"
+  },
+  {
+    "question": "Who wrote 'The Wealth of Nations'?",
+    "options": ["Karl Marx", "Adam Smith", "John Keynes", "Milton Friedman"],
+    "correct": "Adam Smith",
+    "category": "economics"
+  },
+  {
+    "question": "What is the law of demand?",
+    "options": ["As price increases, demand increases", "As price decreases, demand decreases", "As price increases, demand decreases", "Price and demand are unrelated"],
+    "correct": "As price increases, demand decreases",
+    "category": "economics"
+  },
+  {
+    "question": "What is a monopoly?",
+    "options": ["Many sellers, one buyer", "One seller, many buyers", "Many sellers, many buyers", "Few sellers, few buyers"],
+    "correct": "One seller, many buyers",
+    "category": "economics"
+  },
+  {
+    "question": "What does the central bank control?",
+    "options": ["Fiscal policy", "Monetary policy", "Trade policy", "Labor policy"],
+    "correct": "Monetary policy",
+    "category": "economics"
+  },
+  {
+    "question": "What is opportunity cost?",
+    "options": ["The cost of production", "The price of goods", "The value of the next best alternative", "The total cost of ownership"],
+    "correct": "The value of the next best alternative",
+    "category": "economics"
+  },
+  {
+    "question": "What characterizes a recession?",
+    "options": ["Rising GDP", "Falling unemployment", "Economic decline", "High inflation"],
+    "correct": "Economic decline",
+    "category": "economics"
+  },
+  {
+    "question": "What is fiscal policy?",
+    "options": ["Government spending and taxation", "Interest rate control", "Money supply regulation", "Trade regulation"],
+    "correct": "Government spending and taxation",
+    "category": "economics"
+  },
+  {
+    "question": "What is elasticity of demand?",
+    "options": ["Price flexibility", "Quantity flexibility", "Responsiveness to price changes", "Market stability"],
+    "correct": "Responsiveness to price changes",
+    "category": "economics"
+  },
+  {
+    "question": "What is a public good?",
+    "options": ["Goods sold by government", "Goods that are non-excludable and non-rivalrous", "Expensive goods", "Imported goods"],
+    "correct": "Goods that are non-excludable and non-rivalrous",
+    "category": "economics"
+  },
+  {
+    "question": "What does CPI measure?",
+    "options": ["Economic growth", "Consumer Price Index", "Corporate Performance Index", "Capital Price Investment"],
+    "correct": "Consumer Price Index",
+    "category": "economics"
+  },
+  {
+    "question": "What is perfect competition?",
+    "options": ["One seller dominates", "Few large sellers", "Many sellers, identical products", "Government controls market"],
+    "correct": "Many sellers, identical products",
+    "category": "economics"
+  },
+  {
+    "question": "What is the equilibrium price?",
+    "options": ["Highest possible price", "Lowest possible price", "Where supply equals demand", "Government-set price"],
+    "correct": "Where supply equals demand",
+    "category": "economics"
+  },
+  {
+    "question": "What is comparative advantage?",
+    "options": ["Being best at everything", "Lower opportunity cost in production", "Highest quality production", "Fastest production"],
+    "correct": "Lower opportunity cost in production",
+    "category": "economics"
+  },
+  {
+    "question": "What is aggregate demand?",
+    "options": ["Individual consumer demand", "Business demand only", "Total demand in economy", "Government demand"],
+    "correct": "Total demand in economy",
+    "category": "economics"
+  },
+  {
+    "question": "What is the multiplier effect?",
+    "options": ["Price multiplication", "Quantity doubling", "Initial spending creates more spending", "Cost reduction"],
+    "correct": "Initial spending creates more spending",
+    "category": "economics"
+  },
+  {
+    "question": "What is market failure?",
+    "options": ["Business bankruptcy", "Stock market crash", "Inefficient resource allocation", "Price controls"],
+    "correct": "Inefficient resource allocation",
+    "category": "economics"
+  },
+  {
+    "question": "What is deflation?",
+    "options": ["Rising prices", "Stable prices", "Falling prices", "Volatile prices"],
+    "correct": "Falling prices",
+    "category": "economics"
+  },
+  {
+    "question": "What is liquidity?",
+    "options": ["Asset profitability", "Ease of converting to cash", "Investment return", "Market volatility"],
+    "correct": "Ease of converting to cash",
+    "category": "economics"
+  },
+  {
+    "question": "What is the business cycle?",
+    "options": ["Daily trading hours", "Seasonal variations", "Economic fluctuations over time", "Corporate planning cycle"],
+    "correct": "Economic fluctuations over time",
+    "category": "economics"
+  },
+  {
+    "question": "What is oligopoly?",
+    "options": ["One seller", "Two sellers", "Few sellers", "Many sellers"],
+    "correct": "Few sellers",
+    "category": "economics"
+  },
+  {
+    "question": "What is the invisible hand?",
+    "options": ["Government intervention", "Market self-regulation", "Hidden costs", "Secret agreements"],
+    "correct": "Market self-regulation",
+    "category": "economics"
+  },
+  {
+    "question": "What is stagflation?",
+    "options": ["High growth, low inflation", "High inflation, high unemployment", "Low inflation, low unemployment", "Stable economy"],
+    "correct": "High inflation, high unemployment",
+    "category": "economics"
+  },
+  {
+    "question": "What is consumer surplus?",
+    "options": ["Excess production", "Benefit to consumers", "Leftover inventory", "Price difference"],
+    "correct": "Benefit to consumers",
+    "category": "economics"
+  },
+  {
+    "question": "What is the law of supply?",
+    "options": ["Higher price, lower supply", "Lower price, higher supply", "Higher price, higher supply", "Price doesn't affect supply"],
+    "correct": "Higher price, higher supply",
+    "category": "economics"
+  },
+  {
+    "question": "What is externality?",
+    "options": ["Foreign trade", "External costs or benefits", "Outside investment", "International relations"],
+    "correct": "External costs or benefits",
+    "category": "economics"
+  },
+  {
+    "question": "What is marginal utility?",
+    "options": ["Total satisfaction", "Additional satisfaction from one more unit", "Average satisfaction", "Minimum satisfaction"],
+    "correct": "Additional satisfaction from one more unit",
+    "category": "economics"
+  },
+  {
+    "question": "What is the Phillips curve?",
+    "options": ["Supply and demand", "Inflation and unemployment relationship", "Economic growth curve", "Investment returns"],
+    "correct": "Inflation and unemployment relationship",
+    "category": "economics"
+  },
+  {
+    "question": "What is quantitative easing?",
+    "options": ["Tax reduction", "Government spending", "Money supply increase", "Interest rate cuts"],
+    "correct": "Money supply increase",
+    "category": "economics"
+  },
+  {
+    "question": "What is the Laffer curve?",
+    "options": ["Demand curve", "Supply curve", "Tax rate and revenue relationship", "Inflation curve"],
+    "correct": "Tax rate and revenue relationship",
+    "category": "economics"
+  },
+  {
+    "question": "What is crowding out?",
+    "options": ["Market competition", "Government spending reducing private investment", "Population growth", "Resource depletion"],
+    "correct": "Government spending reducing private investment",
+    "category": "economics"
+  },
+  {
+    "question": "What is the velocity of money?",
+    "options": ["Money creation speed", "How fast money changes hands", "Interest rate changes", "Inflation rate"],
+    "correct": "How fast money changes hands",
+    "category": "economics"
+  },
+  {
+    "question": "What is moral hazard?",
+    "options": ["Ethical business practices", "Risk-taking due to protection", "Illegal activities", "Market manipulation"],
+    "correct": "Risk-taking due to protection",
+    "category": "economics"
+  },
+  {
+    "question": "What is adverse selection?",
+    "options": ["Bad investment choices", "Information asymmetry problems", "Market decline", "Poor management"],
+    "correct": "Information asymmetry problems",
+    "category": "economics"
+  },
+  {
+    "question": "What is the Gini coefficient?",
+    "options": ["Economic growth measure", "Income inequality measure", "Inflation indicator", "Trade balance"],
+    "correct": "Income inequality measure",
+    "category": "economics"
+  },
+  {
+    "question": "What is rent-seeking?",
+    "options": ["Property rental", "Seeking economic rent without creating value", "House hunting", "Landlord activities"],
+    "correct": "Seeking economic rent without creating value",
+    "category": "economics"
+  },
+  {
+    "question": "What is the paradox of thrift?",
+    "options": ["Saving too little", "Collective saving reduces income", "Spending too much", "Investment returns"],
+    "correct": "Collective saving reduces income",
+    "category": "economics"
+  },
+  {
+    "question": "What is deadweight loss?",
+    "options": ["Shipping costs", "Efficiency loss from market distortion", "Inventory waste", "Production delays"],
+    "correct": "Efficiency loss from market distortion",
+    "category": "economics"
+  },
+  {
+    "question": "What is the Coase theorem?",
+    "options": ["Supply and demand", "Property rights solve externalities", "Market competition", "Government regulation"],
+    "correct": "Property rights solve externalities",
+    "category": "economics"
+  },
+  {
+    "question": "What is behavioral economics?",
+    "options": ["Animal economics", "Psychology in economic decisions", "Business behavior", "Market psychology"],
+    "correct": "Psychology in economic decisions",
+    "category": "economics"
+  },
+  {
+    "question": "What is the efficient market hypothesis?",
+    "options": ["Markets are always right", "Prices reflect all information", "Markets never fail", "Perfect competition"],
+    "correct": "Prices reflect all information",
+    "category": "economics"
+  },
+  {
+    "question": "What is purchasing power parity?",
+    "options": ["Equal buying power", "Currency exchange rates", "Price levels across countries", "International trade"],
+    "correct": "Price levels across countries",
+    "category": "economics"
+  },
+  {
+    "question": "What is the Keynesian multiplier?",
+    "options": ["Tax multiplier", "Spending creates more economic activity", "Interest rate effect", "Investment returns"],
+    "correct": "Spending creates more economic activity",
+    "category": "economics"
+  },
+  {
+    "question": "What is game theory in economics?",
+    "options": ["Gaming industry", "Strategic decision making", "Gambling economics", "Entertainment economics"],
+    "correct": "Strategic decision making",
+    "category": "economics"
+  },
+  {
+    "question": "What is the tragedy of the commons?",
+    "options": ["Public property problems", "Overuse of shared resources", "Government failure", "Market collapse"],
+    "correct": "Overuse of shared resources",
+    "category": "economics"
+  },
+  {
+    "question": "What is creative destruction?",
+    "options": ["Art economics", "Innovation replacing old industries", "Waste management", "Urban planning"],
+    "correct": "Innovation replacing old industries",
+    "category": "economics"
+  },
+  {
+    "question": "What is the natural rate of unemployment?",
+    "options": ["Zero unemployment", "Unemployment during recession", "Long-term unemployment rate", "Seasonal unemployment"],
+    "correct": "Long-term unemployment rate",
+    "category": "economics"
+  },
+  {
+    "question": "Who wrote 'Romeo and Juliet'?",
+    "options": ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+    "correct": "William Shakespeare",
+    "category": "literature"
+  },
+  {
+    "question": "What is the first book in the Harry Potter series?",
+    "options": ["Chamber of Secrets", "Prisoner of Azkaban", "Philosopher's Stone", "Goblet of Fire"],
+    "correct": "Philosopher's Stone",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote '1984'?",
+    "options": ["Aldous Huxley", "George Orwell", "Ray Bradbury", "H.G. Wells"],
+    "correct": "George Orwell",
+    "category": "literature"
+  },
+  {
+    "question": "What is the opening line of 'Pride and Prejudice'?",
+    "options": ["Call me Ishmael", "It was the best of times", "It is a truth universally acknowledged", "In a hole in the ground"],
+    "correct": "It is a truth universally acknowledged",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Great Gatsby'?",
+    "options": ["Ernest Hemingway", "F. Scott Fitzgerald", "John Steinbeck", "William Faulkner"],
+    "correct": "F. Scott Fitzgerald",
+    "category": "literature"
+  },
+  {
+    "question": "What is the first line of Dante's 'Inferno'?",
+    "options": ["In the middle of the journey of our life", "Abandon all hope", "Here must all distrust be left", "Through me is the way"],
+    "correct": "In the middle of the journey of our life",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'To Kill a Mockingbird'?",
+    "options": ["Harper Lee", "Toni Morrison", "Maya Angelou", "Flannery O'Connor"],
+    "correct": "Harper Lee",
+    "category": "literature"
+  },
+  {
+    "question": "What is the subtitle of 'Frankenstein'?",
+    "options": ["The Monster", "The Modern Prometheus", "A Gothic Tale", "The Creature"],
+    "correct": "The Modern Prometheus",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'One Hundred Years of Solitude'?",
+    "options": ["Mario Vargas Llosa", "Gabriel García Márquez", "Jorge Luis Borges", "Pablo Neruda"],
+    "correct": "Gabriel García Márquez",
+    "category": "literature"
+  },
+  {
+    "question": "What is the first word of 'Moby Dick'?",
+    "options": ["Call", "Ishmael", "The", "Ahab"],
+    "correct": "Call",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Catcher in the Rye'?",
+    "options": ["J.D. Salinger", "Kurt Vonnegut", "Jack Kerouac", "Allen Ginsberg"],
+    "correct": "J.D. Salinger",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of Odysseus's wife in Homer's 'Odyssey'?",
+    "options": ["Helen", "Penelope", "Circe", "Athena"],
+    "correct": "Penelope",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Crime and Punishment'?",
+    "options": ["Leo Tolstoy", "Fyodor Dostoevsky", "Anton Chekhov", "Ivan Turgenev"],
+    "correct": "Fyodor Dostoevsky",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the hobbit in Tolkien's 'The Hobbit'?",
+    "options": ["Frodo Baggins", "Bilbo Baggins", "Samwise Gamgee", "Peregrin Took"],
+    "correct": "Bilbo Baggins",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Jane Eyre'?",
+    "options": ["Charlotte Brontë", "Emily Brontë", "Anne Brontë", "George Eliot"],
+    "correct": "Charlotte Brontë",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Metamorphosis'?",
+    "options": ["Gregor Samsa", "Josef K.", "Karl Rossmann", "Georg Bendemann"],
+    "correct": "Gregor Samsa",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Beloved'?",
+    "options": ["Alice Walker", "Toni Morrison", "Zora Neale Hurston", "Maya Angelou"],
+    "correct": "Toni Morrison",
+    "category": "literature"
+  },
+  {
+    "question": "What is the first book in 'The Chronicles of Narnia' series?",
+    "options": ["The Lion, the Witch and the Wardrobe", "The Magician's Nephew", "Prince Caspian", "The Horse and His Boy"],
+    "correct": "The Lion, the Witch and the Wardrobe",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Wuthering Heights'?",
+    "options": ["Charlotte Brontë", "Emily Brontë", "Anne Brontë", "Elizabeth Gaskell"],
+    "correct": "Emily Brontë",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of Don Quixote's horse?",
+    "options": ["Bucephalus", "Rocinante", "Pegasus", "Shadowfax"],
+    "correct": "Rocinante",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Picture of Dorian Gray'?",
+    "options": ["Oscar Wilde", "Bram Stoker", "Arthur Conan Doyle", "Robert Louis Stevenson"],
+    "correct": "Oscar Wilde",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the ship in 'Moby Dick'?",
+    "options": ["Pequod", "Nautilus", "Hispaniola", "Bounty"],
+    "correct": "Pequod",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Lord of the Rings'?",
+    "options": ["C.S. Lewis", "J.R.R. Tolkien", "George R.R. Martin", "Terry Pratchett"],
+    "correct": "J.R.R. Tolkien",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the narrator in 'The Great Gatsby'?",
+    "options": ["Jay Gatsby", "Tom Buchanan", "Nick Carraway", "George Wilson"],
+    "correct": "Nick Carraway",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Anna Karenina'?",
+    "options": ["Fyodor Dostoevsky", "Leo Tolstoy", "Ivan Turgenev", "Nikolai Gogol"],
+    "correct": "Leo Tolstoy",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Catcher in the Rye'?",
+    "options": ["Holden Caulfield", "Phoebe Caulfield", "Allie Caulfield", "D.B. Caulfield"],
+    "correct": "Holden Caulfield",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Macbeth'?",
+    "options": ["Christopher Marlowe", "William Shakespeare", "Ben Jonson", "John Webster"],
+    "correct": "William Shakespeare",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'To Kill a Mockingbird'?",
+    "options": ["Atticus Finch", "Scout Finch", "Jem Finch", "Boo Radley"],
+    "correct": "Scout Finch",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Iliad'?",
+    "options": ["Homer", "Hesiod", "Sophocles", "Euripides"],
+    "correct": "Homer",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in '1984'?",
+    "options": ["Big Brother", "Winston Smith", "Julia", "O'Brien"],
+    "correct": "Winston Smith",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Canterbury Tales'?",
+    "options": ["Geoffrey Chaucer", "William Langland", "John Gower", "Pearl Poet"],
+    "correct": "Geoffrey Chaucer",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Pride and Prejudice'?",
+    "options": ["Jane Bennet", "Elizabeth Bennet", "Mary Bennet", "Lydia Bennet"],
+    "correct": "Elizabeth Bennet",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Hamlet'?",
+    "options": ["Christopher Marlowe", "William Shakespeare", "Ben Jonson", "Thomas Kyd"],
+    "correct": "William Shakespeare",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Jane Eyre'?",
+    "options": ["Bertha Mason", "Adele Varens", "Jane Eyre", "Helen Burns"],
+    "correct": "Jane Eyre",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Divine Comedy'?",
+    "options": ["Dante Alighieri", "Petrarch", "Boccaccio", "Chaucer"],
+    "correct": "Dante Alighieri",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Wuthering Heights'?",
+    "options": ["Heathcliff", "Catherine Earnshaw", "Edgar Linton", "Hindley Earnshaw"],
+    "correct": "Catherine Earnshaw",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'One Flew Over the Cuckoo's Nest'?",
+    "options": ["Ken Kesey", "Jack Kerouac", "Allen Ginsberg", "William Burroughs"],
+    "correct": "Ken Kesey",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Scarlet Letter'?",
+    "options": ["Arthur Dimmesdale", "Roger Chillingworth", "Hester Prynne", "Pearl"],
+    "correct": "Hester Prynne",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Brave New World'?",
+    "options": ["George Orwell", "Aldous Huxley", "Ray Bradbury", "Philip K. Dick"],
+    "correct": "Aldous Huxley",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Adventures of Huckleberry Finn'?",
+    "options": ["Tom Sawyer", "Huckleberry Finn", "Jim", "Pap Finn"],
+    "correct": "Huckleberry Finn",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Othello'?",
+    "options": ["Christopher Marlowe", "William Shakespeare", "Ben Jonson", "John Ford"],
+    "correct": "William Shakespeare",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Sun Also Rises'?",
+    "options": ["Jake Barnes", "Robert Cohn", "Brett Ashley", "Bill Gorton"],
+    "correct": "Jake Barnes",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'Les Misérables'?",
+    "options": ["Victor Hugo", "Alexandre Dumas", "Gustave Flaubert", "Émile Zola"],
+    "correct": "Victor Hugo",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'The Old Man and the Sea'?",
+    "options": ["Santiago", "Manolin", "DiMaggio", "The Marlin"],
+    "correct": "Santiago",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'A Tale of Two Cities'?",
+    "options": ["Charles Dickens", "Thomas Hardy", "George Eliot", "Anthony Trollope"],
+    "correct": "Charles Dickens",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Fahrenheit 451'?",
+    "options": ["Guy Montag", "Captain Beatty", "Clarisse McClellan", "Mildred Montag"],
+    "correct": "Guy Montag",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'The Grapes of Wrath'?",
+    "options": ["John Steinbeck", "William Faulkner", "Ernest Hemingway", "F. Scott Fitzgerald"],
+    "correct": "John Steinbeck",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Of Mice and Men'?",
+    "options": ["George Milton", "Lennie Small", "Curley", "Slim"],
+    "correct": "George Milton",
+    "category": "literature"
+  },
+  {
+    "question": "Who wrote 'King Lear'?",
+    "options": ["Christopher Marlowe", "William Shakespeare", "Ben Jonson", "Thomas Middleton"],
+    "correct": "William Shakespeare",
+    "category": "literature"
+  },
+  {
+    "question": "What is the name of the protagonist in 'Lord of the Flies'?",
+    "options": ["Jack Merridew", "Ralph", "Piggy", "Simon"],
+    "correct": "Ralph",
+    "category": "literature"
+  }
+]

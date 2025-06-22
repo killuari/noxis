@@ -4,6 +4,7 @@ from user_manager import UserManager
 from level_manager import *
 from economy_manager import *
 from inventory_manager import *
+from knowledge_manager import *
 
 
 class GetStarted(discord.ui.View):
@@ -28,7 +29,7 @@ class HigherLower(discord.ui.View):
         self.webhook_url = webhool_url
         self.interaction = interaction
         self.exp_award = random.randrange(10, 45)
-        self.money = random.randint(100, 500) 
+        self.money = random.randint(200, 400) 
     
     async def on_timeout(self):
         embed = discord.Embed(
@@ -51,14 +52,19 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Higher", style=discord.ButtonStyle.green, disabled=False)
     async def higher(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-            
-        if self.comparison_num in range(1,201):
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+                
+        if self.comparison_num in range(1,150):
+            difficulty_factor = 0.5
+        elif self.comparison_num in range(150, 301):
             difficulty_factor = 0.8
-        elif self.comparison_num in range(800, 1001):
-            difficulty_factor = random.randint(4, 5) 
+        elif self.comparison_num in range(700, 850):
+            difficulty_factor = 4
+        elif self.comparison_num in range(850, 1001):
+            difficulty_factor = 6
         else:
-            difficulty_factor = random.randint(1, 2)
+            difficulty_factor = 1.5
             
         if self.secret_num > self.comparison_num:
             self.money = int(self.money * difficulty_factor)
@@ -107,14 +113,19 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Lower", style=discord.ButtonStyle.red, disabled=False)
     async def lower(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-            
-        if self.comparison_num in range(1,201):
-            difficulty_factor = random.randint(4, 5) 
-        elif self.comparison_num in range(800, 1001):
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return  
+                    
+        if self.comparison_num in range(1,150):
+            difficulty_factor = 6
+        elif self.comparison_num in range(150, 301):
+            difficulty_factor = 4
+        elif self.comparison_num in range(700, 850):
             difficulty_factor = 0.8
+        elif self.comparison_num in range(850, 1001):
+            difficulty_factor = 0.5
         else:
-            difficulty_factor = random.randint(1, 2)
+            difficulty_factor = 1.5
             
         if self.secret_num < self.comparison_num:
             self.money = int(self.money * difficulty_factor)
@@ -163,14 +174,15 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Close Range (+-50)", style=discord.ButtonStyle.secondary, disabled=False)
     async def close_range(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)
-                                
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+                                        
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
-            self.money = int(self.money * 6.5) 
+            self.money = int(self.money * 7.5) 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
-            quantity = random.randint(1,5)
+            quantity = random.randint(1,3)
             await InventoryManager.add_item(self.user_id, item.item_id, quantity)
             answer_choice = random.choice(["Very good", "Nice guess", "Good job"])
             
@@ -217,10 +229,11 @@ class HigherLower(discord.ui.View):
     @discord.ui.button(label="Same", style=discord.ButtonStyle.primary, disabled=False)
     async def same_num(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.user_id != interaction.user.id:
-            interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
-            
+            await interaction.response.send_message("You are not the player", ephemeral=True, delete_after=5.0)    
+            return 
+                    
         if self.secret_num == self.comparison_num:
-            self.money = int(self.money * 10) 
+            self.money = int(self.money * 100) 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.EPIC))
@@ -265,3 +278,120 @@ class HigherLower(discord.ui.View):
             
             self.stop()
             await interaction.response.edit_message(embed=embed, view=None)
+
+
+class Quiz(discord.ui.View):
+    def __init__(self, user_id, question, answer_choices, answer, category, interaction, *, timeout=25):
+        super().__init__(timeout=timeout)
+        self.user_id = user_id
+        self.question = question
+        self.answer_choices = answer_choices
+        self.answer = answer
+        self.category = category
+        self.interaction = interaction
+        
+        
+        self.award = random.randint(10, 20)
+        self.experience = random.randint(75, 150)        
+        
+        for choice in answer_choices:
+            button = discord.ui.Button(label=choice, style=discord.ButtonStyle.primary, disabled=False)
+            button.callback = self.handle_field(choice)
+            self.add_item(button)
+            
+    def handle_field(self, choice):
+        async def move(interaction: discord.Interaction):
+            if interaction.user.id != self.user_id:
+                await interaction.response.send_message("You are not the player.",ephemeral=True, delete_after=5.0)
+                return
+
+            if choice == self.answer:
+                bonus_award = random.randint(20, 35)
+                bonus_xp = random.randint(50, 75)
+                
+                total_award = self.award + bonus_award
+                total_xp = self.experience + bonus_xp
+
+                knowledge = DEFAULT_KNOWLEDGE.copy()
+                knowledge[self.category] = total_award
+                await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
+                await KnowledgeManager.update_total_knowledge(self.user_id)
+                total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+                
+                await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+                self.stop()                
+                await interaction.response.edit_message(
+                    embed=discord.Embed(
+                    title=f"✅ Correct! **{self.answer}** is the right answer", 
+                    description=f"📖 You gained {self.award} + {bonus_award} Bonus Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
+                    color=discord.Color.green()), view=None)
+            else:
+                bonus_award = 0
+                bonus_xp = 0
+                
+                total_award = self.award + bonus_award
+                total_xp = self.experience + bonus_xp
+
+                knowledge = DEFAULT_KNOWLEDGE.copy()
+                knowledge[self.category] = total_award
+                await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)
+                await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
+                await KnowledgeManager.update_total_knowledge(self.user_id)
+                total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+                self.stop()                
+                await interaction.response.edit_message(
+                    embed=discord.Embed(
+                    title=f"❌ Incorrect. The correct answer was: {self.answer}",
+                    description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})", 
+                    color=discord.Color.red()), view=None)
+                
+        return move
+    
+    
+    async def on_timeout(self):
+        bonus_award = 0
+        bonus_xp = 0
+        
+        total_award = self.award + bonus_award
+        total_xp = self.experience + bonus_xp
+
+        knowledge = DEFAULT_KNOWLEDGE.copy()
+        knowledge[self.category] = total_award
+        await KnowledgeManager.add_knowledge(self.user_id, knowledge=knowledge)
+        await KnowledgeManager.update_total_knowledge(self.user_id)
+        total_knowledge = await KnowledgeManager.get_knowledge(self.user_id)
+
+        embed = discord.Embed(
+                title="⏰ Time's up!\n📖 Study complete!",
+                description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
+                color=discord.Color.yellow())
+        embed.set_footer(text="You have to be faster!")          
+        
+        await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)        
+        await self.interaction.edit_original_response(embed=embed, view=None)
+            
+    
+    @discord.ui.button(label="No Bonus", style=discord.ButtonStyle.secondary, emoji="❌", row=2)
+    async def no_bonus(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("You are not the player.",ephemeral=True, delete_after=5.0)
+            return
+                
+        bonus_award = 0
+        bonus_xp = 0
+        
+        total_award = self.award + bonus_award
+        total_xp = self.experience + bonus_xp
+
+        knowledge = DEFAULT_KNOWLEDGE.copy()
+        knowledge[self.category] = total_award
+        await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
+        total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+
+        embed = discord.Embed(
+                title="⏭ You chose to skip the bonus question.",
+                description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
+                color=discord.Color.yellow())
+        await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+        self.stop()        
+        await interaction.response.edit_message(embed=embed, view=None)

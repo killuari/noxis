@@ -1,4 +1,4 @@
-import discord, aiosqlite, typing, time, random, datetime
+import discord, aiosqlite, typing, time, random, datetime, aiofiles
 from discord import app_commands
 from discord.ext import commands
 from user_manager import *
@@ -12,7 +12,7 @@ from knowledge_manager import KnowledgeManager
 
 # This function creates an account through button interaction
 async def get_started(interaction: discord.Interaction, user_id: int):       
-    await interaction.response.send_message(embed=discord.Embed(title="You don't have an account yet.",description="Click on **Get Started** to create one!", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
+    await interaction.response.send_message(embed=discord.Embed(title="Wait something's wrong... Noxis is thinking...\n", description="Seems like you have never used a Noxis-Command before.\nIf you want to start playing click on **Get Started**.", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
 
 class BasicCommands(commands.Cog):
     def __init__(self, bot):
@@ -290,19 +290,23 @@ class BasicCommands(commands.Cog):
 
                 # 10% chance to get money and a common item
                 elif reward_chance <= 0.95:
-                    money = random.randint(750, 2000)
+                    money = random.randint(1500, 2500)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
 
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
-                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
-                    await InventoryManager.add_item(interaction.user.id, item.item_id)
+                    quantity = random.randint(1,3)
+                    found_msg += f"\n🍎 ** Also found** `{quantity} {item.name}`**!**"
+                    await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
                     experience = 50
 
                 # 5% change to get rare item
                 else:
+                    money = random.randint(2000, 3000)
+                    found_msg = f"💰 **Found** `{money}$`**!**"
+                    await EconomyManager.add_money(interaction.user.id, money)
                     item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
-                    found_msg = f"\n🍎 ** Also found** `one {item.name}`**!**"
+                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
 
@@ -444,29 +448,22 @@ class BasicCommands(commands.Cog):
             await db.commit()
         
         
-        award = random.randint(10, 25)
-        experience = random.randint(100, 250)
-
-        # TODO: Call mini-game logic here to award bonus XP       
-        bonus_award = 0
-        bonus_xp = 0
-        
-        total_award = award + bonus_award
-        total_xp = experience + bonus_xp
-
-        knowledge = DEFAULT_KNOWLEDGE.copy()
-        knowledge[category.value] = total_award
-        await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
-        total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
-
-        embed = discord.Embed(
-                title="📖 Study complete!",
-                description=f"🪙 You gained `{award}` Knowledge in {category.value.capitalize()}!\n\nYour total {category.value.capitalize()} Knowledge: `{total_knowledge[category.value]:,}` 🪙",
-                color=discord.Color.green()
-            ).set_thumbnail(url="https://elearningimages.adobe.com/files/2019/01/points-.png")
-        await interaction.response.send_message(embed=embed)
-        await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
-        await DatabaseManager.update_cmd_used(interaction.user.id)        
+        async with aiofiles.open("study_questions.json", "r", encoding="UTF-8") as file:
+            content = await file.read()
+            questions = json.loads(content)
+            num = random.randint(0,50)
+            
+            questions = [question for question in questions if question["category"] == category.value]
+            
+            questions = questions[num]
+            question = questions["question"]
+            answer_choices = questions["options"] 
+            answer = questions["correct"]
+            view = Quiz(interaction.user.id, question, answer_choices, answer, category.value, interaction)
+            
+            await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value.capitalize()}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
+                                                                        description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)           
+                                                    
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
@@ -580,10 +577,10 @@ class BasicCommands(commands.Cog):
             cursor = await db.cursor()
             await cursor.execute("SELECT cmd_used FROM users WHERE user_id=?", (user.id,))
             result = await cursor.fetchone()
-            if result is None or result[0] is None:
-                result = [0]
-            
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "cmd_used")                  
-        embed.add_field(name="Commands", value=f"Rank: `{rank}/{leaderboard}`\nTotal used: `{result[0]}`", inline=True)
-          
+            await cursor.execute("SELECT created_at FROM users WHERE user_id=?", (user.id,))
+            created_at= (await cursor.fetchone())[0]
+        
+        timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
+        embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
+        await DatabaseManager.update_cmd_used(interaction.user.id)    
         await interaction.response.send_message(embed=embed)
