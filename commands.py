@@ -274,16 +274,16 @@ class BasicCommands(commands.Cog):
                     found_msg = "😔 **Found nothing valuable this time**"
                     experience = 10
 
-                # 25% chance to get some money
-                elif reward_chance <= 0.65:
-                    money = random.randint(100, 500)
+                # 30% chance to get some money
+                elif reward_chance <= 0.7:
+                    money = random.randint(200, 500)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
                     experience = 15
 
-                # 20% chance to get more money 
+                # 15% chance to get more money 
                 elif reward_chance <= 0.85:
-                    money = random.randint(500, 1500)
+                    money = random.randint(750, 1500)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
                     experience = 25

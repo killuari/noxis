@@ -56,15 +56,15 @@ class HigherLower(discord.ui.View):
             return 
                 
         if self.comparison_num in range(1,150):
-            difficulty_factor = 0.5
+            difficulty_factor = 1
         elif self.comparison_num in range(150, 301):
-            difficulty_factor = 0.8
-        elif self.comparison_num in range(700, 850):
-            difficulty_factor = 4
-        elif self.comparison_num in range(850, 1001):
-            difficulty_factor = 6
-        else:
             difficulty_factor = 1.5
+        elif self.comparison_num in range(700, 850):
+            difficulty_factor = 6
+        elif self.comparison_num in range(850, 1001):
+            difficulty_factor = 8
+        else:
+            difficulty_factor = 2
             
         if self.secret_num > self.comparison_num:
             self.money = int(self.money * difficulty_factor)
@@ -117,15 +117,15 @@ class HigherLower(discord.ui.View):
             return  
                     
         if self.comparison_num in range(1,150):
-            difficulty_factor = 6
+            difficulty_factor = 8
         elif self.comparison_num in range(150, 301):
-            difficulty_factor = 4
+            difficulty_factor = 6
         elif self.comparison_num in range(700, 850):
-            difficulty_factor = 0.8
-        elif self.comparison_num in range(850, 1001):
-            difficulty_factor = 0.5
-        else:
             difficulty_factor = 1.5
+        elif self.comparison_num in range(850, 1001):
+            difficulty_factor = 1
+        else:
+            difficulty_factor = 2
             
         if self.secret_num < self.comparison_num:
             self.money = int(self.money * difficulty_factor)
@@ -178,7 +178,7 @@ class HigherLower(discord.ui.View):
             return 
                                         
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
-            self.money = int(self.money * 7.5) 
+            self.money = int(self.money * 10) 
             await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
