@@ -318,8 +318,8 @@ class Quiz(discord.ui.View):
                 await KnowledgeManager.update_total_knowledge(self.user_id)
                 total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
                 
-                await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
-                await DatabaseManager.update_cmd_used(interaction.user.id)  
+                await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+                self.stop()                
                 await interaction.response.edit_message(
                     embed=discord.Embed(
                     title=f"✅ Correct! **{self.answer}** is the right answer", 
@@ -334,9 +334,11 @@ class Quiz(discord.ui.View):
 
                 knowledge = DEFAULT_KNOWLEDGE.copy()
                 knowledge[self.category] = total_award
+                await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)
                 await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
                 await KnowledgeManager.update_total_knowledge(self.user_id)
                 total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+                self.stop()                
                 await interaction.response.edit_message(
                     embed=discord.Embed(
                     title=f"❌ Incorrect. The correct answer was: {self.answer}",
@@ -365,9 +367,7 @@ class Quiz(discord.ui.View):
                 color=discord.Color.yellow())
         embed.set_footer(text="You have to be faster!")          
         
-        await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)
-        await DatabaseManager.update_cmd_used(self.user_id)
-        
+        await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)        
         await self.interaction.edit_original_response(embed=embed, view=None)
             
     
@@ -392,6 +392,6 @@ class Quiz(discord.ui.View):
                 title="⏭ You chose to skip the bonus question.",
                 description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
                 color=discord.Color.yellow())
-        await LevelManager.add_experience(interaction.user.id, total_xp, interaction.followup.url)
-        await DatabaseManager.update_cmd_used(interaction.user.id)   
+        await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+        self.stop()        
         await interaction.response.edit_message(embed=embed, view=None)

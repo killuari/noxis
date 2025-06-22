@@ -582,5 +582,5 @@ class BasicCommands(commands.Cog):
         
         timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
         embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
-        
+        await DatabaseManager.update_cmd_used(interaction.user.id)    
         await interaction.response.send_message(embed=embed)
