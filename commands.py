@@ -536,6 +536,15 @@ class BasicCommands(commands.Cog):
         if player is not None:
             user = player
             
+            async with aiosqlite.connect("database.db") as db:
+                cursor = await db.cursor()
+                await cursor.execute("SELECT * FROM users WHERE user_id=?", (user.id,))
+                result = await cursor.fetchone()  
+                
+                if result is None or result[0] is None:
+                    await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+                    return
+
         level, experience = await LevelManager.get_lvl_exp(user.id)
         inv = await InventoryManager.get_inventory(user.id)
         total = sum([item.quantity for item in inv])
@@ -559,7 +568,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
-        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
+        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value:,}$`", inline=True)
                        
         knowledge = await KnowledgeManager.get_knowledge(user.id)
         science = knowledge["science"]
@@ -589,4 +598,20 @@ class BasicCommands(commands.Cog):
         timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
         embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
         await DatabaseManager.update_cmd_used(interaction.user.id)    
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="inventory", description="Displays your or someones inventory")
+    async def inventory(self, interaction: discord.Interaction, user: discord.User = None): 
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return  
+        
+        user = interaction.user if user is None else user 
+        
+        inventory = await InventoryManager.get_inventory(user.id)
+        embed = discord.Embed(title=user.name)
+
+        for item in inventory:
+            embed.add_field(name=item.name, value=item.quantity)
+
         await interaction.response.send_message(embed=embed)
