@@ -403,16 +403,55 @@ class Inventory(discord.ui.View):
         self.interaction = interaction
         self.page = page
         self.inventory = inventory
+        self.cur_page = 1
 
     @discord.ui.button(emoji="⏮", style=discord.ButtonStyle.secondary, disabled=False)
     async def first_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        pass
+        if self.interaction.user.id != interaction.user.id:
+            await interaction.response.send_message(f"Only {self.interaction.user.id} can use these buttons")
+            return
+        
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed.set_footer(text=f"Page 1/{round(len(self.inventory)/10)}")
+
+
+        for idx, item in enumerate(self.inventory):
+            if idx <= 9:
+                    embed.add_field(name=f"{item.quantity}x {item.name}", value=f"{item.description}\nMax_stack: `{item.max_stack}`\nUsable: `{item.usable}`\nValue: `{item.value:,}`", inline=True)
+        
+        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
+
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
     async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
+
     @discord.ui.button(emoji="▶", style=discord.ButtonStyle.secondary, disabled=False)
     async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
+
     @discord.ui.button(emoji="⏭", style=discord.ButtonStyle.secondary, disabled=False)
     async def last_page(self, interaction: discord.Interaction, button: discord.ui.Button):
-        pass
+        if self.interaction.user.id != interaction.user.id:
+            await interaction.response.send_message(f"Only {self.interaction.user.id} can use these buttons", ephemeral=True)
+            return
+        
+        total_pages = round(len(self.inventory)/10)
+        self.cur_page = total_pages  
+
+        start_idx = (self.cur_page - 1) * 10
+        end_idx = start_idx + 10
+
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
+
+        for item in self.inventory[start_idx:end_idx]:
+            embed.add_field(
+                name=f"{item.quantity}x {item.name}",
+                value=(
+                    f"{item.description}\n"
+                    f"Max_stack: `{item.max_stack}`\n"
+                    f"Usable: `{item.usable}`\n"
+                    f"Value: `{item.value:,}`"),
+                inline=True)
+
+        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))

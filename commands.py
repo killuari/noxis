@@ -607,7 +607,16 @@ class BasicCommands(commands.Cog):
             return  
         
         user = interaction.user if user is None else user 
-        
+    
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT * FROM users WHERE user_id=?", (user.id,))
+            result = await cursor.fetchone()  
+            
+            if result is None or result[0] is None:
+                await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+                return
+    
         inventory = await InventoryManager.get_inventory(user.id)
         
         if inventory == []:
@@ -619,13 +628,13 @@ class BasicCommands(commands.Cog):
             return 
 
         pages_req = True if len(inventory) > 9 else False
-        
-        embed = discord.Embed(title=f"{user.name} inventory", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+
+        embed = discord.Embed(title=f"{user.name}'s inventory", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page 1/{round(len(inventory)/10)}")
 
         for idx, item in enumerate(inventory):
             if idx <= 9:
-                embed.add_field(name=f"{item.quantity}x {item.name}", value=item.description, inline=True)
+                embed.add_field(name=f"{item.quantity}x {item.name}", value=f"{item.description}\nMax_stack: `{item.max_stack}`\nUsable: `{item.usable}`\nValue: `{item.value:,}`", inline=True)
 
         view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
 
