@@ -553,7 +553,7 @@ class BasicCommands(commands.Cog):
         total_balance = await EconomyManager.get_total_balance(user.id)
         req_exp = LevelManager.calculate_exp_for_level(level+1)
 
-        embed = discord.Embed(title=f"{user.name}", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=user.name, colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
@@ -609,9 +609,25 @@ class BasicCommands(commands.Cog):
         user = interaction.user if user is None else user 
         
         inventory = await InventoryManager.get_inventory(user.id)
-        embed = discord.Embed(title=user.name)
+        
+        if inventory == []:
+            embed = discord.Embed(title="It's pretty empty around here...", 
+                                  description=f"{user.name} doesn't have any items yet. I think a few of my commands would come in handy 😉", 
+                                  color=discord.Color.dark_gray())
+            embed.set_footer(text="Try /higherlower or /scavenge")
+            await interaction.response.send_message(embed=embed)
+            return 
 
-        for item in inventory:
-            embed.add_field(name=item.name, value=item.quantity)
+        pages_req = True if len(inventory) > 9 else False
+        
+        embed = discord.Embed(title=f"{user.name} inventory", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed.set_footer(text=f"Page 1/{round(len(inventory)/10)}")
 
-        await interaction.response.send_message(embed=embed)
+        for idx, item in enumerate(inventory):
+            if idx <= 9:
+                embed.add_field(name=f"{item.quantity}x {item.name}", value=item.description, inline=True)
+
+        view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
+
+        await interaction.response.send_message(embed=embed, view=view)
+        await DatabaseManager.update_cmd_used(interaction.user.id)

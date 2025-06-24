@@ -395,3 +395,24 @@ class Quiz(discord.ui.View):
         await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
         self.stop()        
         await interaction.response.edit_message(embed=embed, view=None)
+
+
+class Inventory(discord.ui.View):
+    def __init__(self, interaction, inventory, page, *, timeout=None):
+        super().__init__(timeout=timeout)
+        self.interaction = interaction
+        self.page = page
+        self.inventory = inventory
+
+    @discord.ui.button(emoji="⏮", style=discord.ButtonStyle.secondary, disabled=False)
+    async def first_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+    @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
+    async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+    @discord.ui.button(emoji="▶", style=discord.ButtonStyle.secondary, disabled=False)
+    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+    @discord.ui.button(emoji="⏭", style=discord.ButtonStyle.secondary, disabled=False)
+    async def last_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
