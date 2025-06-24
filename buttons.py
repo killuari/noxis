@@ -425,7 +425,7 @@ class Inventory(discord.ui.View):
                     name=f"{item.quantity}x {item.name}",
                     value=(
                         f"{item.description}\n"
-                        f"Max_stack: `{item.max_stack}`\n"
+                        f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
                         f"Value: `{item.value:,}`"),
                     inline=True)
@@ -453,7 +453,7 @@ class Inventory(discord.ui.View):
                     name=f"{item.quantity}x {item.name}",
                     value=(
                         f"{item.description}\n"
-                        f"Max_stack: `{item.max_stack}`\n"
+                        f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
                         f"Value: `{item.value:,}`"),
                     inline=True)
@@ -484,7 +484,7 @@ class Inventory(discord.ui.View):
                     name=f"{item.quantity}x {item.name}",
                     value=(
                         f"{item.description}\n"
-                        f"Max_stack: `{item.max_stack}`\n"
+                        f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
                         f"Value: `{item.value:,}`"),
                     inline=True)
@@ -513,7 +513,7 @@ class Inventory(discord.ui.View):
                 name=f"{item.quantity}x {item.name}",
                 value=(
                     f"{item.description}\n"
-                    f"Max_stack: `{item.max_stack}`\n"
+                    f"Rarity: `{item.rarity}`\n"
                     f"Usable: `{item.usable}`\n"
                     f"Value: `{item.value:,}`"),
                 inline=True)

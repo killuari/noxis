@@ -634,7 +634,7 @@ class BasicCommands(commands.Cog):
 
         for idx, item in enumerate(inventory):
             if idx <= 9:
-                embed.add_field(name=f"{item.quantity}x {item.name}", value=f"{item.description}\nMax_stack: `{item.max_stack}`\nUsable: `{item.usable}`\nValue: `{item.value:,}`", inline=True)
+                embed.add_field(name=f"{item.quantity}x {item.name}", value=f"{item.description}\nRarity: `{item.rarity}`\nUsable: `{item.usable}`\nValue: `{item.value:,}`", inline=True)
 
         view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
 
