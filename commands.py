@@ -31,8 +31,10 @@ class BasicCommands(commands.Cog):
             if user is None:
                 await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (interaction.user.id,))
                 balance, bank_balance = await cursor.fetchone()                             
+               
                 rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
                 max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+               
                 await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
                 return
                     
@@ -40,14 +42,18 @@ class BasicCommands(commands.Cog):
             else:
                 await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user.id,))
                 result = await cursor.fetchone()  
+               
                 if result is None or result[0] is None:
                     user_found = False
+               
                 else:
                     balance, bank_balance = result                        
-                    rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
-                    max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                    rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
+                    max_bank_balance = await EconomyManager.get_max_bank_capacity(user.id)
+               
                     await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
                     await DatabaseManager.update_cmd_used(interaction.user.id)
+               
                 if not user_found:
                     await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
 
