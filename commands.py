@@ -617,7 +617,7 @@ class BasicCommands(commands.Cog):
                 await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
                 return
     
-        inventory = await InventoryManager.get_inventory(user.id)
+        inventory = await InventoryManager.get_inventory_sorted_by_rarity(user.id)
         
         if inventory == []:
             embed = discord.Embed(title="It's pretty empty around here...", 
@@ -627,14 +627,14 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=embed)
             return 
 
-        pages_req = True if len(inventory) > 9 else False
+        pages_req = True if len(inventory) > 5 else False
 
         embed = discord.Embed(title=f"{user.name}'s inventory", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
-        embed.set_footer(text=f"Page 1/{round(len(inventory)/10)}")
+        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+5)//6)}")
 
         for idx, item in enumerate(inventory):
-            if idx <= 9:
-                embed.add_field(name=f"{item.quantity}/{item.max_stack} {item.name}", value=f"{item.description}\nRarity: `{item.rarity}`\nUsable: `{item.usable}`\nValue: `{item.value:,}`", inline=True)
+            if idx <= 5:
+                embed.add_field(name=f"{item.quantity}/{item.max_stack} {item.name}", value=f"{item.description}\nRarity: `{item.rarity}`\nUsable: `{item.usable}`\nValue: `{item.value:,}$`", inline=True)
 
         view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
 

@@ -412,13 +412,13 @@ class Inventory(discord.ui.View):
             return
         
         self.cur_page = 1  
-        total_pages = round(len(self.inventory)/10)
+        total_pages = max(1, (len(self.inventory)+5)//6)
         
         embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
         start_idx = 0
-        end_idx = 10
+        end_idx = 6
 
         for item in self.inventory[start_idx:end_idx]:
                 embed.add_field(
@@ -427,7 +427,7 @@ class Inventory(discord.ui.View):
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
-                        f"Value: `{item.value:,}`"),
+                        f"Value: `{item.value:,}$`"),
                     inline=True)
     
         await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
@@ -440,10 +440,10 @@ class Inventory(discord.ui.View):
         
         if self.cur_page > 1:
             self.cur_page -= 1
-            total_pages = round(len(self.inventory)/10)
+            total_pages = max(1, (len(self.inventory)+5)//6)
             
-            start_idx = (self.cur_page - 1) * 10
-            end_idx = start_idx + 10
+            start_idx = (self.cur_page - 1) * 6
+            end_idx = start_idx + 6
 
             embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
@@ -455,7 +455,7 @@ class Inventory(discord.ui.View):
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
-                        f"Value: `{item.value:,}`"),
+                        f"Value: `{item.value:,}$`"),
                     inline=True)
 
             await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
@@ -468,13 +468,13 @@ class Inventory(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use these buttons", ephemeral=True)
             return
         
-        total_pages = round(len(self.inventory)/10)
+        total_pages = max(1, (len(self.inventory)+5)//6)
         
         if self.cur_page < total_pages:
             self.cur_page += 1
             
-            start_idx = (self.cur_page - 1) * 10
-            end_idx = start_idx + 10
+            start_idx = (self.cur_page - 1) * 6
+            end_idx = start_idx + 6
 
             embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
@@ -486,7 +486,7 @@ class Inventory(discord.ui.View):
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
                         f"Usable: `{item.usable}`\n"
-                        f"Value: `{item.value:,}`"),
+                        f"Value: `{item.value:,}$`"),
                     inline=True)
 
             await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
@@ -499,11 +499,11 @@ class Inventory(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use these buttons", ephemeral=True)
             return
         
-        total_pages = round(len(self.inventory)/10)
+        total_pages = max(1, (len(self.inventory)+5)//6)
         self.cur_page = total_pages  
 
-        start_idx = (self.cur_page - 1) * 10
-        end_idx = start_idx + 10
+        start_idx = (self.cur_page - 1) * 6
+        end_idx = start_idx + 6
 
         embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
@@ -515,7 +515,7 @@ class Inventory(discord.ui.View):
                     f"{item.description}\n"
                     f"Rarity: `{item.rarity}`\n"
                     f"Usable: `{item.usable}`\n"
-                    f"Value: `{item.value:,}`"),
+                    f"Value: `{item.value:,}$`"),
                 inline=True)
 
         await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
