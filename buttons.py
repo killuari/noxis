@@ -422,7 +422,7 @@ class Inventory(discord.ui.View):
 
         for item in self.inventory[start_idx:end_idx]:
                 embed.add_field(
-                    name=f"{item.quantity}x {item.name}",
+                    name=f"{item.quantity}/{item.max_stack} {item.name}",
                     value=(
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
@@ -450,7 +450,7 @@ class Inventory(discord.ui.View):
 
             for item in self.inventory[start_idx:end_idx]:
                 embed.add_field(
-                    name=f"{item.quantity}x {item.name}",
+                    name=f"{item.quantity}/{item.max_stack} {item.name}",
                     value=(
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
@@ -481,7 +481,7 @@ class Inventory(discord.ui.View):
 
             for item in self.inventory[start_idx:end_idx]:
                 embed.add_field(
-                    name=f"{item.quantity}x {item.name}",
+                    name=f"{item.quantity}/{item.max_stack} {item.name}",
                     value=(
                         f"{item.description}\n"
                         f"Rarity: `{item.rarity}`\n"
@@ -510,7 +510,7 @@ class Inventory(discord.ui.View):
 
         for item in self.inventory[start_idx:end_idx]:
             embed.add_field(
-                name=f"{item.quantity}x {item.name}",
+                name=f"{item.quantity}/{item.max_stack} {item.name}",
                 value=(
                     f"{item.description}\n"
                     f"Rarity: `{item.rarity}`\n"
