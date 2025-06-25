@@ -536,7 +536,7 @@ class BasicCommands(commands.Cog):
         if player is not None:
             user = player
             
-        if not UserManager.user_exists(user.id):
+        if not await UserManager.user_exists(user.id):
             await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
             return
 
@@ -603,7 +603,7 @@ class BasicCommands(commands.Cog):
         
         user = interaction.user if user is None else user 
     
-        if not UserManager.user_exists(user.id):
+        if not await UserManager.user_exists(user.id):
             await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
             return
     

@@ -414,7 +414,7 @@ class Inventory(discord.ui.View):
         self.cur_page = 1  
         total_pages = max(1, (len(self.inventory)+5)//6)
         
-        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
         start_idx = 0
@@ -445,7 +445,7 @@ class Inventory(discord.ui.View):
             start_idx = (self.cur_page - 1) * 6
             end_idx = start_idx + 6
 
-            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.inventory[start_idx:end_idx]:
@@ -476,7 +476,7 @@ class Inventory(discord.ui.View):
             start_idx = (self.cur_page - 1) * 6
             end_idx = start_idx + 6
 
-            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.inventory[start_idx:end_idx]:
@@ -505,7 +505,7 @@ class Inventory(discord.ui.View):
         start_idx = (self.cur_page - 1) * 6
         end_idx = start_idx + 6
 
-        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", colour=6702).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
         for item in self.inventory[start_idx:end_idx]:
