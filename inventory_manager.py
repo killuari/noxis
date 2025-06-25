@@ -88,6 +88,13 @@ class InventoryManager:
 
         return items
 
+    @staticmethod
+    async def get_inventory_sorted_by_rarity(user_id: int) -> list:
+        """Returns a sorted list by rarity (legendary -> common)"""
+        items = await InventoryManager.get_inventory(user_id)
+        
+        items.sort(key=lambda x: x.rarity.value, reverse=True)
+        return items
 
     @staticmethod
     async def get_inventory_value(user_id: int):
@@ -106,3 +113,4 @@ class InventoryManager:
             cursor = await db.cursor()
             await cursor.execute("UPDATE users SET inv_value=? WHERE user_id=?", (value, user_id))
             await db.commit()
+    

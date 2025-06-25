@@ -11,6 +11,9 @@ class Rarity(Enum):
 
     def __lt__(self, obj):
         return self.value < obj.value
+    
+    def __str__(self):
+        return self.name.capitalize()
 
 @dataclass
 class Item:

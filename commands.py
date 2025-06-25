@@ -31,23 +31,29 @@ class BasicCommands(commands.Cog):
             if user is None:
                 await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (interaction.user.id,))
                 balance, bank_balance = await cursor.fetchone()                             
+               
                 rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
                 max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
-                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+               
+                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.from_str("#607bff")))
                 return
                     
             # get balance of other user
             else:
                 await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (user.id,))
                 result = await cursor.fetchone()  
+               
                 if result is None or result[0] is None:
                     user_found = False
+               
                 else:
                     balance, bank_balance = result                        
-                    rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
-                    max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
+                    rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
+                    max_bank_balance = await EconomyManager.get_max_bank_capacity(user.id)
+               
                     await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
                     await DatabaseManager.update_cmd_used(interaction.user.id)
+               
                 if not user_found:
                     await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
 
@@ -530,6 +536,10 @@ class BasicCommands(commands.Cog):
         if player is not None:
             user = player
             
+        if not await UserManager.user_exists(user.id):
+            await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+            return
+
         level, experience = await LevelManager.get_lvl_exp(user.id)
         inv = await InventoryManager.get_inventory(user.id)
         total = sum([item.quantity for item in inv])
@@ -538,7 +548,7 @@ class BasicCommands(commands.Cog):
         total_balance = await EconomyManager.get_total_balance(user.id)
         req_exp = LevelManager.calculate_exp_for_level(level+1)
 
-        embed = discord.Embed(title=f"{user.name}", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=user.name, color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
@@ -553,7 +563,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
-        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value}$`", inline=True)
+        embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value:,}$`", inline=True)
                        
         knowledge = await KnowledgeManager.get_knowledge(user.id)
         science = knowledge["science"]
@@ -584,3 +594,39 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
         await DatabaseManager.update_cmd_used(interaction.user.id)    
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="inventory", description="Displays your or someones inventory")
+    async def inventory(self, interaction: discord.Interaction, user: discord.User = None): 
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return  
+        
+        user = interaction.user if user is None else user 
+    
+        if not await UserManager.user_exists(user.id):
+            await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+            return
+    
+        inventory = await InventoryManager.get_inventory_sorted_by_rarity(user.id)
+        
+        if inventory == []:
+            embed = discord.Embed(title="It's pretty empty around here...", 
+                                  description=f"{user.name} doesn't have any items yet. I think a few of my commands would come in handy 😉", 
+                                  color=discord.Color.red())
+            embed.set_footer(text="Try /higherlower or /scavenge")
+            await interaction.response.send_message(embed=embed)
+            return 
+
+        pages_req = True if len(inventory) > 5 else False
+
+        embed = discord.Embed(title=f"{user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+5)//6)}")
+
+        for idx, item in enumerate(inventory):
+            if idx <= 5:
+                embed.add_field(name=f"{item.quantity}/{item.max_stack} {item.name}", value=f"{item.description}\nRarity: `{item.rarity}`\nUsable: `{item.usable}`\nValue: `{item.value:,}$`", inline=True)
+
+        view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
+
+        await interaction.response.send_message(embed=embed, view=view)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
