@@ -536,14 +536,9 @@ class BasicCommands(commands.Cog):
         if player is not None:
             user = player
             
-            async with aiosqlite.connect("database.db") as db:
-                cursor = await db.cursor()
-                await cursor.execute("SELECT * FROM users WHERE user_id=?", (user.id,))
-                result = await cursor.fetchone()  
-                
-                if result is None or result[0] is None:
-                    await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
-                    return
+        if not UserManager.user_exists(user.id):
+            await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+            return
 
         level, experience = await LevelManager.get_lvl_exp(user.id)
         inv = await InventoryManager.get_inventory(user.id)
@@ -608,14 +603,9 @@ class BasicCommands(commands.Cog):
         
         user = interaction.user if user is None else user 
     
-        async with aiosqlite.connect("database.db") as db:
-            cursor = await db.cursor()
-            await cursor.execute("SELECT * FROM users WHERE user_id=?", (user.id,))
-            result = await cursor.fetchone()  
-            
-            if result is None or result[0] is None:
-                await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
-                return
+        if not UserManager.user_exists(user.id):
+            await interaction.response.send_message(f"{user} doesn't have an account. Try again.", ephemeral=True, delete_after=8.0)
+            return
     
         inventory = await InventoryManager.get_inventory_sorted_by_rarity(user.id)
         
