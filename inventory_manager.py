@@ -90,28 +90,9 @@ class InventoryManager:
 
     @staticmethod
     async def get_inventory_sorted_by_rarity(user_id: int) -> list:
-        """Gibt alle Items eines Inventars sortiert nach Rarity (legendary -> common) zurück"""
-        if not await UserManager.user_exists(user_id):
-            print("User doesnt exist")
-            return
+        """Returns a sorted list by rarity (legendary -> common)"""
+        items = await InventoryManager.get_inventory(user_id)
         
-        items = []
-        async with aiosqlite.connect("database.db") as db:
-            cursor = await db.cursor()
-            await cursor.execute("SELECT * FROM inventory WHERE user_id = ?", (user_id,))
-            result = await cursor.fetchall()
-            
-            if not result:
-                print("User doesnt have items")
-                return []
-            
-            for item_values in result:
-                item = await ItemManager.get_item(item_values[1])
-                item.quantity = item_values[2]
-                item.acquired_at = datetime.datetime.strptime(item_values[-1], "%Y-%m-%d %H:%M:%S").timestamp()
-                items.append(item)
-
-        # Sortiere nach Rarity absteigend (LEGENDARY zuerst)
         items.sort(key=lambda x: x.rarity.value, reverse=True)
         return items
 
