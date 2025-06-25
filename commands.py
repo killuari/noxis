@@ -35,7 +35,7 @@ class BasicCommands(commands.Cog):
                 rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
                 max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
                
-                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+                await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.from_str("#607bff")))
                 return
                     
             # get balance of other user
@@ -553,7 +553,7 @@ class BasicCommands(commands.Cog):
         total_balance = await EconomyManager.get_total_balance(user.id)
         req_exp = LevelManager.calculate_exp_for_level(level+1)
 
-        embed = discord.Embed(title=user.name, colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=user.name, color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
@@ -622,14 +622,14 @@ class BasicCommands(commands.Cog):
         if inventory == []:
             embed = discord.Embed(title="It's pretty empty around here...", 
                                   description=f"{user.name} doesn't have any items yet. I think a few of my commands would come in handy 😉", 
-                                  color=discord.Color.dark_gray())
+                                  color=discord.Color.red())
             embed.set_footer(text="Try /higherlower or /scavenge")
             await interaction.response.send_message(embed=embed)
             return 
 
         pages_req = True if len(inventory) > 5 else False
 
-        embed = discord.Embed(title=f"{user.name}'s inventory", colour=6702).set_thumbnail(url=user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
         embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+5)//6)}")
 
         for idx, item in enumerate(inventory):
