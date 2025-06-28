@@ -560,7 +560,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nXP: `{experience}/{req_exp}`\n{progress_bar}", inline=True)
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
-        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
+        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`\nTotal: `{total_balance:,}$`", inline=True)
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
         embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value:,}$`", inline=True)
