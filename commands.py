@@ -207,7 +207,8 @@ class BasicCommands(commands.Cog):
             else:
                 next_daily_time = last_daily + datetime.timedelta(days=1)
                 timestamp = int(next_daily_time.timestamp())
-                await interaction.response.send_message(embed=discord.Embed(title="You already claimed your daily.", description=f"Time left until available: <t:{timestamp}:R>", color=discord.Color.red()))
+                embed=discord.Embed(title="You already claimed your daily.", description=f"Time left until available: <t:{timestamp}:R>", color=discord.Color.red()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="weekly", description="Your weekly reward")
     async def weekly(self, interaction: discord.Interaction):
@@ -243,10 +244,11 @@ class BasicCommands(commands.Cog):
             else:
                 next_daily_time = last_daily + datetime.timedelta(weeks=1)
                 timestamp = int(next_daily_time.timestamp())
-                await interaction.response.send_message(embed=discord.Embed(
+                embed=discord.Embed(
                     title="You already claimed your weekly.", 
                     description=f"Time left until available: <t:{timestamp}:R>", 
-                    color=discord.Color.red()))
+                    color=discord.Color.red()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="scavenge", description="Investigate your surroundings and try your luck finding coins or items.")
     async def scavenge(self, interaction: discord.Interaction):
@@ -335,7 +337,7 @@ class BasicCommands(commands.Cog):
                     title="⏰ Scavenging Cooldown", 
                     description=f"🛑 You're still tired from your last search!\n⏰ Next scavenge: <t:{timestamp}:R>", 
                     color=discord.Color.red()
-                    ).set_footer(text="💡 Try /work or /daily while you wait!"))
+                    ).set_footer(text= await KnowledgeManager.get_random_tip()))
                 
     @app_commands.command(name="rob", description="Try your luck and rob someone.")
     async def rob(self, interaction: discord.Interaction, user: discord.User):
@@ -412,7 +414,7 @@ class BasicCommands(commands.Cog):
                     title="⏰ Robbery Cooldown", 
                     description=f"🛑 You're still tired from your last robbery!\n⏰ Next robbery: <t:{timestamp}:R>", 
                     color=discord.Color.red()
-                    ).set_footer(text="💡 Try /work or /daily while you wait!"))
+                    ).set_footer(text= await KnowledgeManager.get_random_tip()))
     
     @app_commands.command(name="study", description="Choose a category for extra points")
     @app_commands.choices(category=[
@@ -443,10 +445,11 @@ class BasicCommands(commands.Cog):
             if not claim_available:
                 next_study_time = last_study + datetime.timedelta(minutes=15)
                 timestamp = int(next_study_time.timestamp())
-                await interaction.response.send_message(embed=discord.Embed(
+                embed=discord.Embed(
                     title="⏰ Study Cooldown",
                     description=f"🛑 You need to take a break before studying again!\n\n⏰ Next study: <t:{timestamp}:R>",
-                    color=discord.Color.red()))
+                    color=discord.Color.red()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
                 return
 
             # Update last used time for study
@@ -494,7 +497,8 @@ class BasicCommands(commands.Cog):
             if not claim_available:
                 next_available = last_game + datetime.timedelta(seconds=25)
                 timestamp = int(next_available.timestamp())
-                await interaction.response.send_message(embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()))
+                embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
                 return
             
             await cursor.execute("UPDATE last_used SET higherlower=? WHERE user_id=?", (current_time, interaction.user.id))
@@ -560,7 +564,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nXP: `{experience}/{req_exp}`\n{progress_bar}", inline=True)
         
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
-        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\nTotal: `{total_balance:,}$`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`", inline=True)
+        embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`\nTotal: `{total_balance:,}$`", inline=True)
                        
         rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
         embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value:,}$`", inline=True)
@@ -630,3 +634,9 @@ class BasicCommands(commands.Cog):
 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
+        
+    @app_commands.command(name="tip", description="You get a random tip for the game")
+    async def get_random_tip(self, interaction: discord.Interaction):
+        tip = await KnowledgeManager.get_random_tip()
+        await interaction.response.send_message(embed=discord.Embed(title=tip,
+                                                                    color=discord.Color.from_str("#607bff")))
