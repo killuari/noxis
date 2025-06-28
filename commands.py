@@ -630,3 +630,9 @@ class BasicCommands(commands.Cog):
 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
+        
+    @app_commands.command(name="get_tip", description="You get a random tip for the game")
+    async def get_random_tip(self, interaction: discord.Interaction):
+        tip = await KnowledgeManager.get_random_tip()
+        await interaction.response.send_message(embed=discord.Embed(title=tip,
+                                                                    color=discord.Color.from_str("#607bff")))
