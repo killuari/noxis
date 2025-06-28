@@ -37,6 +37,13 @@ class DatabaseManager:
                     PRIMARY KEY (user_id)
                 )
             """)
+
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS last_random_tip (
+                    random_tip TEXT,
+                    PRIMARY KEY (random_tip)
+                )
+            """)
             
             # Inventory Tabelle
             await db.execute("""

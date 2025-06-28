@@ -87,5 +87,28 @@ class KnowledgeManager:
             num = random.randint(0, len(tips) - 1)
             tip = tips[num]
             tip = tip["tip"]
+            
+            async with aiosqlite.connect("database.db") as db:
+                cursor = await db.cursor()
+                await cursor.execute("SELECT random_tip FROM last_random_tip")
+                result = await cursor.fetchone()
+                last_found = True
+                
+                if result is None:
+                    last_found = False
+                    result = [0]    
+
+                while tip == result[0]:
+                    num = random.randint(0, len(tips) - 1)
+                    tip = tips[num]
+                    tip = tip["tip"]
+                
+                if not last_found:                   
+                    await cursor.execute("INSERT INTO last_random_tip (random_tip) VALUES (?)", (tip,))
+                    await db.commit()
+                    
+                else:
+                    await cursor.execute("UPDATE last_random_tip SET random_tip=?", (tip,))
+                    await db.commit()
         
         return tip
