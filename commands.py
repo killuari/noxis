@@ -642,9 +642,6 @@ class BasicCommands(commands.Cog):
                                                                     color=discord.Color.from_str("#607bff")))
 
     async def autocomplete_items(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        if not await UserManager.user_exists(interaction.user.id):
-            return []
-
         suggestions = [ 
             app_commands.Choice(name=item.name, value=item.name) 
             for item in ITEMS.values() 
@@ -668,11 +665,10 @@ class BasicCommands(commands.Cog):
         
         embed = discord.Embed(
             title=item.name,
-            description=f"{item.description}\n"
-                        f"You have a total of `{item.quantity}` {item.name}\n"
-                        f"Net Value: `{item.value}$`\n"
-                        f"Your total value: `{item.value * item.quantity}$`\n"
-                        f"Rarity: {item.rarity}\n",
+            description=f"{item.description}\n\nYou have a total of **{item.quantity}**",
             color=discord.Color.from_str("#607bff"))
+        
+        embed.add_field(name="Value", value=f"`{item.value}$`", inline=False)
+        embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
         
         await interaction.response.send_message(embed=embed)
