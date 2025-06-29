@@ -23,7 +23,6 @@ class Item:
     description: str
     rarity: Rarity
     value: int = 0
-    max_stack: int = 99
     quantity: int = 0
     usable: bool = False
     metadata: Dict = None
@@ -42,7 +41,6 @@ ITEMS = {
         description="A fresh piece of bread for sustenance",
         rarity=Rarity.COMMON,
         value=100,
-        max_stack=50,
         usable=True,
         metadata={
             "nutrition": 20,      # satiety value
@@ -54,7 +52,6 @@ ITEMS = {
         description="A bottle of drinking water",
         rarity=Rarity.COMMON,
         value=100,
-        max_stack=30,
         usable=True,
     ),
     3: Item(
@@ -63,7 +60,6 @@ ITEMS = {
         description="Sturdy rope useful for climbing or securing",
         rarity=Rarity.UNCOMMON,
         value=250,
-        max_stack=40,
         usable=False,
     ),
     4: Item(
@@ -72,7 +68,6 @@ ITEMS = {
         description="A solid iron sword",
         rarity=Rarity.UNCOMMON,
         value=1000,
-        max_stack=5,
         usable=False,
         metadata={
             "damage": 12,
@@ -84,7 +79,6 @@ ITEMS = {
         description="A sturdy wooden shield for protection",
         rarity=Rarity.UNCOMMON,
         value=60,
-        max_stack=5,
         usable=False,
     ),
     6: Item(
@@ -93,7 +87,6 @@ ITEMS = {
         description="A basic hammer, also useful for building",
         rarity=Rarity.RARE,
         value=50,
-        max_stack=5,
         usable=False,
     ),
     7: Item(
@@ -102,7 +95,6 @@ ITEMS = {
         description="A bundle of nails for building and repairs",
         rarity=Rarity.COMMON,
         value=50,
-        max_stack=100,
         usable=False,
     ),
     8: Item(
@@ -111,7 +103,6 @@ ITEMS = {
         description="A simple tent for overnight stays outdoors",
         rarity=Rarity.RARE,
         value=5000,
-        max_stack=5,
         usable=True,
     ),
     9: Item(
@@ -120,7 +111,6 @@ ITEMS = {
         description="Keeps you warm during cold nights",
         rarity=Rarity.COMMON,
         value=200,
-        max_stack=20,
         usable=False,
     ),
     10: Item(
@@ -129,7 +119,6 @@ ITEMS = {
         description="Pot for cooking over an open fire",
         rarity=Rarity.UNCOMMON,
         value=500,
-        max_stack=1,
         usable=False,
     ),
     11: Item(
@@ -138,7 +127,6 @@ ITEMS = {
         description="Prepackaged rations for traveling",
         rarity=Rarity.UNCOMMON,
         value=500,
-        max_stack=20,
         usable=True,
     ),
     12: Item(
@@ -147,7 +135,6 @@ ITEMS = {
         description="Used to start a fire",
         rarity=Rarity.UNCOMMON,
         value=200,
-        max_stack=10,
         usable=True,
     ),
     13: Item(
@@ -156,7 +143,6 @@ ITEMS = {
         description="qdh",
         rarity=Rarity.RARE,
         value=2000,
-        max_stack=10,
         usable=False,
     ),
     14: Item(
@@ -165,7 +151,6 @@ ITEMS = {
         description="Map of the surrounding area",
         rarity=Rarity.COMMON,
         value=200,
-        max_stack=10,
         usable=False,
     ),
     15: Item(
@@ -174,7 +159,6 @@ ITEMS = {
         description="Shows cardinal directions",
         rarity=Rarity.UNCOMMON,
         value=400,
-        max_stack=15,
         usable=False,
     ),
     16: Item(
@@ -183,7 +167,6 @@ ITEMS = {
         description="Oil lantern for dark areas",
         rarity=Rarity.UNCOMMON,
         value=500,
-        max_stack=20,
         usable=True,
     ),
     17: Item(
@@ -192,7 +175,6 @@ ITEMS = {
         description="A simple bow for ranged combat",
         rarity=Rarity.UNCOMMON,
         value=800,
-        max_stack=5,
         usable=False,
     ),
     18: Item(
@@ -201,7 +183,6 @@ ITEMS = {
         description="Standard arrows for the bow",
         rarity=Rarity.COMMON,
         value=30,
-        max_stack=100,
         usable=False,
     ),
     19: Item(
@@ -210,7 +191,6 @@ ITEMS = {
         description="A torch that provides light for a while",
         rarity=Rarity.COMMON,
         value=300,
-        max_stack=20,
         usable=True,
     ),
     20: Item(
@@ -219,7 +199,6 @@ ITEMS = {
         description="Contains a random reward (mostly practical items)",
         rarity=Rarity.EPIC,
         value=2000,
-        max_stack=5,
         usable=True,
         metadata={
             # possible rewards are kept realistic items
