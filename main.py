@@ -7,7 +7,6 @@ from commands import BasicCommands
 from buttons import *
 from inventory_manager import InventoryManager
 
-
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
 
