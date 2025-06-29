@@ -15,7 +15,6 @@ client = commands.Bot(command_prefix="=", intents=intents)
 load_dotenv() 
 TOKEN = os.getenv("BOT_TOKEN")
 
-
 @client.event
 async def on_ready():
     await DatabaseManager.init_database()
