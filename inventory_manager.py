@@ -2,6 +2,7 @@ import aiosqlite, json, datetime
 from items import *
 from user_manager import UserManager
 
+
 class InventoryManager:
     @staticmethod
     async def add_item(user_id: int, item_id: int, quantity: int = 1) -> int: # returns quantity that would exceed the max stack of specified item
