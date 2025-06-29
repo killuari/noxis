@@ -1,4 +1,4 @@
-import discord, aiosqlite, asyncio, random
+import discord, random
 from database_manager import *
 from user_manager import UserManager
 from level_manager import *

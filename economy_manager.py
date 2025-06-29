@@ -1,4 +1,4 @@
-import aiosqlite, discord, math
+import aiosqlite, math
 from typing import Tuple
 from user_manager import UserManager
 
