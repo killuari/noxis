@@ -6,7 +6,7 @@ from database_manager import DatabaseManager
 from commands import BasicCommands
 from buttons import *
 from inventory_manager import InventoryManager
-
+ 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
 
@@ -31,5 +31,5 @@ async def on_guild_join(guild: discord.Guild):
 @client.event
 async def on_member_join(member):
     await member.send(embed=discord.Embed(title="Welcome on this Server!", description="Click on **Get Started** to create an account in order to be able to start playing!", color=discord.Color.green()), view=GetStarted())
-
+ 
 client.run(TOKEN)
