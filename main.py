@@ -32,4 +32,5 @@ async def on_guild_join(guild: discord.Guild):
 async def on_member_join(member):
     await member.send(embed=discord.Embed(title="Welcome on this Server!", description="Click on **Get Started** to create an account in order to be able to start playing!", color=discord.Color.green()), view=GetStarted())
  
+ 
 client.run(TOKEN)
