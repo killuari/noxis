@@ -1,11 +1,10 @@
-import discord, os, aiosqlite
+import discord, os
 from discord.ext import commands
 from dotenv import load_dotenv
 from items import *
 from database_manager import DatabaseManager
 from commands import BasicCommands
 from buttons import *
-from inventory_manager import InventoryManager
 
 
 intents = discord.Intents.all()
