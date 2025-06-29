@@ -640,3 +640,39 @@ class BasicCommands(commands.Cog):
         tip = await KnowledgeManager.get_random_tip()
         await interaction.response.send_message(embed=discord.Embed(title=tip,
                                                                     color=discord.Color.from_str("#607bff")))
+
+    async def autocomplete_items(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        if not await UserManager.user_exists(interaction.user.id):
+            return []
+
+        suggestions = [ 
+            app_commands.Choice(name=item.name, value=item.name) 
+            for item in ITEMS.values() 
+            if current.lower() in item.name.lower()
+        ]
+
+        # Discord erlaubt max. 25 Vorschläge
+        return suggestions[:25]
+
+    @app_commands.command(name="item", description="Shows all the info about an item")
+    @app_commands.autocomplete(item=autocomplete_items)
+    async def item(self, interaction: discord.Interaction, item: str):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+                    
+        item = await ItemManager.get_item_by_name(item)
+        if not item:
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        embed = discord.Embed(
+            title=item.name,
+            description=f"{item.description}\n"
+                        f"You have a total of `{item.quantity}` {item.name}\n"
+                        f"Net Value: `{item.value}$`\n"
+                        f"Your total value: `{item.value * item.quantity}$`\n"
+                        f"Rarity: {item.rarity}\n",
+            color=discord.Color.from_str("#607bff"))
+        
+        await interaction.response.send_message(embed=embed)
