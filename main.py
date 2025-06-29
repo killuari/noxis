@@ -11,7 +11,6 @@ from inventory_manager import InventoryManager
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
 
-
 load_dotenv() 
 TOKEN = os.getenv("BOT_TOKEN")
 
