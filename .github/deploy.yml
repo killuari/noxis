@@ -1,0 +1,33 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.RPI_SSH_PRIVATE_KEY }}
+
+      - name: Add Raspberry Pi to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RPI_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Pull latest code and restart service
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_USER }}@${{ secrets.RPI_SSH_HOST }} << 'EOF'
+            cd /home/shared/projects/noxis
+            sudo git pull origin main
+            sudo systemctl restart noxis
+          EOF
