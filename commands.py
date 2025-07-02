@@ -624,7 +624,7 @@ class BasicCommands(commands.Cog):
         pages_req = True if len(inventory) > 9 else False
 
         embed = discord.Embed(title=f"{user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
-        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+8)//9)}")
+        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+8)//9)} | Use /item <item> to get more detailed info on an item!")
 
         for idx, item in enumerate(inventory):
             if idx < 9:
