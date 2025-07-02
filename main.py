@@ -27,7 +27,7 @@ async def on_guild_join(guild: discord.Guild):
         if channel.name.lower() in ["general", "chat", "allgemein"]:
             await channel.send(embed=discord.Embed(title="Hi I'm **Noxis**!", description="Click on **Get Started** to create an account in order to be able to start playing!", color=discord.Color.green()), view=GetStarted())
             return
-        
+    
 @client.event
 async def on_member_join(member):
     await member.send(embed=discord.Embed(title="Welcome on this Server!", description="Click on **Get Started** to create an account in order to be able to start playing!", color=discord.Color.green()), view=GetStarted())
