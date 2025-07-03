@@ -17,11 +17,6 @@ class InventoryManager:
 
             item_quantity = await InventoryManager.get_item_quantity(user_id, item_id)
             
-            # Add quantity if user already has item
-            if item_quantity + quantity > item.max_stack:
-                print("Quantity exceeds max stack of specified item")
-                return item_quantity + quantity - item.max_stack
-            
             if item_quantity > 0:
                 await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
             else:

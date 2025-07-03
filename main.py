@@ -21,7 +21,7 @@ async def on_ready():
 
 @client.event
 async def on_guild_join(guild: discord.Guild):
-    all_channels = await guild.fetch_channels()
+    all_channels = await guild.fetch_channels() 
     
     for channel in all_channels:
         if channel.name.lower() in ["general", "chat", "allgemein"]:

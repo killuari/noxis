@@ -621,14 +621,16 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=embed)
             return 
 
-        pages_req = True if len(inventory) > 5 else False
+        pages_req = True if len(inventory) > 9 else False
 
         embed = discord.Embed(title=f"{user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
-        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+5)//6)}")
+        embed.set_footer(text=f"Page 1/{max(1, (len(inventory)+8)//9)} | Use /item <item> to get more detailed info on an item!")
 
         for idx, item in enumerate(inventory):
-            if idx <= 5:
-                embed.add_field(name=f"{item.quantity}/{item.max_stack} {item.name}", value=f"{item.description}\nRarity: `{item.rarity}`\nUsable: `{item.usable}`\nValue: `{item.value:,}$`", inline=True)
+            if idx < 9:
+                embed.add_field(name=f"{item.quantity}x {item.name} ({item.rarity})",
+                                value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
+                                inline=True)
 
         view = Inventory(interaction, inventory, page=1) if pages_req else discord.utils.MISSING
 
@@ -640,3 +642,35 @@ class BasicCommands(commands.Cog):
         tip = await KnowledgeManager.get_random_tip()
         await interaction.response.send_message(embed=discord.Embed(title=tip,
                                                                     color=discord.Color.from_str("#607bff")))
+
+    async def autocomplete_items(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        suggestions = [ 
+            app_commands.Choice(name=item.name, value=item.name) 
+            for item in ITEMS.values() 
+            if current.lower() in item.name.lower()
+        ]
+
+        # Discord erlaubt max. 25 Vorschläge
+        return suggestions[:25]
+
+    @app_commands.command(name="item", description="Shows all the info about an item")
+    @app_commands.autocomplete(item=autocomplete_items)
+    async def item(self, interaction: discord.Interaction, item: str):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+                    
+        item = await ItemManager.get_item_by_name(item)
+        if not item:
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        embed = discord.Embed(
+            title=item.name,
+            description=f"{item.description}\n\nYou have a total of **{item.quantity}**",
+            color=discord.Color.from_str("#607bff"))
+        
+        embed.add_field(name="Value", value=f"`{item.value}$`", inline=False)
+        embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
+        
+        await interaction.response.send_message(embed=embed)
