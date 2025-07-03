@@ -28,6 +28,7 @@ jobs:
       - name: Pull latest code and restart service
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_USER }}@${{ secrets.RPI_SSH_HOST }} << 'EOF'
+            sudo git config --global --add safe.directory /home/shared/projects/noxis
             cd /home/shared/projects/noxis
             sudo git pull origin main
             sudo systemctl restart noxis
