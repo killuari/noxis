@@ -86,7 +86,7 @@ ITEMS = {
         name="Hammer",
         description="A basic hammer, also useful for building",
         rarity=Rarity.RARE,
-        value=50,
+        value=2500,
         usable=False,
     ),
     7: Item(
