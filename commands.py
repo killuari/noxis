@@ -686,7 +686,7 @@ class BasicCommands(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     balance, bank_balance = await EconomyManager.get_balance(user_id)
                     total_balance = await EconomyManager.get_total_balance(user_id)
-                    msg += f"`{idx}` **{user.name}** - 💵 {balance:,} | 🏦 {bank_balance:,} | Total: **{total_balance:,}**\n\n"
+                    msg += f"`{idx}` **{user.name}** - **{total_balance:,}**$ | 💵 {balance:,}$ | 🏦 {bank_balance:,}$\n\n"
                     
             title = "📊 Leaderboard - Balance"
             
@@ -695,7 +695,7 @@ class BasicCommands(commands.Cog):
                 if idx <= 5:
                     user = await self.bot.fetch_user(user_id)
                     level, _ = await LevelManager.get_lvl_exp(user_id)
-                    msg += f"`{idx}` {user.name} - 🏅 Level {level}\n\n"
+                    msg += f"`{idx}` **{user.name}** - 🏅 Level **{level}**\n\n"
                     
             title = "📊 Leaderboard - Level"
             
@@ -707,7 +707,7 @@ class BasicCommands(commands.Cog):
                     items = await InventoryManager.get_inventory(user_id)
                     count = sum(item.quantity for item in items)
                     unique_items = len(items)
-                    msg += f"`{idx}` {user.name} - 🎒 {unique_items} unique items ({count} in total) | 💰 **{inventory_value:,}**\n\n"
+                    msg += f"`{idx}` **{user.name}** - 💰 **{inventory_value:,}**$ | 🎒 {unique_items} unique items ({count} in total)\n\n"
                     
             title = "📊 Leaderboard - Inventory Value"
 
