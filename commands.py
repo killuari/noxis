@@ -32,7 +32,7 @@ class BasicCommands(commands.Cog):
                 await cursor.execute("SELECT balance, bank_balance FROM users WHERE user_id=?", (interaction.user.id,))
                 balance, bank_balance = await cursor.fetchone()                             
                
-                rank, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
+                rank, leaderboard, _ = await DatabaseManager.get_ranking(interaction.user.id, "users", "total_balance")
                 max_bank_balance = await EconomyManager.get_max_bank_capacity(interaction.user.id)
                
                 await interaction.response.send_message(embed=discord.Embed(title=f"{interaction.user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.from_str("#607bff")))
@@ -48,7 +48,7 @@ class BasicCommands(commands.Cog):
                
                 else:
                     balance, bank_balance = result                        
-                    rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
+                    rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
                     max_bank_balance = await EconomyManager.get_max_bank_capacity(user.id)
                
                     await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
@@ -554,7 +554,7 @@ class BasicCommands(commands.Cog):
 
         embed = discord.Embed(title=user.name, color=discord.Color.from_str("#607bff")).set_thumbnail(url=user.avatar.url.split("?")[0])
         
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "level")                  
+        rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "level")                  
         progess_curr = round(experience/req_exp, 1)
         progess_curr = round(progess_curr * 5) 
         green_bars = progess_curr * "🟩"
@@ -563,10 +563,10 @@ class BasicCommands(commands.Cog):
         progress_bar = green_bars + black_bars
         embed.add_field(name="Level", value=f"Rank: `{rank}/{leaderboard}`\nLevel: `{level}`\nXP: `{experience}/{req_exp}`\n{progress_bar}", inline=True)
         
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
+        rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "total_balance")                  
         embed.add_field(name="Balance", value=f"Rank: `{rank}/{leaderboard}`\n💵: `{balance:,}$`\n🏦: `{bank_balance:,}$`\nTotal: `{total_balance:,}$`", inline=True)
                        
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
+        rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "inv_value")                  
         embed.add_field(name="Inventory", value=f"Rank: `{rank}/{leaderboard}`\nTotal items: `{total}`\nUnique items: `{len(inv)}`\nValue: `{inv_value:,}$`", inline=True)
                        
         knowledge = await KnowledgeManager.get_knowledge(user.id)
@@ -578,7 +578,7 @@ class BasicCommands(commands.Cog):
         stat_economics = (await KnowledgeManager.get_knowledge_threshold(economics)).capitalize()
         literature = knowledge["literature"]
         stat_literature = (await KnowledgeManager.get_knowledge_threshold(literature)).capitalize()
-        rank, leaderboard = await DatabaseManager.get_ranking(user.id, "users", "total_knowledge")  
+        rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "total_knowledge")  
         embed.add_field(name="Knowledge", value=f"""
                         Rank: `{rank}/{leaderboard}`
                         Science: `{stat_science}`
@@ -674,3 +674,55 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
         
         await interaction.response.send_message(embed=embed)
+        
+    @app_commands.command(name="leaderboard", description="Shows leaderboard of top 5 users for selected category")
+    @app_commands.choices(category=[
+        app_commands.Choice(name="Balance", value="total_balance"),
+        app_commands.Choice(name="Level", value="level"),
+        app_commands.Choice(name="Inventory", value="inv_value")
+    ])
+    async def leaderboard(self, interaction: discord.Interaction, category: app_commands.Choice[str]):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+    
+        
+        title = ""
+        msg = ""
+        _, _, leaderboard= await DatabaseManager.get_ranking(interaction.user.id, "users", category.value) 
+        
+        if category.name == "Balance":
+            for idx, (user_id,) in enumerate(leaderboard, start=1):
+                if idx <= 5:  
+                    user = await self.bot.fetch_user(user_id)
+                    balance, bank_balance = await EconomyManager.get_balance(user_id)
+                    total_balance = await EconomyManager.get_total_balance(user_id)
+                    msg += f"`{idx}` **{user.name}** - 💵 {balance:,} | 🏦 {bank_balance:,} | Total: **{total_balance:,}**\n\n"
+            
+            title = "📊 Leaderboard - Balance"
+                    
+        elif category.name == "Level":  
+            for idx, (user_id,) in enumerate(leaderboard, start=1):
+                if idx <= 5:
+                    user = await self.bot.fetch_user(user_id)
+                    level, _ = await LevelManager.get_lvl_exp(user_id)
+                    msg += f"`{idx}` {user.name} - 🏅 Level {level}\n\n"
+                    
+            title = "📊 Leaderboard - Level"
+                    
+        elif category.name == "Inventory":  
+            for idx, (user_id,) in enumerate(leaderboard, start=1):
+                if idx <= 5:
+                    user = await self.bot.fetch_user(user_id)
+                    inventory_value = await InventoryManager.get_inventory_value(user_id)
+                    items = await InventoryManager.get_inventory(user_id)
+                    count = sum(item.quantity for item in items)  
+                    unique_items = len(items)
+                    msg += f"`{idx}` {user.name} - 🎒 {unique_items} unique items ({count} in total) | 💰 **{inventory_value:,}**\n\n"
+                    
+            title = "📊 Leaderboard - Inventory Value"
+
+
+        await interaction.response.send_message(embed=discord.Embed(title=title,
+                                                                    description=msg,
+                                                                    color=discord.Color.from_str("#607bff")))
