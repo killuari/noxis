@@ -687,8 +687,15 @@ class BasicCommands(commands.Cog):
                     balance, bank_balance = await EconomyManager.get_balance(user_id)
                     total_balance = await EconomyManager.get_total_balance(user_id)
                     msg += f"`{idx}` **{user.name}** - **{total_balance:,}**$ | 💵 {balance:,}$ | 🏦 {bank_balance:,}$\n\n"
+                
+                if user_id == interaction.user.id:
+                    author_rank = idx
+                
+            author_balance, author_bank_balance = await EconomyManager.get_balance(interaction.user.id)      
+            author_total_balance = await EconomyManager.get_total_balance(interaction.user.id)
+            msg += f"\n**Compare with your stats:**\n\n`{author_rank}` **{interaction.user.name}** - **{author_total_balance:,}**$ | 💵 {author_balance:,}$ | 🏦 {author_bank_balance:,}$\n\n"
                     
-            title = "📊 Leaderboard - Balance"
+            title = "Leaderboard - Balance"
             
         elif category_value == "level":
             for idx, (user_id,) in enumerate(leaderboard, start=1):
@@ -696,8 +703,14 @@ class BasicCommands(commands.Cog):
                     user = await self.bot.fetch_user(user_id)
                     level, _ = await LevelManager.get_lvl_exp(user_id)
                     msg += f"`{idx}` **{user.name}** - 🏅 Level **{level}**\n\n"
-                    
-            title = "📊 Leaderboard - Level"
+                
+                if user_id == interaction.user.id:
+                    author_rank = idx
+            
+            author_level, _ = await LevelManager.get_lvl_exp(interaction.user.id)
+            msg += f"\n**Compare with your stats:**\n\n`{author_rank}` **{interaction.user.name}** - 🏅 Level **{author_level}**\n\n"
+            
+            title = "Leaderboard - Level"
             
         elif category_value == "inv_value":
             for idx, (user_id,) in enumerate(leaderboard, start=1):
@@ -707,11 +720,21 @@ class BasicCommands(commands.Cog):
                     items = await InventoryManager.get_inventory(user_id)
                     count = sum(item.quantity for item in items)
                     unique_items = len(items)
-                    msg += f"`{idx}` **{user.name}** - 💰 **{inventory_value:,}**$ | 🎒 {unique_items} unique items ({count} in total)\n\n"
+                    msg += f"`{idx}` **{user.name}** - **{inventory_value:,}**$ | 🎒 {count} items ({unique_items} unique)\n\n"
                     
-            title = "📊 Leaderboard - Inventory Value"
+                if user_id == interaction.user.id:
+                    author_rank = idx
+                    
+            author_inv_value = await InventoryManager.get_inventory_value(interaction.user.id)
+            author_items = await InventoryManager.get_inventory(user_id)
+            total = sum(item.quantity for item in author_items)
+            author_unique_items = len(author_items)   
+            msg += f"\n**Compare with your stats:**\n\n`{author_rank}` **{interaction.user.name}** - **{author_inv_value:,}**$ | 🎒 {total} items ({author_unique_items} unique)"
+            
+            title = "Leaderboard - Inventory Value"
 
         embed = discord.Embed(title=title, description=msg, color=discord.Color.from_str("#607bff"))
+        embed.set_thumbnail(url="https://images.emojiterra.com/twitter/v13.1/512px/1f4ca.png")
 
         if view is None:
             view = LeaderboardView(self, interaction.user.id, category_value)
