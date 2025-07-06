@@ -398,11 +398,12 @@ class Quiz(discord.ui.View):
 
 
 class Inventory(discord.ui.View):
-    def __init__(self, interaction, inventory, page, *, timeout=None):
+    def __init__(self, interaction, inventory, url, page, *, timeout=None):
         super().__init__(timeout=timeout)
         self.interaction = interaction
         self.page = page
         self.inventory = inventory
+        self.url = url
         self.cur_page = page
 
     @discord.ui.button(emoji="⏮", style=discord.ButtonStyle.secondary, disabled=False)
@@ -413,7 +414,7 @@ class Inventory(discord.ui.View):
         
         self.cur_page = 1  
         total_pages = max(1, (len(self.inventory)+8)//9)
-        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.url)
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
         start_idx = 0
@@ -423,7 +424,7 @@ class Inventory(discord.ui.View):
                 name=f"{item.quantity}x {item.name} ({item.rarity})",
                 value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
                 inline=True)
-        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
+        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
 
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
     async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -436,7 +437,7 @@ class Inventory(discord.ui.View):
             total_pages = max(1, (len(self.inventory)+8)//9)
             start_idx = (self.cur_page - 1) * 9
             end_idx = start_idx + 9
-            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.url)
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.inventory[start_idx:end_idx]:
@@ -445,7 +446,7 @@ class Inventory(discord.ui.View):
                     value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
                     inline=True)
 
-            await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
+            await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         else:
             await interaction.response.defer()
 
@@ -459,7 +460,7 @@ class Inventory(discord.ui.View):
             self.cur_page += 1
             start_idx = (self.cur_page - 1) * 9
             end_idx = start_idx + 9
-            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+            embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.url)
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
             
             for item in self.inventory[start_idx:end_idx]:
@@ -468,7 +469,7 @@ class Inventory(discord.ui.View):
                     value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
                     inline=True)
                 
-            await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
+            await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         else:
             await interaction.response.defer()
 
@@ -481,7 +482,7 @@ class Inventory(discord.ui.View):
         self.cur_page = total_pages
         start_idx = (self.cur_page - 1) * 9
         end_idx = start_idx + 9
-        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.interaction.user.avatar.url.split("?")[0])
+        embed = discord.Embed(title=f"{self.interaction.user.name}'s inventory", color=discord.Color.from_str("#607bff")).set_thumbnail(url=self.url)
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
         
         for item in self.inventory[start_idx:end_idx]:
@@ -490,7 +491,7 @@ class Inventory(discord.ui.View):
                 value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
                 inline=True)
 
-        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.cur_page))
+        await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         
         
 class LeaderboardDropdown(discord.ui.Select):
