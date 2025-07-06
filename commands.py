@@ -8,7 +8,7 @@ from inventory_manager import InventoryManager
 from economy_manager import EconomyManager
 from level_manager import LevelManager
 from knowledge_manager import KnowledgeManager
-
+from buttons import LeaderboardView
 
 # This function creates an account through button interaction
 async def get_started(interaction: discord.Interaction, user_id: int):       
@@ -675,33 +675,22 @@ class BasicCommands(commands.Cog):
         
         await interaction.response.send_message(embed=embed)
         
-    @app_commands.command(name="leaderboard", description="Shows leaderboard of top 5 users for selected category")
-    @app_commands.choices(category=[
-        app_commands.Choice(name="Balance", value="total_balance"),
-        app_commands.Choice(name="Level", value="level"),
-        app_commands.Choice(name="Inventory", value="inv_value")
-    ])
-    async def leaderboard(self, interaction: discord.Interaction, category: app_commands.Choice[str]):
-        if not await UserManager.user_exists(interaction.user.id):
-            await get_started(interaction, interaction.user.id)
-            return
-    
-        
+    async def send_leaderboard_embed(self, interaction, category_value, update=False, view=None):
         title = ""
         msg = ""
-        _, _, leaderboard= await DatabaseManager.get_ranking(interaction.user.id, "users", category.value) 
-        
-        if category.name == "Balance":
+        _, _, leaderboard = await DatabaseManager.get_ranking(interaction.user.id, "users", category_value)
+
+        if category_value == "total_balance":
             for idx, (user_id,) in enumerate(leaderboard, start=1):
-                if idx <= 5:  
+                if idx <= 5:
                     user = await self.bot.fetch_user(user_id)
                     balance, bank_balance = await EconomyManager.get_balance(user_id)
                     total_balance = await EconomyManager.get_total_balance(user_id)
                     msg += f"`{idx}` **{user.name}** - 💵 {balance:,} | 🏦 {bank_balance:,} | Total: **{total_balance:,}**\n\n"
-            
-            title = "📊 Leaderboard - Balance"
                     
-        elif category.name == "Level":  
+            title = "📊 Leaderboard - Balance"
+            
+        elif category_value == "level":
             for idx, (user_id,) in enumerate(leaderboard, start=1):
                 if idx <= 5:
                     user = await self.bot.fetch_user(user_id)
@@ -709,20 +698,42 @@ class BasicCommands(commands.Cog):
                     msg += f"`{idx}` {user.name} - 🏅 Level {level}\n\n"
                     
             title = "📊 Leaderboard - Level"
-                    
-        elif category.name == "Inventory":  
+            
+        elif category_value == "inv_value":
             for idx, (user_id,) in enumerate(leaderboard, start=1):
                 if idx <= 5:
                     user = await self.bot.fetch_user(user_id)
                     inventory_value = await InventoryManager.get_inventory_value(user_id)
                     items = await InventoryManager.get_inventory(user_id)
-                    count = sum(item.quantity for item in items)  
+                    count = sum(item.quantity for item in items)
                     unique_items = len(items)
                     msg += f"`{idx}` {user.name} - 🎒 {unique_items} unique items ({count} in total) | 💰 **{inventory_value:,}**\n\n"
                     
             title = "📊 Leaderboard - Inventory Value"
 
+        embed = discord.Embed(title=title, description=msg, color=discord.Color.from_str("#607bff"))
 
-        await interaction.response.send_message(embed=discord.Embed(title=title,
-                                                                    description=msg,
-                                                                    color=discord.Color.from_str("#607bff")))
+        if view is None:
+            view = LeaderboardView(self, interaction.user.id, category_value)
+
+        if update:
+            await interaction.response.edit_message(embed=embed, view=view)
+            view.message = interaction.message
+            
+        else:
+            await interaction.response.send_message(embed=embed, view=view)
+            
+            try:
+                msg = await interaction.original_response()
+                view.message = msg
+                
+            except Exception:
+                pass
+            
+    @app_commands.command(name="leaderboard", description="Shows leaderboard of top 5 users for selected category")
+    async def leaderboard(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+
+        await self.send_leaderboard_embed(interaction, "total_balance", view=LeaderboardView(self, interaction.user.id, "total_balance"))
