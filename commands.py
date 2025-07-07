@@ -730,7 +730,7 @@ class BasicCommands(commands.Cog):
                     author_rank = idx
                     
             author_inv_value = await InventoryManager.get_inventory_value(interaction.user.id)
-            author_items = await InventoryManager.get_inventory(user_id)
+            author_items = await InventoryManager.get_inventory(interaction.user.id)
             total = sum(item.quantity for item in author_items)
             author_unique_items = len(author_items)   
             msg += f"\n**Compare with your stats:**\n\n`{author_rank}` **{interaction.user.name}** - **{author_inv_value:,}**$ | 🎒 {total} items ({author_unique_items} unique)"
