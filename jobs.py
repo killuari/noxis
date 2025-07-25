@@ -8,7 +8,7 @@ class Job:
     salary: int 
     cooldown: int
     required_level: int  
-    required_knowledge: dict = {"science": int, "economics": int, "literature": int, "medicine": int}
+    required_knowledge: dict 
 
 
 JOBS = {
