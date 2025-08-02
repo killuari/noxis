@@ -27,7 +27,7 @@ jobs:
           echo "${{ secrets.RPI_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Debugging: show known_hosts and SSH fingerprint
+      - name: Debugging - show known_hosts and SSH fingerprint
         run: |
           echo "---- ~/.ssh/known_hosts ----"
           cat ~/.ssh/known_hosts || true
