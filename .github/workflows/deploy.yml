@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          ssh-keyscan -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -t rsa,ecdsa,ed25519 -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_HOST }} >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: Pull latest code and restart service
