@@ -23,9 +23,7 @@ jobs:
       - name: Add Raspberry Pi to known_hosts
         run: |
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -t rsa,ecdsa,ed25519 -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_HOST }} >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          echo "${{ secrets.RPI_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
       - name: Pull latest code and restart service
         run: |
