@@ -32,12 +32,12 @@ jobs:
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.RPI_SSH_PORT }} ${{ secrets.RPI_SSH_USER }}@${{ secrets.RPI_SSH_HOST }} << 'EOF'
             git config --global user.name "deploybot"
             git config --global user.email "deploybot@raspberrypi.local"
-            
+
             sudo git config --global --add safe.directory /home/shared/projects/noxis
             cd /home/shared/projects/noxis
             
             # HTTPS remote mit Token verwenden
-            sudo git remote set-url origin https://${{ secrets.GITHUB_PAT }}@github.com/killuari/noxis.git
+            sudo git remote set-url origin https://${{ secrets.PAT }}@github.com/killuari/noxis.git
             sudo git pull origin main
             
             # Remote wieder ohne Token setzen (Sicherheit)
