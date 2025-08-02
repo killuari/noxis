@@ -23,7 +23,19 @@ jobs:
       - name: Add Raspberry Pi to known_hosts
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           echo "${{ secrets.RPI_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Debugging: show known_hosts and SSH fingerprint
+        run: |
+          echo "---- ~/.ssh/known_hosts ----"
+          cat ~/.ssh/known_hosts || true
+          echo ""
+          echo "---- SSH verbose check ----"
+          ssh -vvv -o StrictHostKeyChecking=yes \
+              -p ${{ secrets.RPI_SSH_PORT }} \
+              ${{ secrets.RPI_SSH_USER }}@${{ secrets.RPI_SSH_HOST }} exit || true
 
       - name: Pull latest code and restart service
         run: |
