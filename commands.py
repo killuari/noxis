@@ -786,7 +786,7 @@ class BasicCommands(commands.Cog):
         else:
             view = discord.utils.MISSING
             embed = discord.Embed(title="Available Jobs", description="Here are the jobs you can apply for:", color=discord.Color.from_str("#607bff"))
-            embed.set_footer(text="Page 1/1 | Use /job_apply to apply for a job")
+            embed.set_footer(text="Page 1/1 | Use /work apply to apply for a job")
           
             for job in jobs:
                 requirements_list = []

@@ -540,7 +540,7 @@ class JobList(discord.ui.View):
     def get_embed(self):
         total_pages = max(1, (len(self.jobs)+4)//5)
         embed = discord.Embed(title="Available Jobs", description="Here are the jobs you can apply for:", color=discord.Color.from_str("#607bff"))
-        embed.set_footer(text=f"Page {self.cur_page}/{total_pages} | Use /job_apply to apply for a job")
+        embed.set_footer(text=f"Page {self.cur_page}/{total_pages} | Use /work apply to apply for a job")
         start_idx = (self.cur_page - 1) * 5
         end_idx = start_idx + 5
 
