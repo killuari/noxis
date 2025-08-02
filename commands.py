@@ -18,6 +18,9 @@ async def get_started(interaction: discord.Interaction, user_id: int):
 class BasicCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.work_group = app_commands.Group(name="work", description="Job related commands") # Create work group and register subcommand
+        self.work_group.command(name="list", description="Shows all available jobs")(self.work_list) # Register the work list command
+        self.bot.tree.add_command(self.work_group)
         
     @app_commands.command(name="balance", description="Shows your or someones balance and bank_balance")
     async def balance(self, interaction: discord.Interaction, user: discord.User=None):
@@ -766,8 +769,7 @@ class BasicCommands(commands.Cog):
 
         await self.send_leaderboard_embed(interaction, "total_balance", view=LeaderboardView(self, interaction.user.id, "total_balance"))
         
-    @app_commands.command(name="job_list", description="Shows all available jobs")
-    async def job_list(self, interaction: discord.Interaction):
+    async def work_list(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
