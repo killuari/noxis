@@ -1,0 +1,43 @@
+{
+  "name": "Vaultbreaker",
+  "description": "A high-stakes vault job under the cover of night.",
+  "allowed_items": ["decoy_bag"],
+  "events": [
+    {
+      "id": "vault_entry",
+      "type": "choice",
+      "description": "You approach the vault door. The guard is still here!",
+      "choices": [
+        {
+          "label": "Knock him out",
+          "outcome": "fight_guard"
+        },
+        {
+          "label": "Sneak past",
+          "outcome": "sneak_success",
+          "chance": 0.6,
+          "fail_outcome": "sneak_fail"
+        }
+      ]
+    },
+    {
+      "id": "lockpick_minigame",
+      "type": "minigame",
+      "game": "lockpick",
+      "success_outcome": "vault_opened",
+      "fail_outcome": "alarm_triggered"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "item",
+      "id": "thief_mask",
+      "chance": 0.5
+    },
+    {
+      "type": "currency",
+      "amount_min": 500,
+      "amount_max": 2000
+    }
+  ]
+}

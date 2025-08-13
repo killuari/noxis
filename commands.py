@@ -768,6 +768,20 @@ class BasicCommands(commands.Cog):
             return
 
         await self.send_leaderboard_embed(interaction, "total_balance", view=LeaderboardView(self, interaction.user.id, "total_balance"))
+
+    @app_commands.command(name="expedition", description="Go on an expedition for some special rewards!")
+    async def expedition(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+
+        embed = discord.Embed(
+            title="Choose an Expedition",
+            color=discord.Color.from_str("#607bff"),
+        ).add_field(name="Name", value="Vaultbreaker"
+        ).add_field(name="Description", value="QDH")
+
+        await interaction.response.send_message()
         
     async def work_list(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
