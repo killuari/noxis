@@ -1,7 +1,7 @@
 {
   "name": "Vaultbreaker",
   "description": "A high-stakes vault job under the cover of night.",
-  "allowed_items": ["decoy_bag"],
+  "allowed_items": ["decoy_bag", "second_chance"],
   "events": [
     {
       "id": "vault_entry",
