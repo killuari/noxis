@@ -1,4 +1,5 @@
 {
+  "id": 0,
   "name": "Vaultbreaker",
   "description": "A high-stakes vault job under the cover of night.",
   "allowed_items": ["decoy_bag", "second_chance"],

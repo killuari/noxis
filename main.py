@@ -20,6 +20,8 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
+    await ExpeditionManager.load_all()
+
 @client.event
 async def on_guild_join(guild: discord.Guild):
     all_channels = await guild.fetch_channels() 
