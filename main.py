@@ -17,10 +17,9 @@ TOKEN = os.getenv("BOT_TOKEN")
 @client.event
 async def on_ready():
     await DatabaseManager.init_database()
+    await ExpeditionManager.load_all()
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
-
-    await ExpeditionManager.load_all()
 
 @client.event
 async def on_guild_join(guild: discord.Guild):

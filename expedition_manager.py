@@ -1,11 +1,14 @@
 import os, json, discord
 
 class ExpeditionDropdown(discord.ui.Select):
-    def __init__(self, author_id: int, options=...):
+    def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
         self.author_id = author_id
         options = [
-            discord.SelectOption(label=expedition["name"], value=expedition["id"], description=expedition["description"], default=expedition["id"]==0)
-            for expedition in ExpeditionManager.expeditions.values()
+            discord.SelectOption(label=ExpeditionManager.get_expedition(id)["name"], 
+                                 value=id, 
+                                 description=ExpeditionManager.get_expedition(id)["description"], 
+                                 default=ExpeditionManager.get_expedition(id)["id"]==current_expedition_id)
+            for id in range(len(ExpeditionManager.expeditions.keys()))
         ]
         super().__init__(options=options)
 
@@ -14,12 +17,13 @@ class ExpeditionDropdown(discord.ui.Select):
             await interaction.response.send_message("This is not your expedition.", ephemeral=True)
             return
         
-        await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id=self.values[0], update=True)
+        print(self.values)
+        await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id=int(self.values[0]), update=True)
 
 class ExpeditionView(discord.ui.View):
-    def __init__(self, author_id: int, timeout = 180):
+    def __init__(self, author_id: int, current_expedition_id: int = 0, timeout = 180):
         super().__init__(timeout=timeout)
-        self.add_item(ExpeditionDropdown(author_id=author_id))
+        self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
 class ExpeditionManager:
     expeditions = {}
@@ -41,6 +45,8 @@ class ExpeditionManager:
                     print(f"[ERROR] Fehler in {filename}: {e}")
                 except Exception as e:
                     print(f"[ERROR] Konnte {filename} nicht laden: {e}")
+
+        print("Successfully loaded all expedition!")
     
     @classmethod
     def get_expedition(cls, expedition_id: int):
@@ -63,7 +69,7 @@ class ExpeditionManager:
         if not update:
             await interaction.response.send_message(embed=embed, view=ExpeditionView(interaction.user.id))
         else:
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=embed, view=ExpeditionView(interaction.user.id, current_expedition_id=expedition_id))
 
     def start_expedition(self, user_id, expedition_id):
         # State initialisieren, erste Event-ID starten
