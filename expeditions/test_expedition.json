@@ -3,6 +3,7 @@
   "name": "Test Expedition",
   "description": "A test expedition.",
   "allowed_items": ["qdh", "baller los"],
+  "cost": 350000,
   "events": [
     {
       "id": "vault_entry",
