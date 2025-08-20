@@ -1,4 +1,4 @@
-import os, json, discord
+import os, json, discord, random
 from typing import List
 from economy_manager import EconomyManager
 from dataclasses import dataclass
@@ -10,12 +10,44 @@ class Expedition:
     description: str
     allowed_items: List[str]
     cost: int
-    events: dict
+    events: dict = None
 
-    def event_to_message(self, event_id: str):
+    def get_event_callbacks(self, event_id: str):
         event = self.events[event_id]
-        if event is not None:
-            embed = discord.Embed(title=event["description"])
+        callbacks = []
+        if event is None:
+            return None
+        
+        for choice in event.choices:
+            if random.random() <= choice["chance"]:
+                outcome = random.choice(choice["success_outcomes"])
+            else:
+                outcome = random.choice(choice["fail_outcomes"])
+
+            new_event = self.events[outcome]
+
+            async def event_callback(interaction: discord.Interaction):
+                embed, view = new_event.event_to_message()
+                await interaction.response.edit_message(embed=embed, view=view)
+
+            callbacks.append(event_callback)
+        
+        return callbacks
+            
+
+@dataclass
+class ExpeditionEvent:
+    event_id: str
+    type: str
+    description: str
+    choices: List[dict]
+
+    def event_to_message(self):
+        embed = discord.Embed(title=self.description)
+        view = EventView(self)
+        return (embed, view)
+
+            
 
 class ExpeditionDropdown(discord.ui.Select):
     def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
@@ -65,6 +97,17 @@ class ExpeditionView(discord.ui.View):
         
         ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
 
+class EventView(discord.ui.View):
+    def __init__(self, expedition: Expedition, event: ExpeditionEvent, timeout = 180):
+        super().__init__(timeout=timeout)
+
+        if event.type == "start" or event.type == "choice":
+            button_callbacks = expedition.get_event_callbacks(event.event_id)
+            for idx, choice in enumerate(event.choices):
+                button = discord.ui.Button(label=choice["label"])
+                button.callback = button_callbacks[idx]
+                self.add_item(button)
+
 class ExpeditionManager:
     expeditions = {}
 
@@ -89,8 +132,28 @@ class ExpeditionManager:
         print("Successfully loaded all expeditions!")
     
     @classmethod
-    def get_expedition(cls, expedition_id: int):
-        return cls.expeditions.get(expedition_id)
+    def get_expedition(cls, expedition_id: int) -> Expedition:
+        expedition_dict = cls.expeditions.get(expedition_id)
+        expedition = Expedition(
+            expedition_id=expedition_dict["id"],
+            name=expedition_dict["name"],
+            description=expedition_dict["description"],
+            allowed_items=expedition_dict["allowed_items"],
+            cost=expedition_dict["cost"]
+        )
+
+        events = {}
+        for event in expedition_dict["events"]:
+            if event["type"] == "start" or event["type"] == "choice":
+                events[event["id"]] = ExpeditionEvent(
+                    event_id=event["id"],
+                    type=event["type"],
+                    description=event["description"],
+                    choices=event["choices"]
+                )
+
+        expedition.events = events
+        return expedition
     
     @staticmethod
     async def send_expedition_embed(interaction: discord.Interaction, expedition_id: int, update: bool = False):
