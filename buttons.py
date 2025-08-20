@@ -5,6 +5,7 @@ from level_manager import *
 from economy_manager import *
 from inventory_manager import *
 from knowledge_manager import *
+from mini_games import lockpick
 
 
 class GetStarted(discord.ui.View):
@@ -640,32 +641,55 @@ class JobList(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
 
 class BankrobItems(discord.ui.View):
-    def __init__(self, interaction, target, *, timeout=None):
-        super().__init__(timeout=timeout)
+    def __init__(self, interaction, target):
+        super().__init__(timeout=None)
         self.interaction = interaction
         self.target = target
+        self.items = ["Lockpick plus", "Insider tip"]     
+        
+        for item_name in self.items:
+            button = discord.ui.Button(label=item_name, style=discord.ButtonStyle.secondary, disabled=False)
+            button.callback = self.create_callback(button) 
+            self.add_item(button)
 
-    @discord.ui.button(label="Thief Mask")
-    async def thief_mask(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('You clicked Thief Mask!')
+    def create_callback(self, button):
+        async def click(interaction: discord.Interaction):
+            if interaction.user.id != self.interaction.user.id:
+                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+                return
+            
+            button.style = discord.ButtonStyle.green if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
+               
+            await interaction.response.edit_message(view=self)
+        return click
 
-    @discord.ui.button(label="Lockpick plus")
-    async def lockpick_plus(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('You clicked Lockpick plus!')
-
-    @discord.ui.button(label="Insider tip")
-    async def insider_tip(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('You clicked Insider tip!')
-
-    @discord.ui.button(label="Start")
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
     async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('You clicked Start!')
-
-class Bankrob(discord.ui.Modal, title="Bankrob"):
-    message = discord.ui.TextInput(
-        label=""
-    )
+        if interaction.user.id != self.interaction.user.id:
+            interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+            return
+        
+        await interaction.response.edit_message(embed=discord.Embed(title="Game rules:"), view=LockpickView())
+        
+class LockpickView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
+    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.interaction.user.id:
+            interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+            return
+        
+        await interaction.response.send_modal(BankrobModal(interaction, self.target))
+        
+class BankrobModal(discord.ui.Modal):
+    def __init__(self, interaction, target, title="Bankrob"):
+        super().__init__(title=title, timeout=None)
+        self.interaction = interaction
+        self.target = target 
+        self.guess = discord.ui.TextInput(label="Your guess:")
+        self.add_item(self.guess)
+         
     async def on_submit(self, interaction):
-        await interaction.response.send_message("")
-
-
+        await lockpick(interaction, self.target, self.guess.value, ["Lockpick plus", "Insider tip"])
