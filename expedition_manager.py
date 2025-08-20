@@ -35,9 +35,9 @@ class Expedition:
         
         return callbacks
             
-
 @dataclass
 class ExpeditionEvent:
+    expedition_id: int
     event_id: str
     type: str
     description: str
@@ -46,10 +46,8 @@ class ExpeditionEvent:
 
     def event_to_message(self):
         embed = discord.Embed(title=self.description)
-        view = EventView(self)
+        view = EventView(event=self)
         return (embed, view)
-
-            
 
 class ExpeditionDropdown(discord.ui.Select):
     def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
@@ -97,11 +95,12 @@ class ExpeditionView(discord.ui.View):
             await interaction.response.send_message(f"You dont have enough money on your wallet!", ephemeral=True)
             return
         
-        ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
+        await ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
 
 class EventView(discord.ui.View):
-    def __init__(self, expedition: Expedition, event: ExpeditionEvent, timeout = 180):
+    def __init__(self, event: ExpeditionEvent, timeout = 180):
         super().__init__(timeout=timeout)
+        expedition = ExpeditionManager.get_expedition(expedition_id=event.expedition_id)
 
         if event.type == "start" or event.type == "choice":
             button_callbacks = expedition.get_event_callbacks(event.event_id)
@@ -143,6 +142,7 @@ class ExpeditionManager:
         start_events = {}
         for event_dict in expedition_dict["events"]:
             event = ExpeditionEvent(
+                expedition_id=expedition_dict["id"],
                 event_id=event_dict["id"],
                 type=event_dict["type"],
                 description=event_dict["description"],
@@ -150,6 +150,7 @@ class ExpeditionManager:
 
             if event.type == "start":
                 event.choices = event_dict["choices"]
+                events[event.event_id] = event
                 start_events[event.event_id] = event
             elif event.type == "choice":
                 event.choices = event_dict["choices"]
@@ -192,13 +193,9 @@ class ExpeditionManager:
                                                                         author_balance=(await EconomyManager.get_balance(interaction.user.id))[0], 
                                                                         current_expedition_id=expedition_id))
     @staticmethod
-    def start_expedition(interaction: discord.Interaction, expedition_id: int):
+    async def start_expedition(interaction: discord.Interaction, expedition_id: int):
         expedition = ExpeditionManager.get_expedition(expedition_id=expedition_id)
-        start_event = random.choice(expedition.start_events.values())
+        start_event = random.choice(list(expedition.start_events.values()))
         embed, view = start_event.event_to_message()
 
-        interaction.response.edit_message(embed=embed, view=view)
-
-
-
-
+        await interaction.response.edit_message(embed=embed, view=view)
