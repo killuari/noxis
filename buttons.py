@@ -638,3 +638,34 @@ class JobList(discord.ui.View):
         self.cur_page = total_pages
         embed = self.get_embed() 
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
+
+class BankrobItems(discord.ui.View):
+    def __init__(self, interaction, target, *, timeout=None):
+        super().__init__(timeout=timeout)
+        self.interaction = interaction
+        self.target = target
+
+    @discord.ui.button(label="Thief Mask")
+    async def thief_mask(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('You clicked Thief Mask!')
+
+    @discord.ui.button(label="Lockpick plus")
+    async def lockpick_plus(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('You clicked Lockpick plus!')
+
+    @discord.ui.button(label="Insider tip")
+    async def insider_tip(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('You clicked Insider tip!')
+
+    @discord.ui.button(label="Start")
+    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('You clicked Start!')
+
+class Bankrob(discord.ui.Modal, title="Bankrob"):
+    message = discord.ui.TextInput(
+        label=""
+    )
+    async def on_submit(self, interaction):
+        await interaction.response.send_message("")
+
+

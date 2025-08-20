@@ -820,3 +820,58 @@ class BasicCommands(commands.Cog):
                 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
+        
+    @app_commands.command(name="bankrob", description="Try to bankrob someone")
+    async def bankrob(self, interaction: discord.Interaction, target: discord.User):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        if target == interaction.user or target.bot: 
+            await interaction.response.send_message("You must enter a valid target.", ephemeral=True, delete_after=8.0)
+            return
+        
+        if await InventoryManager.get_item_quantity(interaction.user.id, 21) <= 0:
+            embed=discord.Embed(title="Error",
+                                description="You need the following item to use /bankrob: `thief mask`",
+                                color=discord.Color.red()).set_footer(text="Try /expedition for getting a thief mask")
+            
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+        
+        if (await EconomyManager.get_balance(target.id))[1] < 50000:
+            embed=discord.Embed(title="Error",
+                                description="Your target doesn't have enough money in their bank account",
+                                color=discord.Color.red()).set_footer(text="Try someone else")
+            
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT bankrob FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_game = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+
+            if result is None or last_game is None:
+                claim_available = True
+            else:
+                last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_game + datetime.timedelta(minutes=30))
+            
+            if not claim_available:
+                next_available = last_game + datetime.timedelta(minutes=30)
+                timestamp = int(next_available.timestamp())
+                embed=discord.Embed(title="WOOOOOOW", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
+                return
+            
+            await cursor.execute("UPDATE last_used SET bankrob=? WHERE user_id=?", (current_time, interaction.user.id))
+            await db.commit()
+        
+        bankrob_buttons = BankrobItems(interaction, target)
+        embed = discord.Embed(title=f"Starting your bankrob on {target.name}", description="Note: Thief Mask is mandatory. Select the items you want to use:", color=discord.Color.from_str("#607bff"))    
+        await interaction.response.send_message(embed=embed, view=bankrob_buttons)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
