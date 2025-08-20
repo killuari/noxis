@@ -1,5 +1,21 @@
 import os, json, discord
+from typing import List
 from economy_manager import EconomyManager
+from dataclasses import dataclass
+
+@dataclass
+class Expedition:
+    expedition_id: int
+    name: str
+    description: str
+    allowed_items: List[str]
+    cost: int
+    events: dict
+
+    def event_to_message(self, event_id: str):
+        event = self.events[event_id]
+        if event is not None:
+            embed = discord.Embed(title=event["description"])
 
 class ExpeditionDropdown(discord.ui.Select):
     def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
@@ -18,7 +34,6 @@ class ExpeditionDropdown(discord.ui.Select):
             await interaction.response.send_message("This is not your expedition.", ephemeral=True)
             return
         
-        print(self.values)
         await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id=int(self.values[0]), update=True)
 
 class ExpeditionView(discord.ui.View):
@@ -26,13 +41,14 @@ class ExpeditionView(discord.ui.View):
         super().__init__(timeout=timeout)
         self.author_id = author_id
         self.author_balance = author_balance
-        self.selected_expedition = ExpeditionManager.get_expedition(current_expedition_id)
+        self.selected_expedition_id = current_expedition_id
+        selected_expedition = ExpeditionManager.get_expedition(self.selected_expedition_id)
 
         self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
         start_button = discord.ui.Button(
-            label=f"Start Expedition! Cost: {self.selected_expedition["cost"]}" if author_balance > self.selected_expedition["cost"] else f"Too Expensive! Cost: {self.selected_expedition["cost"]}",
-            style=discord.ButtonStyle.green if author_balance > self.selected_expedition["cost"] else discord.ButtonStyle.red
+            label=f"Start Expedition! Cost: {selected_expedition["cost"]}" if author_balance > selected_expedition["cost"] else f"Too Expensive! Cost: {selected_expedition["cost"]}",
+            style=discord.ButtonStyle.green if author_balance > selected_expedition["cost"] else discord.ButtonStyle.red
         )
         start_button.callback = self.start_expedition_callback
 
@@ -47,7 +63,7 @@ class ExpeditionView(discord.ui.View):
             await interaction.response.send_message(f"You dont have enough money on your wallet!", ephemeral=True)
             return
         
-        print("expedition starts here")
+        ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
 
 class ExpeditionManager:
     expeditions = {}
@@ -99,11 +115,13 @@ class ExpeditionManager:
                                                                         author_balance=(await EconomyManager.get_balance(interaction.user.id))[0], 
                                                                         current_expedition_id=expedition_id))
 
-    def start_expedition(self, user_id, expedition_id):
-        # State initialisieren, erste Event-ID starten
-        pass
+    def start_expedition(self, interaction: discord.Interaction, expedition_id: int):
+        expedition = ExpeditionManager.get_expedition(expedition_id=expedition_id)
 
     def handle_event_choice(self, user_id, choice_id):
         # Nächstes Event oder Outcome ausführen
         pass
+
+
+
 
