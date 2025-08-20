@@ -400,9 +400,10 @@
     {
       "id": "lockpick_minigame",
       "type": "minigame",
+      "description": "You need to play lockpick.",
       "game": "lockpick",
-      "success_outcome": "vault_opened",
-      "fail_outcome": "alarm_triggered"
+      "success_outcomes": ["vault_opened"],
+      "fail_outcomes": ["alarm_triggered"]
     },
 
     {
