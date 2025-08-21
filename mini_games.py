@@ -4,24 +4,26 @@ from items import Item
 from buttons import *
 
 class LockpickGame:
-    def __init__(self, user: discord.User, target: discord.User = None, num_length: int = 4, max_num: int = 9):
+    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 5, num_length: int = 4, max_num: int = 9):
         self.user = user
         self.target = target
         self.num_length = num_length
         self.max_num = max_num
+        self.lives = lives
 
         self.desc = ""
         if target is not None:
             self.desc += f"**{self.user.mention}** is attempting to crack **{self.target.mention}**'s vault code!\n\n"
 
     async def start_game(self, items_used: Dict = {"lockpick_plus": False, "insider_tip": False}):
-        self.tip = random.choice(self.secret_pin) if items_used["insider_tip"] else None
-        self.lives = 6 if items_used["lockpick_plus"] else 5
-        self.max_attempts = self.lives
-
         secret_nums = (str(random.randint(0, self.max_num)) for i in range(self.num_length))
         self.secret_pin = "".join(secret_nums)
+        secret_pin_set = set(self.secret_pin)
         self.allowed_digits = set(str(i) for i in range(0, self.max_num+1))
+        
+        self.tip = random.choice(self.allowed_digits-secret_pin_set) if items_used["insider_tip"] else None
+        self.lives += 1 if items_used["lockpick_plus"] else 0
+        self.max_attempts = self.lives
 
         self.history = []
         
@@ -38,8 +40,7 @@ class LockpickGame:
                     return
                 
                 self.lives -= 1
-                feedback = self.get_visual_feedback(current_guess)
-                success = feedback == "🟩"*self.num_length
+                success, feedback = self.get_visual_feedback(current_guess)
                 self.history.append({"guess": current_guess, "feedback": feedback})
 
             game_over = success or self.lives == 0
@@ -74,6 +75,9 @@ class LockpickGame:
 
             embed = discord.Embed(title=title, description=desc, color=color)
 
+            if self.tip is not None:
+                embed.add_field(name="Insider Tip", value=self.tip, inline=False)
+
             if len(self.history) > 0:
                 history_text = ""
                 for idx, entry in enumerate(self.history, start=1):
@@ -86,7 +90,7 @@ class LockpickGame:
 
         return next_guess
     
-    def get_visual_feedback(self, guess: str) -> str:
+    def get_visual_feedback(self, guess: str) -> Tuple[bool, str]:
         """
         Returns a visual feedback string for a given guess against the secret.
         - ✅ = correct digit in correct position (bull)
@@ -117,7 +121,7 @@ class LockpickGame:
                 else:
                     result[i] = '🟥'
         
-        return ' '.join(result)
+        return (all(char == '🟩' for char in result), ' '.join(result))
 
 class LockpickView(discord.ui.View):
     def __init__(self, lockpick_game: LockpickGame):
