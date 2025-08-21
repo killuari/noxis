@@ -877,8 +877,8 @@ class BasicCommands(commands.Cog):
             description=(
                 f"**{interaction.user.mention}** is trying to rob **{target.mention}**'s bank account!\n\n"
                 "To succeed, you must crack a **4-digit security code**.\n\n"
-                "🔢 The code uses digits from **0–9** (e.g., `4821`).\n"
-                f"⏳ You have **6 attempts** to guess it.\n"
+                "🔢 The code uses digits from **0–9** (e.g., `4821`). Each digit **appears only once**\n"
+                f"⏳ You have **5 attempts** to guess it.\n"
                 "🕵️ After each guess, you'll get feedback:\n"
                 "-> 🟩 **Correct digit in the correct place**\n"
                 "-> 🟨 **Correct digit in the wrong place**\n" \
@@ -891,7 +891,7 @@ class BasicCommands(commands.Cog):
             name="🛠️ Optional Items",
             value=(
                 "- `Lockpick+`: +1 extra attempt\n"
-                "- `Insider Tip`: Reveals one digit at the start\n"
+                "- `Insider Tip`: Reveals one digit that's not part of the code\n"
             ),
             inline=False
         ).set_footer(text="Good luck... the vault is waiting!")

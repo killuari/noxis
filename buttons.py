@@ -658,7 +658,7 @@ class SelectItems(discord.ui.View):
             button.callback = self.create_callback(button)
             self.add_item(button)
 
-            self.button_mapping[button.label] = item_id
+            self.button_mapping[button.label] = (await ItemManager.get_item(item_id)).name
 
         self.callback_wrapper = callback_wrapper
 
@@ -674,7 +674,7 @@ class SelectItems(discord.ui.View):
             
             button.style = discord.ButtonStyle.blurple if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
             
-            items_used = {item_id: False for item_id in self.allowed_item_ids}
+            items_used = {(await ItemManager.get_item(item_id)).name: False for item_id in self.allowed_item_ids}
             for child in self.children:
                 if isinstance(child, discord.ui.Button):
                     if button.style == discord.ButtonStyle.blurple:

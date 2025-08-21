@@ -215,7 +215,7 @@ ITEMS = {
     ),
     22: Item(
         item_id=22,
-        name="Lockpick plus",
+        name="lockpick_plus",
         description="Contains a random reward (mostly practical items)",
         rarity=Rarity.EPIC,
         value=2000,
@@ -223,7 +223,7 @@ ITEMS = {
     ),
     23: Item(
         item_id=23,
-        name="Insider tip",
+        name="insider_tip",
         description="Contains a random reward (mostly practical items)",
         rarity=Rarity.EPIC,
         value=2000,

@@ -4,7 +4,7 @@ from items import Item
 from buttons import *
 
 class LockpickGame:
-    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 5, num_length: int = 4, max_num: int = 9):
+    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 4, num_length: int = 4, max_num: int = 9):
         self.user = user
         self.target = target
         self.num_length = num_length
@@ -13,15 +13,15 @@ class LockpickGame:
 
         self.desc = ""
         if target is not None:
-            self.desc += f"**{self.user.mention}** is attempting to crack **{self.target.mention}**'s vault code!\n\n"
+            self.desc += f"{self.user.mention} is attempting to crack {self.target.mention}'s vault code!\n\n"
 
     async def start_game(self, items_used: Dict = {"lockpick_plus": False, "insider_tip": False}):
-        secret_nums = (str(random.randint(0, self.max_num)) for i in range(self.num_length))
+        secret_nums = [str(num) for num in random.sample(range(self.max_num + 1), self.num_length)]
         self.secret_pin = "".join(secret_nums)
-        secret_pin_set = set(self.secret_pin)
         self.allowed_digits = set(str(i) for i in range(0, self.max_num+1))
-        
-        self.tip = random.choice(self.allowed_digits-secret_pin_set) if items_used["insider_tip"] else None
+        remaining_digits = tuple(self.allowed_digits-set(self.secret_pin))
+
+        self.tip = random.choice(remaining_digits) if items_used["insider_tip"] else None
         self.lives += 1 if items_used["lockpick_plus"] else 0
         self.max_attempts = self.lives
 
@@ -61,22 +61,22 @@ class LockpickGame:
                     if success:
                         title = "🎉 Vault Cracked!"
                         desc = (
-                            f"**{self.user.mention}** successfully robbed **{self.target.mention}**'s bank!\n\n"
+                            f"{self.user.mention} successfully robbed {self.target.mention}'s bank!\n\n"
                             f"💰 You stole **{50000:,} coins** from their bank balance."
                         )
                         color = discord.Color.green()
                     else:
                         title = "🚨 Police Caught You!"
                         desc = (
-                            f"**{self.user.mention}** failed to crack the vault in time...\n\n"
+                            f"{self.user.mention} failed to crack the vault in time...\n\n"
                             f"🚓 The police fined you **{20000:,} coins**."
                         )
                         color = discord.Color.red()
 
             embed = discord.Embed(title=title, description=desc, color=color)
 
-            if self.tip is not None:
-                embed.add_field(name="Insider Tip", value=self.tip, inline=False)
+            if self.tip is not None and not game_over:
+                embed.add_field(name="Insider Tip", value=f"Not in the code: {self.tip}", inline=False)
 
             if len(self.history) > 0:
                 history_text = ""
