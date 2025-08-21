@@ -5,7 +5,7 @@ from level_manager import *
 from economy_manager import *
 from inventory_manager import *
 from knowledge_manager import *
-from mini_games import lockpick
+from mini_games import *
 
 
 class GetStarted(discord.ui.View):
@@ -640,56 +640,47 @@ class JobList(discord.ui.View):
         embed = self.get_embed() 
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
 
-class BankrobItems(discord.ui.View):
-    def __init__(self, interaction, target):
+class SelectItems(discord.ui.View):
+    def __init__(self, user_id: int, allowed_item_ids: Tuple[int]): 
         super().__init__(timeout=None)
-        self.interaction = interaction
-        self.target = target
-        self.items = ["Lockpick plus", "Insider tip"]     
-        
-        for item_name in self.items:
-            button = discord.ui.Button(label=item_name, style=discord.ButtonStyle.secondary, disabled=False)
-            button.callback = self.create_callback(button) 
+        self.user_id = user_id
+        self.allowed_item_ids = allowed_item_ids
+        self.button_mapping = {}
+
+    async def add_buttons(self, callback_wrapper: callable): # der callback_wrapper kriegt als argument die items die mitgenommen wurden (default None) und returnt das eigentliche callback
+        for item_id in self.allowed_item_ids:                # hatte ich zuerst auch alles in der init aber ich brauch hier paar mal await deswegen einfach per factory method ausserhalb
+            button = discord.ui.Button(
+                label=(await ItemManager.get_item(item_id)).name, 
+                style=discord.ButtonStyle.secondary, 
+                disabled=(await InventoryManager.get_item_quantity(user_id=self.user_id, item_id=item_id)) == 0
+            )
+
+            button.callback = self.create_callback(button)
             self.add_item(button)
+
+            self.button_mapping[button.label] = item_id
+
+        self.callback_wrapper = callback_wrapper
+
+        self.start_button = discord.ui.Button(label="Start", style=discord.ButtonStyle.green)
+        self.start_button.callback = await self.callback_wrapper()
+        self.add_item(self.start_button)
 
     def create_callback(self, button):
         async def click(interaction: discord.Interaction):
-            if interaction.user.id != self.interaction.user.id:
+            if interaction.user.id != self.user_id:
                 await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
                 return
             
-            button.style = discord.ButtonStyle.green if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
-               
+            button.style = discord.ButtonStyle.blurple if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
+            
+            items_used = {item_id: False for item_id in self.allowed_item_ids}
+            for child in self.children:
+                if isinstance(child, discord.ui.Button):
+                    if button.style == discord.ButtonStyle.blurple:
+                        items_used[self.button_mapping[button.label]] = True
+
+            self.start_button.callback = await self.callback_wrapper(items_used=items_used)
+
             await interaction.response.edit_message(view=self)
         return click
-
-    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
-    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.interaction.user.id:
-            interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
-            return
-        
-        await interaction.response.edit_message(embed=discord.Embed(title="Game rules:"), view=LockpickView())
-        
-class LockpickView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        
-    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
-    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.interaction.user.id:
-            interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
-            return
-        
-        await interaction.response.send_modal(BankrobModal(interaction, self.target))
-        
-class BankrobModal(discord.ui.Modal):
-    def __init__(self, interaction, target, title="Bankrob"):
-        super().__init__(title=title, timeout=None)
-        self.interaction = interaction
-        self.target = target 
-        self.guess = discord.ui.TextInput(label="Your guess:")
-        self.add_item(self.guess)
-         
-    async def on_submit(self, interaction):
-        await lockpick(interaction, self.target, self.guess.value, ["Lockpick plus", "Insider tip"])
