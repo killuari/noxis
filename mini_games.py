@@ -1,24 +1,24 @@
 import discord, random
-from typing import List, Dict
-from items import Item
+from typing import List, Dict, Tuple
 from buttons import *
 
 class LockpickGame:
-    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 4, num_length: int = 4, max_num: int = 9):
+    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 3, num_length: int = 4, max_num: int = 9):
         self.user = user
         self.target = target
         self.num_length = num_length
         self.max_num = max_num
         self.lives = lives
 
+        secret_nums = [str(num) for num in random.sample(range(self.max_num + 1), self.num_length)]
+        self.secret_pin = "".join(secret_nums)
+        self.allowed_digits = set(str(i) for i in range(0, self.max_num+1))
+
         self.desc = ""
         if target is not None:
             self.desc += f"{self.user.mention} is attempting to crack {self.target.mention}'s vault code!\n\n"
 
-    async def start_game(self, items_used: Dict = {"lockpick_plus": False, "insider_tip": False}):
-        secret_nums = [str(num) for num in random.sample(range(self.max_num + 1), self.num_length)]
-        self.secret_pin = "".join(secret_nums)
-        self.allowed_digits = set(str(i) for i in range(0, self.max_num+1))
+    async def start_game(self, interaction: discord.Interaction, items_used: Dict = {"lockpick_plus": False, "insider_tip": False}):
         remaining_digits = tuple(self.allowed_digits-set(self.secret_pin))
 
         self.tip = random.choice(remaining_digits) if items_used["insider_tip"] else None
@@ -27,68 +27,81 @@ class LockpickGame:
 
         self.history = []
         
-        return await self.next_guess_wrapper()
+        await self.next_guess(interaction=interaction)
 
-    async def next_guess_wrapper(self, current_guess: str = None):
-        async def next_guess(interaction: discord.Interaction) -> discord.Interaction:
-            success = False
+    async def next_guess(self, interaction: discord.Interaction, current_guess: str = None) -> discord.Interaction:
+        success = False
+        wrong_input = False
 
-            if current_guess is not None:
-                if not current_guess.isdigit() or not all(char in self.allowed_digits for char in current_guess):
-                    embed=discord.Embed(title="Wrong input!", description=f"**Only digits 0-{self.max_num} are allowed!**", color=discord.Color.red())
-                    await interaction.response.edit_message(embed=embed, view=LockpickView(lockpick_game=self))
-                    return
-                
+        if current_guess is not None:
+            if not current_guess.isdigit() or not all(char in self.allowed_digits for char in current_guess):
+                wrong_input = True
+            
+            if not wrong_input:
                 self.lives -= 1
                 success, feedback = self.get_visual_feedback(current_guess)
                 self.history.append({"guess": current_guess, "feedback": feedback})
 
-            game_over = success or self.lives == 0
-            
-            if not game_over:
-                title="🔐 Cracking the Vault..."
-                desc=self.desc + (
-                    f"You have **{self.lives}/{self.max_attempts} attempts** remaining.\n"
-                    f"Each guess is a 4-digit code (digits 0-{self.max_num}).\n\n"
-                    "Feedback per guess:\n"
-                    "🟩 = Correct digit in correct place\n"
-                    "🟨 = Correct digit in wrong place\n"
-                    "🟥 = Not a correct digit"
-                )
-                color=discord.Color.orange()
-            else:
-                if self.target is not None:
-                    if success:
-                        title = "🎉 Vault Cracked!"
-                        desc = (
-                            f"{self.user.mention} successfully robbed {self.target.mention}'s bank!\n\n"
-                            f"💰 You stole **{50000:,} coins** from their bank balance."
-                        )
-                        color = discord.Color.green()
-                    else:
-                        title = "🚨 Police Caught You!"
-                        desc = (
-                            f"{self.user.mention} failed to crack the vault in time...\n\n"
-                            f"🚓 The police fined you **{20000:,} coins**."
-                        )
-                        color = discord.Color.red()
+        game_over = success or self.lives == 0
+        
+        if not game_over:
+            title="🔐 Cracking the Vault..."
+            desc=self.desc + (
+                f"You have **{self.lives}/{self.max_attempts} attempts** remaining.\n"
+                f"Each guess is a 4-digit code (digits 0-{self.max_num}).\n\n"
+                "Feedback per guess:\n"
+                "🟩 = Correct digit in correct place\n"
+                "🟨 = Correct digit in wrong place\n"
+                "🟥 = Not a correct digit"
+            )
+            color=discord.Color.orange()
+        else:
+            if self.target is not None:
+                stolen_percentage = random.randint(2, 5) * 0.01
+                stolen_amount = min(int(stolen_percentage * (await EconomyManager.get_balance(self.target.id))[1]), 25_000)
+                if success:
+                    await EconomyManager.add_money(self.user.id, stolen_amount)
+                    await EconomyManager.remove_money(self.target.id, stolen_amount, bank=True)
 
-            embed = discord.Embed(title=title, description=desc, color=color)
+                    title = "🎉 Vault Cracked!"
+                    desc = (
+                        f"{self.user.mention} successfully robbed {self.target.mention}'s bank!\n\n"
+                        f"💰 You stole **{stolen_amount:,} coins** from their bank balance."
+                    )
+                    color = discord.Color.green()
+                else:
+                    fine = int(0.3 * stolen_amount)
+                    money_left = await EconomyManager.remove_money(self.user.id, fine)
 
-            if self.tip is not None and not game_over:
-                embed.add_field(name="Insider Tip", value=f"Not in the code: {self.tip}", inline=False)
+                     # if user doesnt have enough money in wallet, try to take it from bank
+                    if money_left > 0:
+                        money_left = await EconomyManager.remove_money(self.user.id, money_left, bank=True)
+                    # TODO: add functionality if user also doesnt have enough money in bank
 
-            if len(self.history) > 0:
-                history_text = ""
-                for idx, entry in enumerate(self.history, start=1):
-                    guess = entry["guess"]
-                    feedback = entry["feedback"]
-                    history_text += f"`{guess}` → {feedback}\n"
-                embed.add_field(name="📜 Guess History", value=history_text, inline=False)
+                    title = "🚨 Police Caught You!"
+                    desc = (
+                        f"{self.user.mention} failed to crack the vault in time...\n\n"
+                        f"🚓 The police fined you **{fine:,} coins**."
+                    )
+                    color = discord.Color.red()
 
-            await interaction.response.edit_message(embed=embed, view=LockpickView(lockpick_game=self) if not game_over else None)
+        if wrong_input:
+            desc += f"\n\n**Wrong input! Only digits 0-{self.max_num} are allowed!**"
 
-        return next_guess
+        embed = discord.Embed(title=title, description=desc, color=color)
+
+        if self.tip is not None and not game_over:
+            embed.add_field(name="Insider Tip", value=f"Not in the code: {self.tip}", inline=False)
+
+        if len(self.history) > 0:
+            history_text = ""
+            for entry in self.history:
+                guess = entry["guess"]
+                feedback = entry["feedback"]
+                history_text += f"`{guess}` → {feedback}\n"
+            embed.add_field(name="📜 Guess History", value=history_text, inline=False)
+
+        await interaction.response.edit_message(embed=embed, view=LockpickView(lockpick_game=self) if not game_over else None)
     
     def get_visual_feedback(self, guess: str) -> Tuple[bool, str]:
         """
@@ -144,4 +157,4 @@ class LockpickModal(discord.ui.Modal):
         self.add_item(self.text_input)
          
     async def on_submit(self, interaction: discord.Interaction):
-        await (await self.lockpick_game.next_guess_wrapper(current_guess=self.text_input.value))(interaction)
+        await self.lockpick_game.next_guess(interaction=interaction, current_guess=self.text_input.value)

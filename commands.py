@@ -386,7 +386,7 @@ class BasicCommands(commands.Cog):
 
                     # if user doesnt have enough money in wallet, try to take it from bank
                     if money_left > 0: 
-                        money_left = await EconomyManager.remove_money(interaction.user.id, lost_money, bank=True)
+                        money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
                     # TODO: add functionality if user also doesnt have enough money in bank
                     
                     await interaction.response.send_message(embed=discord.Embed(
@@ -898,7 +898,7 @@ class BasicCommands(commands.Cog):
         
         lockpick_game = LockpickGame(user=interaction.user, target=target)
         item_selection = SelectItems(interaction.user.id, (22, 23))
-        await item_selection.add_buttons(callback_wrapper=lockpick_game.start_game)
+        await item_selection.add_buttons(callback=lockpick_game.start_game)
 
         await interaction.response.send_message(embed=embed, view=item_selection)
         await DatabaseManager.update_cmd_used(interaction.user.id)

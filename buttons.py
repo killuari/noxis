@@ -647,7 +647,7 @@ class SelectItems(discord.ui.View):
         self.allowed_item_ids = allowed_item_ids
         self.button_mapping = {}
 
-    async def add_buttons(self, callback_wrapper: callable): # der callback_wrapper kriegt als argument die items die mitgenommen wurden (default None) und returnt das eigentliche callback
+    async def add_buttons(self, callback: callable): # das callback kriegt als argument die interaction und die items_used
         for item_id in self.allowed_item_ids:                # hatte ich zuerst auch alles in der init aber ich brauch hier paar mal await deswegen einfach per factory method ausserhalb
             button = discord.ui.Button(
                 label=(await ItemManager.get_item(item_id)).name, 
@@ -660,10 +660,12 @@ class SelectItems(discord.ui.View):
 
             self.button_mapping[button.label] = (await ItemManager.get_item(item_id)).name
 
-        self.callback_wrapper = callback_wrapper
+        self.callback = callback
+
+        self.items_used = {(await ItemManager.get_item(item_id)).name: False for item_id in self.allowed_item_ids}
 
         self.start_button = discord.ui.Button(label="Start", style=discord.ButtonStyle.green)
-        self.start_button.callback = await self.callback_wrapper()
+        self.start_button.callback = self.create_start_callback()
         self.add_item(self.start_button)
 
     def create_callback(self, button):
@@ -674,13 +676,25 @@ class SelectItems(discord.ui.View):
             
             button.style = discord.ButtonStyle.blurple if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
             
-            items_used = {(await ItemManager.get_item(item_id)).name: False for item_id in self.allowed_item_ids}
             for child in self.children:
                 if isinstance(child, discord.ui.Button):
-                    if button.style == discord.ButtonStyle.blurple:
-                        items_used[self.button_mapping[button.label]] = True
-
-            self.start_button.callback = await self.callback_wrapper(items_used=items_used)
+                    if child.style == discord.ButtonStyle.blurple:
+                        self.items_used[self.button_mapping[child.label]] = True
 
             await interaction.response.edit_message(view=self)
         return click
+    
+    def create_start_callback(self):
+        async def start_callback(interaction: discord.Interaction):
+            if interaction.user.id != self.user_id:
+                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+                return
+
+            for item_name, used in self.items_used.items():
+                if used:
+                    item_id = (await ItemManager.get_item_by_name(item_name)).item_id
+                    await InventoryManager.remove_item(interaction.user.id, item_id)
+
+            await self.callback(interaction=interaction, items_used=self.items_used)
+
+        return start_callback
