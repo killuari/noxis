@@ -862,12 +862,12 @@ class BasicCommands(commands.Cog):
                 last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
                 claim_available = current_time >= (last_game + datetime.timedelta(minutes=30))
             
-            # if not claim_available:
-            #     next_available = last_game + datetime.timedelta(minutes=30)
-            #     timestamp = int(next_available.timestamp())
-            #     embed=discord.Embed(title="⏰ Bankrob Cooldown", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
-            #     await interaction.response.send_message(embed=embed)
-            #     return
+            if not claim_available:
+                next_available = last_game + datetime.timedelta(minutes=30)
+                timestamp = int(next_available.timestamp())
+                embed=discord.Embed(title="⏰ Bankrob Cooldown", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
+                return
             
             await cursor.execute("UPDATE last_used SET bankrob=? WHERE user_id=?", (current_time, interaction.user.id))
             await db.commit()
