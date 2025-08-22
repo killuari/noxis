@@ -1,6 +1,7 @@
 import discord, random
 from typing import List, Dict, Tuple
 from buttons import *
+from economy_manager import EconomyManager
 
 class LockpickGame:
     def __init__(self, user: discord.User, target: discord.User = None, lives: int = 3, num_length: int = 4, max_num: int = 9):
