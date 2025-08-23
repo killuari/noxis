@@ -4,6 +4,7 @@ from discord.ext import commands
 from user_manager import *
 from buttons import *
 from items import *
+from mini_games import *
 from inventory_manager import InventoryManager
 from economy_manager import EconomyManager
 from level_manager import LevelManager
@@ -386,7 +387,7 @@ class BasicCommands(commands.Cog):
 
                     # if user doesnt have enough money in wallet, try to take it from bank
                     if money_left > 0: 
-                        money_left = await EconomyManager.remove_money(interaction.user.id, lost_money, bank=True)
+                        money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
                     # TODO: add functionality if user also doesnt have enough money in bank
                     
                     await interaction.response.send_message(embed=discord.Embed(
@@ -829,3 +830,84 @@ class BasicCommands(commands.Cog):
             return
 
         await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id = 0)
+        
+    @app_commands.command(name="bankrob", description="Try to bankrob someone")
+    async def bankrob(self, interaction: discord.Interaction, target: discord.User):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        if target == interaction.user or target.bot: 
+            await interaction.response.send_message("You must enter a valid target.", ephemeral=True, delete_after=8.0)
+            return
+        
+        if await InventoryManager.get_item_quantity(interaction.user.id, 21) <= 0:
+            embed=discord.Embed(title="Error",
+                                description="You need the following item to use this command: `thief mask`",
+                                color=discord.Color.red()).set_footer(text="Try the vaultbreaker expedition to get a thief mask! (/expedition)")
+            
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+        
+        if (await EconomyManager.get_balance(target.id))[1] < 50000:
+            embed=discord.Embed(title="Error",
+                                description="Your target doesn't have enough money in their bank account",
+                                color=discord.Color.red()).set_footer(text="Try someone else")
+            
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT bankrob FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_game = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+
+            if result is None or last_game is None:
+                claim_available = True
+            else:
+                last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_game + datetime.timedelta(minutes=30))
+            
+            if not claim_available:
+                next_available = last_game + datetime.timedelta(minutes=30)
+                timestamp = int(next_available.timestamp())
+                embed=discord.Embed(title="⏰ Bankrob Cooldown", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
+                return
+            
+            await cursor.execute("UPDATE last_used SET bankrob=? WHERE user_id=?", (current_time, interaction.user.id))
+            await db.commit()
+        
+        embed = discord.Embed(
+            title="💰 Bank Robbery Attempt!",
+            description=(
+                f"**{interaction.user.mention}** is trying to rob **{target.mention}**'s bank account!\n\n"
+                "To succeed, you must crack a **4-digit security code**.\n\n"
+                "🔢 The code uses digits from **0–9** (e.g., `4821`). Each digit **appears only once**\n"
+                f"⏳ You have **5 attempts** to guess it.\n"
+                "🕵️ After each guess, you'll get feedback:\n"
+                "-> 🟩 **Correct digit in the correct place**\n"
+                "-> 🟨 **Correct digit in the wrong place**\n" \
+                "-> 🟥 **Not a correct digit**\n\n"
+                "If you crack the code in time, you steal a share of the target's bank funds.\n"
+                "If not... the police catches you and you must pay a fine!"
+            ),
+            color=discord.Color.from_str("#607bff")
+        ).add_field(
+            name="🛠️ Optional Items",
+            value=(
+                "- `Lockpick+`: +1 extra attempt\n"
+                "- `Insider Tip`: Reveals one digit that's not part of the code\n"
+            ),
+            inline=False
+        ).set_footer(text="Good luck... the vault is waiting!")
+        
+        lockpick_game = LockpickGame(user=interaction.user, target=target)
+        item_selection = SelectItems(interaction.user.id, (22, 23))
+        await item_selection.add_buttons(callback=lockpick_game.start_game)
+
+        await interaction.response.send_message(embed=embed, view=item_selection)
+        await DatabaseManager.update_cmd_used(interaction.user.id)

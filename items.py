@@ -205,6 +205,30 @@ ITEMS = {
             "possible_rewards": ["Bread", "Water Bottle", "Nails Pack", "Flint and Steel", "Arrows"],
         }
     ),
+    21: Item(
+        item_id=21,
+        name="Thief mask",
+        description="Contains a random reward (mostly practical items)",
+        rarity=Rarity.EPIC,
+        value=2000,
+        usable=True,        
+    ),
+    22: Item(
+        item_id=22,
+        name="lockpick_plus",
+        description="Contains a random reward (mostly practical items)",
+        rarity=Rarity.EPIC,
+        value=2000,
+        usable=True,        
+    ),
+    23: Item(
+        item_id=23,
+        name="insider_tip",
+        description="Contains a random reward (mostly practical items)",
+        rarity=Rarity.EPIC,
+        value=2000,
+        usable=True,        
+    )
 }
 
 

@@ -34,6 +34,7 @@ class DatabaseManager:
                     rob TIMESTAMP,
                     study TIMESTAMP,
                     higherlower TIMESTAMP,
+                    bankrob TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)
