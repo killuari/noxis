@@ -11,6 +11,7 @@ from level_manager import LevelManager
 from knowledge_manager import KnowledgeManager
 from buttons import LeaderboardView
 from jobs import JobManager
+from expedition_manager import ExpeditionManager, ExpeditionView
 
 # This function creates an account through button interaction
 async def get_started(interaction: discord.Interaction, user_id: int):       
@@ -628,7 +629,7 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=embed)
             return 
 
-        pages_req = True if len(inventory) > 9 else False
+        pages_req = len(inventory) > 9
 
         url = "https://cdn.pixabay.com/photo/2022/10/09/17/21/discord-7509681_1280.png" if user.avatar == None else user.avatar.url.split("?")[0]
 
@@ -778,7 +779,7 @@ class BasicCommands(commands.Cog):
         jobs = await JobManager.get_all_jobs()
         user_level, _ = await LevelManager.get_lvl_exp(interaction.user.id)
         user_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
-        pages_req = True if len(jobs) > 5 else False
+        pages_req = len(jobs) > 5
         
         if pages_req:
             view = JobList(interaction, jobs, user_level, user_knowledge, page=1)
@@ -821,6 +822,14 @@ class BasicCommands(commands.Cog):
                 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
+
+    @app_commands.command(name="expedition", description="Go on an expedition for some special rewards!")
+    async def expedition(self, interaction: discord.Interaction):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+
+        await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id = 0)
         
     @app_commands.command(name="bankrob", description="Try to bankrob someone")
     async def bankrob(self, interaction: discord.Interaction, target: discord.User):
