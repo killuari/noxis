@@ -228,6 +228,22 @@ ITEMS = {
         rarity=Rarity.EPIC,
         value=2000,
         usable=True,        
+    ),
+    24: Item(
+        item_id=24,
+        name="decoy_bag",
+        description="Decoy bag",
+        rarity=Rarity.EPIC,
+        value=2000,
+        usable=False,        
+    ),
+    25: Item(
+        item_id=25,
+        name="second_chance",
+        description="Second Chance",
+        rarity=Rarity.EPIC,
+        value=2000,
+        usable=False,        
     )
 }
 
