@@ -890,7 +890,7 @@ class BasicCommands(commands.Cog):
                 f"⏳ You have **5 attempts** to guess it.\n"
                 "🕵️ After each guess, you'll get feedback:\n"
                 "-> 🟩 **Correct digit in the correct place**\n"
-                "-> 🟨 **Correct digit in the wrong place**\n" \
+                "-> 🟨 **Correct digit in the wrong place**\n"
                 "-> 🟥 **Not a correct digit**\n\n"
                 "If you crack the code in time, you steal a share of the target's bank funds.\n"
                 "If not... the police catches you and you must pay a fine!"

@@ -400,7 +400,8 @@
     {
       "id": "lockpick_minigame",
       "type": "minigame",
-      "description": "You need to play lockpick.",
+      "title": "🔐 Cracking the Vault...",
+      "description": "To succeed, you must crack a **4-digit security code**.\n\n🔢 The code uses digits from **0–9** (e.g., `4821`). Each digit **appears only once**\n⏳ You have **5 attempts** to guess it.\n🕵️ After each guess, you'll get feedback:\n-> 🟩 **Correct digit in the correct place**\n-> 🟨 **Correct digit in the wrong place**\n-> 🟥 **Not a correct digit**\n\n",
       "game": "lockpick",
       "success_outcomes": ["vault_opened"],
       "fail_outcomes": ["alarm_triggered"]

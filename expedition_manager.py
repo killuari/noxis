@@ -2,6 +2,7 @@ import os, json, discord, random
 from typing import List
 from economy_manager import EconomyManager
 from dataclasses import dataclass
+from mini_games import *
 
 @dataclass
 class Expedition:
@@ -13,27 +14,44 @@ class Expedition:
     events: dict = None
     start_events: dict = None
 
-    def get_event_callbacks(self, event_id: str):
+    def get_event_callbacks(self, event_id: str) -> List:
         event = self.events[event_id]
-        callbacks = []
         if event is None:
             return None
         
+        callbacks = []
         for choice in event.choices:
             if random.random() <= choice["chance"]:
                 outcome = random.choice(choice["success_outcomes"])
             else:
                 outcome = random.choice(choice["fail_outcomes"])
 
-            new_event = self.events[outcome]
-
-            async def event_callback(interaction: discord.Interaction):
-                embed, view = new_event.event_to_message()
-                await interaction.response.edit_message(embed=embed, view=view)
-
-            callbacks.append(event_callback)
+            callbacks.append(self.create_event_callback(outcome))
         
         return callbacks
+    
+    def get_minigame_callbacks(self, event_id: str) -> Dict:
+        event = self.events[event_id]
+        if event is None:
+            return None
+        
+        outcomes = (random.choice(event.outcomes["success_outcomes"]), random.choice(event.outcomes["fail_outcomes"]))
+        callbacks = []
+        for outcome in outcomes:
+            callbacks.append(self.create_event_callback(outcome))
+
+        return {"success_callback": callbacks[0], "fail_callback": callbacks[1]}
+
+    def create_event_callback(self, event_id: str):
+        event = self.events[event_id]
+        if event is None:
+            return None
+        
+        async def event_callback(interaction: discord.Interaction):
+            embed, view = event.event_to_message(interaction=interaction)
+            await interaction.response.edit_message(embed=embed, view=view)
+
+        return event_callback
             
 @dataclass
 class ExpeditionEvent:
@@ -41,13 +59,20 @@ class ExpeditionEvent:
     event_id: str
     type: str
     description: str
+    title: str = ""
+    outcomes: Dict = None
     choices: List[dict] = None
     rewards: List[dict] = None
 
-    def event_to_message(self):
-        embed = discord.Embed(title=self.description)
-        view = EventView(event=self)
+    def event_to_message(self, interaction: discord.Interaction):
+        if self.type != "minigame":
+            embed = discord.Embed(title=self.description)
+            view = EventView(event=self)
+        else:
+            embed = discord.Embed(title=self.title, description=self.description)
+            view = EventView(event=self, interaction=interaction)
         return (embed, view)
+            
 
 class ExpeditionDropdown(discord.ui.Select):
     def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
@@ -98,21 +123,41 @@ class ExpeditionView(discord.ui.View):
         await ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
 
 class EventView(discord.ui.View):
-    def __init__(self, event: ExpeditionEvent, timeout = 180):
+    def __init__(self, event: ExpeditionEvent, interaction: discord.Interaction = None, timeout = 180):
         super().__init__(timeout=timeout)
-        expedition = ExpeditionManager.get_expedition(expedition_id=event.expedition_id)
+        self.event = event
+        self.expedition = ExpeditionManager.get_expedition(expedition_id=event.expedition_id)
 
         if event.type == "start" or event.type == "choice":
-            button_callbacks = expedition.get_event_callbacks(event.event_id)
+            button_callbacks = self.expedition.get_event_callbacks(event.event_id)
+
             for idx, choice in enumerate(event.choices):
                 button = discord.ui.Button(label=choice["label"])
                 button.callback = button_callbacks[idx]
                 self.add_item(button)
+
+        elif event.type == "minigame":
+            button = discord.ui.Button(label="Start")
+            button.callback = self.create_minigame_callback(minigame=event.event_id, interaction=interaction)
+            self.add_item(button)
+
         elif event.type == "end":
             print("end")
 
+    def create_minigame_callback(self, minigame: str, interaction: discord.Interaction):
+        callbacks = self.expedition.get_minigame_callbacks(self.event.event_id)
+        game = ExpeditionManager.games[minigame](user=interaction.user, callbacks=callbacks, expedition=True)
+
+        async def callback(interaction: discord.Interaction):
+            await game.start_game(interaction=interaction)
+
+        return callback
+
 class ExpeditionManager:
     expeditions = {}
+    games = {
+        "lockpick_minigame": LockpickGame
+    }
 
     @classmethod
     async def load_all(cls, folder="expeditions"):
@@ -155,6 +200,10 @@ class ExpeditionManager:
             elif event.type == "choice":
                 event.choices = event_dict["choices"]
                 events[event.event_id] = event
+            elif event.type == "minigame":
+                event.title = event_dict["title"]
+                event.outcomes = {"success_outcomes": event_dict["success_outcomes"], "fail_outcomes": event_dict["fail_outcomes"]}
+                events[event.event_id] = event
             elif event.type == "end":
                 event.rewards = event_dict["rewards"]
                 events[event.event_id] = event
@@ -196,6 +245,6 @@ class ExpeditionManager:
     async def start_expedition(interaction: discord.Interaction, expedition_id: int):
         expedition = ExpeditionManager.get_expedition(expedition_id=expedition_id)
         start_event = random.choice(list(expedition.start_events.values()))
-        embed, view = start_event.event_to_message()
+        embed, view = start_event.event_to_message(interaction=interaction)
 
         await interaction.response.edit_message(embed=embed, view=view)
