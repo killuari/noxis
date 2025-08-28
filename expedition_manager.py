@@ -79,8 +79,8 @@ class ExpeditionView(discord.ui.View):
         self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
         start_button = discord.ui.Button(
-            label=f"Start Expedition! Cost: {self.selected_expedition.cost}" if author_balance > self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost}",
-            style=discord.ButtonStyle.green if author_balance > self.selected_expedition.cost else discord.ButtonStyle.red
+            label=f"Start Expedition! Cost: {self.selected_expedition.cost}" if author_balance >= self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost}",
+            style=discord.ButtonStyle.green if author_balance >= self.selected_expedition.cost else discord.ButtonStyle.red
         )
         start_button.callback = self.start_expedition_callback
 
@@ -91,10 +91,16 @@ class ExpeditionView(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use this button!", ephemeral=True)
             return
         
-        if (await EconomyManager.get_balance(self.author_id))[0] < self.selected_expedition.cost:
-            await interaction.response.send_message(f"You dont have enough money on your wallet!", ephemeral=True)
+        if await EconomyManager.get_total_balance(self.author_id) < self.selected_expedition.cost:      # ist doch besser wenn geschaut wird ob man gesamt genug geld hat 
+            await interaction.response.send_message(f"You dont have enough money to start a expedition!", ephemeral=True)
             return
         
+        money_left = await EconomyManager.remove_money(self.author_id, 10000, False)
+
+        # if user doesnt have enough money in wallet, try to take it from bank
+        if money_left > 0: 
+            money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
+                    
         await ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
 
 class EventView(discord.ui.View):
@@ -186,11 +192,11 @@ class ExpeditionManager:
 
         if not update:
             await interaction.response.send_message(embed=embed, view=ExpeditionView(author_id=interaction.user.id, 
-                                                                                     author_balance=(await EconomyManager.get_balance(interaction.user.id))[0]))
+                                                                                     author_balance=await EconomyManager.get_total_balance(interaction.user.id)))
         else:
             await interaction.response.edit_message(embed=embed, 
                                                     view=ExpeditionView(author_id=interaction.user.id, 
-                                                                        author_balance=(await EconomyManager.get_balance(interaction.user.id))[0], 
+                                                                        author_balance=await EconomyManager.get_total_balance(interaction.user.id), 
                                                                         current_expedition_id=expedition_id))
     @staticmethod
     async def start_expedition(interaction: discord.Interaction, expedition_id: int):

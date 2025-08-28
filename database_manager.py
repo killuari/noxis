@@ -35,6 +35,7 @@ class DatabaseManager:
                     study TIMESTAMP,
                     higherlower TIMESTAMP,
                     bankrob TIMESTAMP,
+                    expedition TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)
