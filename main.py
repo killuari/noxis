@@ -18,6 +18,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def on_ready():
     await DatabaseManager.init_database()
     await ExpeditionManager.load_all()
+    await ItemManager.load_all()
     await client.add_cog(BasicCommands(client))    
     await DatabaseManager.add_column_to_table("database.db", "last_used", "expedition", "TIMESTAMP")
     await client.tree.sync()

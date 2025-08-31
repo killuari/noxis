@@ -44,7 +44,7 @@ class DatabaseManager:
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS inventory (
                     user_id INTEGER NOT NULL,
-                    item_id INTEGER NOT NULL,
+                    item_id TEXT NOT NULL,
                     quantity INTEGER DEFAULT 1,
                     acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (user_id, item_id)
