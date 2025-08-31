@@ -20,7 +20,6 @@ async def on_ready():
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
     await client.add_cog(BasicCommands(client))    
-    await DatabaseManager.add_column_to_table("database.db", "last_used", "expedition", "TIMESTAMP")
     await client.tree.sync()
 
 @client.event
