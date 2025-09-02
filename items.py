@@ -207,7 +207,7 @@ ITEMS = {
     ),
     21: Item(
         item_id=21,
-        name="Thief mask",
+        name="thief_mask",
         description="Contains a random reward (mostly practical items)",
         rarity=Rarity.EPIC,
         value=2000,
@@ -243,6 +243,22 @@ ITEMS = {
         description="Second Chance",
         rarity=Rarity.EPIC,
         value=2000,
+        usable=False,        
+    ),
+    26: Item(
+        item_id=26,
+        name="gold_bar",
+        description="Gold Bar",
+        rarity=Rarity.EPIC,
+        value=3000,
+        usable=False,        
+    ),
+    27: Item(
+        item_id=27,
+        name="jewel_bag",
+        description="Jewel Bag",
+        rarity=Rarity.EPIC,
+        value=10000,
         usable=False,        
     )
 }

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from mini_games import LockpickGame
 from buttons import SelectItems
 from items import ItemManager
+from inventory_manager import InventoryManager
 
 @dataclass
 class Expedition:
@@ -13,9 +14,14 @@ class Expedition:
     description: str
     allowed_items: List[str]
     cost: int
-    events: dict = None
-    start_events: dict = None
+    events: Dict = None
+    start_events: Dict = None
     items_used: List[int] = None
+    rewards: Dict = None
+
+    def __post_init__(self):
+        if self.rewards is None:
+            self.rewards = {"money": 0, "items": []}
 
     def get_event_callbacks(self, event_id: str) -> List:
         event = self.events[event_id]
@@ -53,21 +59,52 @@ class Expedition:
         async def event_callback(interaction: discord.Interaction):
             embed, view = event.event_to_message(interaction=interaction)
 
+            if len(event.penalties) > 0:
+                for penalty in event.penalties:
+                    if penalty["type"] == "currency":
+                        amount = random.randrange(penalty["amount_min"], penalty["amount_max"])
+
+                penalty_string = f"Money: -{amount:,}$"
+
+                embed.add_field(name="⛔ Consequences", value=penalty_string, inline=False)
+
+                money_left = await EconomyManager.remove_money(interaction.user.id, amount, bank=False)
+                if money_left > 0:
+                    await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
+
             if len(event.rewards) > 0:
-                items = ""
+                items = []
+                amount = 0
+
                 for reward in event.rewards:
                     if reward["type"] == "currency":
                         amount = random.randrange(reward["amount_min"], reward["amount_max"])
 
                     elif reward["type"] == "item":
-                        items += ", " if len(items) > 0 else ""
-                        items += reward["id"]
+                        items.append(reward["id"])
+
+                reward_string = f"Money: {self.rewards["money"]:,}$ (+{amount:,})\n" if self.rewards["money"] > 0 else f"Money: {amount:,}$\n"
+                reward_string += f"Items: {", ".join(self.rewards["items"])} (+ {items})" if len(self.rewards["items"]) > 0 else f"Items: {", ".join(items)}"
+
+                self.rewards["money"] += amount
+                self.rewards["items"].extend(items)
+
+                embed.add_field(name="💰 Loot", value=reward_string, inline=False)
+
+            if event.type == "end":
+                embed.clear_fields()
 
                 reward_string = f"""
-                    Money: {amount:,}$
-                    Items: {items}
+                    Money: {self.rewards["money"]:,}$
+                    Items: {", ".join(self.rewards["items"])}
                 """
-                embed.add_field(name="Rewards", value=reward_string, inline=False)
+
+                embed.add_field(name="🏆 Rewards", value=reward_string, inline=False)
+
+                await EconomyManager.add_money(interaction.user.id, self.rewards["money"])
+
+                for item_id in self.rewards["items"]:
+                    await InventoryManager.add_item(interaction.user.id, (await ItemManager.get_item_by_name(item_id)).item_id)
 
             await interaction.response.edit_message(embed=embed, view=view)
 
