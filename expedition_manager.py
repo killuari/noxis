@@ -18,10 +18,12 @@ class Expedition:
     start_events: Dict = None
     items_used: List[int] = None
     rewards: Dict = None
+    losses: Dict = None
 
     def __post_init__(self):
         if self.rewards is None:
             self.rewards = {"money": 0, "items": []}
+            self.losses = {"money": 0, "items": []}
 
     def get_event_callbacks(self, event_id: str) -> List:
         event = self.events[event_id]
@@ -59,6 +61,7 @@ class Expedition:
         async def event_callback(interaction: discord.Interaction):
             embed, view = event.event_to_message(interaction=interaction)
 
+            penalty_string = ""
             if len(event.penalties) > 0:
                 for penalty in event.penalties:
                     if penalty["type"] == "currency":
@@ -66,7 +69,9 @@ class Expedition:
 
                 penalty_string = f"Money: -{amount:,}$"
 
-                embed.add_field(name="⛔ Consequences", value=penalty_string, inline=False)
+                embed.add_field(name="💸 You lost", value=penalty_string, inline=False)
+
+                self.losses["money"] += amount
 
                 money_left = await EconomyManager.remove_money(interaction.user.id, amount, bank=False)
                 if money_left > 0:
@@ -89,17 +94,22 @@ class Expedition:
                 self.rewards["money"] += amount
                 self.rewards["items"].extend(items)
 
-                embed.add_field(name="💰 Loot", value=reward_string, inline=False)
+                embed.add_field(name="💰 You found", value=reward_string, inline=False)
 
             if event.type == "end":
                 embed.clear_fields()
 
-                reward_string = f"""
-                    Money: {self.rewards["money"]:,}$
-                    Items: {", ".join(self.rewards["items"])}
-                """
+                penalty_string = f"Money: -{self.losses["money"]:,}$"
+                
+                embed.add_field(name="⛔ Total Losses", value=penalty_string, inline=False)
 
-                embed.add_field(name="🏆 Rewards", value=reward_string, inline=False)
+                reward_string = f"Money: {self.rewards["money"]:,}$\n" if self.rewards["money"] > 0 else ""
+                reward_string += f"Items: {", ".join(self.rewards["items"])}" if len(self.rewards["items"]) > 0 else ""
+
+                if reward_string == "":
+                    reward_string = "Nothing"
+
+                embed.add_field(name="🏆 Total Rewards", value=reward_string, inline=False)
 
                 await EconomyManager.add_money(interaction.user.id, self.rewards["money"])
 

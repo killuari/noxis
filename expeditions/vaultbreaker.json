@@ -268,10 +268,9 @@
             "guard_knocked_out"
           ],
           "fail_outcomes": [
-            "injured",
-            "backup_called"
+            "injured"
           ],
-          "chance": 0.7
+          "chance": 0.4
         },
         {
           "label": "Run inside",
@@ -282,7 +281,7 @@
             "alarm_minor",
             "guard_pursuit"
           ],
-          "chance": 0.3
+          "chance": 0.6
         },
         {
           "label": "Throw smoke bomb",
@@ -293,7 +292,7 @@
             "equipment_lost",
             "guard_pursuit"
           ],
-          "chance": 0.8
+          "chance": 0.7
         }
       ],
       "title": "Guard Fight",
@@ -524,10 +523,9 @@
             "lockpick_minigame"
           ],
           "fail_outcomes": [
-            "outdated_info",
-            "guard_patrol"
+            "outdated_info"
           ],
-          "chance": 0.9
+          "chance": 0.8
         }
       ],
       "title": "Blueprint Found",
@@ -580,10 +578,9 @@
             "hiding_spot"
           ],
           "fail_outcomes": [
-            "locked_door",
-            "guard_patrol"
+            "locked_door"
           ],
-          "chance": 0.8
+          "chance": 0.7
         },
         {
           "label": "Move towards the main vault",
@@ -713,10 +710,10 @@
             "guard_patrol",
             "time_wasted"
           ],
-          "chance": 0.5
+          "chance": 0.2
         },
         {
-          "label": "Set up for a bigger heist later (take blueprints instead)",
+          "label": "Set up for a bigger heist",
           "success_outcomes": [
             "blueprint_found"
           ],
@@ -724,7 +721,7 @@
             "guard_patrol",
             "outdated_info"
           ],
-          "chance": 0.9
+          "chance": 0.7
         }
       ],
       "title": "Side Loot Room",
@@ -970,10 +967,9 @@
             "vault_corridor"
           ],
           "fail_outcomes": [
-            "alarm_triggered",
-            "guard_patrol"
+            "alarm_triggered"
           ],
-          "chance": 0.6
+          "chance": 0.5
         },
         {
           "label": "Run for the vault before backup arrives",
@@ -981,8 +977,7 @@
             "lockpick_minigame"
           ],
           "fail_outcomes": [
-            "alarm_triggered",
-            "overwhelmed"
+            "alarm_triggered"
           ],
           "chance": 0.5
         }
