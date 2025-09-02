@@ -69,19 +69,16 @@ class ExpeditionEvent:
     event_id: str
     expedition: Expedition
     type: str
+    title: str
     description: str
-    title: str = ""
+    color: str
     outcomes: Dict = None
     choices: List[dict] = None
     rewards: List[dict] = None
 
     def event_to_message(self, interaction: discord.Interaction):
-        if self.type != "minigame":
-            embed = discord.Embed(title=self.description)
-            view = EventView(event=self)
-        else:
-            embed = discord.Embed(title=self.title, description=self.description)
-            view = EventView(event=self, interaction=interaction)
+        embed = discord.Embed(title=self.title, description=self.description, color=discord.Color.from_str(self.color))
+        view = EventView(event=self, interaction=interaction)
         return (embed, view)
             
 
@@ -223,7 +220,9 @@ class ExpeditionManager:
                 expedition=expedition,
                 event_id=event_dict["id"],
                 type=event_dict["type"],
+                title=event_dict["title"],
                 description=event_dict["description"],
+                color=event_dict["color"]
             )
 
             if event.type == "start":
@@ -234,7 +233,6 @@ class ExpeditionManager:
                 event.choices = event_dict["choices"]
                 events[event.event_id] = event
             elif event.type == "minigame":
-                event.title = event_dict["title"]
                 event.outcomes = {"success_outcomes": event_dict["success_outcomes"], "fail_outcomes": event_dict["fail_outcomes"]}
                 events[event.event_id] = event
             elif event.type == "end":

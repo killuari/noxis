@@ -521,7 +521,7 @@
             "vent_damage",
             "stuck_in_vent"
           ],
-          "chance": 0.7
+          "chance": 0.5
         },
         {
           "label": "Try to widen the vent opening",
@@ -532,7 +532,7 @@
             "noise_made",
             "vent_damage"
           ],
-          "chance": 0.6
+          "chance": 0.8
         }
       ],
       "title": "Vent Found",
@@ -774,13 +774,13 @@
         {
           "label": "Start looting",
           "success_outcomes": [
-            "final_loot"
+            "lockpick_minigame"
           ],
           "fail_outcomes": [
             "guard_patrol",
             "equipment_dropped"
           ],
-          "chance": 0.9
+          "chance": 0.6
         },
         {
           "label": "Scout the room first",
@@ -792,7 +792,7 @@
             "time_wasted",
             "guard_patrol"
           ],
-          "chance": 0.8
+          "chance": 0.9
         }
       ],
       "title": "Vent Entry",
@@ -2283,7 +2283,7 @@
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 100,
+          "amount_min": 200,
           "amount_max": 500
         },
         {
@@ -2302,8 +2302,8 @@
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 1000,
-          "amount_max": 5000
+          "amount_min": 8000,
+          "amount_max": 12000
         },
         {
           "type": "item",
@@ -2313,7 +2313,7 @@
         {
           "type": "item",
           "id": "gold_bar",
-          "chance": 0.2
+          "chance": 0.4
         }
       ],
       "title": "Escape Success",
@@ -2326,8 +2326,8 @@
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 8000,
-          "amount_max": 15000
+          "amount_min": 15000,
+          "amount_max": 20000
         },
         {
           "type": "item",
