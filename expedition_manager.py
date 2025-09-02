@@ -52,6 +52,23 @@ class Expedition:
         
         async def event_callback(interaction: discord.Interaction):
             embed, view = event.event_to_message(interaction=interaction)
+
+            if len(event.rewards) > 0:
+                items = ""
+                for reward in event.rewards:
+                    if reward["type"] == "currency":
+                        amount = random.randrange(reward["amount_min"], reward["amount_max"])
+
+                    elif reward["type"] == "item":
+                        items += ", " if len(items) > 0 else ""
+                        items += reward["id"]
+
+                reward_string = f"""
+                    Money: {amount:,}$
+                    Items: {items}
+                """
+                embed.add_field(name="Rewards", value=reward_string, inline=False)
+
             await interaction.response.edit_message(embed=embed, view=view)
 
         return event_callback
@@ -73,8 +90,9 @@ class ExpeditionEvent:
     description: str
     color: str
     outcomes: Dict = None
-    choices: List[dict] = None
-    rewards: List[dict] = None
+    choices: List[Dict] = None
+    rewards: List[Dict] = None
+    penalties: List[Dict] = None
 
     def event_to_message(self, interaction: discord.Interaction):
         embed = discord.Embed(title=self.title, description=self.description, color=discord.Color.from_str(self.color))
@@ -222,22 +240,17 @@ class ExpeditionManager:
                 type=event_dict["type"],
                 title=event_dict["title"],
                 description=event_dict["description"],
-                color=event_dict["color"]
+                color=event_dict["color"],
+                choices=event_dict["choices"],
+                rewards=event_dict["rewards"],
+                penalties=event_dict["penalties"]
             )
 
             if event.type == "start":
-                event.choices = event_dict["choices"]
-                events[event.event_id] = event
                 start_events[event.event_id] = event
-            elif event.type == "choice":
-                event.choices = event_dict["choices"]
-                events[event.event_id] = event
             elif event.type == "minigame":
                 event.outcomes = {"success_outcomes": event_dict["success_outcomes"], "fail_outcomes": event_dict["fail_outcomes"]}
-                events[event.event_id] = event
-            elif event.type == "end":
-                event.rewards = event_dict["rewards"]
-                events[event.event_id] = event
+            events[event.event_id] = event
 
         expedition.events = events
         expedition.start_events = start_events

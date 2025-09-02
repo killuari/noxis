@@ -49,7 +49,9 @@
         }
       ],
       "title": "Start Rooftop",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_sewer",
@@ -93,7 +95,9 @@
         }
       ],
       "title": "Start Sewer",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_frontdoor",
@@ -137,7 +141,9 @@
         }
       ],
       "title": "Start Frontdoor",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_truck",
@@ -167,7 +173,9 @@
         }
       ],
       "title": "Start Truck",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_service_door",
@@ -199,7 +207,9 @@
         }
       ],
       "title": "Start Service Door",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vault_entry",
@@ -243,7 +253,9 @@
         }
       ],
       "title": "Vault Entry",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_fight",
@@ -285,7 +297,9 @@
         }
       ],
       "title": "Guard Fight",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "sneak_success",
@@ -327,7 +341,9 @@
         }
       ],
       "title": "Sneak Success",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "cameras_disabled",
@@ -370,7 +386,9 @@
         }
       ],
       "title": "Cameras Disabled",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_pattern_found",
@@ -402,7 +420,9 @@
         }
       ],
       "title": "Guard Pattern Found",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_distracted",
@@ -433,7 +453,9 @@
         }
       ],
       "title": "Guard Distracted",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "hidden_entry",
@@ -465,7 +487,9 @@
         }
       ],
       "title": "Hidden Entry",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "trap_set",
@@ -485,7 +509,9 @@
         }
       ],
       "title": "Trap Set",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "blueprint_found",
@@ -505,7 +531,9 @@
         }
       ],
       "title": "Blueprint Found",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vent_found",
@@ -536,7 +564,9 @@
         }
       ],
       "title": "Vent Found",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vault_corridor",
@@ -591,7 +621,9 @@
         }
       ],
       "title": "Vault Corridor",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_knocked_out",
@@ -634,7 +666,9 @@
         }
       ],
       "title": "Guard Knocked Out",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "lockpick_minigame",
@@ -649,7 +683,10 @@
         "lockpick_broken",
         "alarm_minor"
       ],
-      "color": "#607bff"
+      "color": "#607bff",
+      "choices": [],
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "side_loot_room",
@@ -691,7 +728,9 @@
         }
       ],
       "title": "Side Loot Room",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "keycard_acquired",
@@ -722,7 +761,9 @@
         }
       ],
       "title": "Keycard Acquired",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vault_opened",
@@ -735,7 +776,6 @@
             "final_loot"
           ],
           "fail_outcomes": [
-            "guard_patrol",
             "equipment_dropped"
           ],
           "chance": 0.9
@@ -764,7 +804,9 @@
         }
       ],
       "title": "Vault Opened",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vent_entry",
@@ -796,7 +838,9 @@
         }
       ],
       "title": "Vent Entry",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "noise_made",
@@ -834,7 +878,8 @@
         }
       ],
       "title": "Noise Made",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_alert",
@@ -872,7 +917,8 @@
         }
       ],
       "title": "Guard Alert",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "time_wasted",
@@ -910,7 +956,8 @@
         }
       ],
       "title": "Time Wasted",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "alarm_minor",
@@ -948,7 +995,8 @@
         }
       ],
       "title": "Alarm Minor",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_suspicious",
@@ -979,7 +1027,9 @@
         }
       ],
       "title": "Guard Suspicious",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "identity_questioned",
@@ -1017,7 +1067,8 @@
         }
       ],
       "title": "Identity Questioned",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "backup_called",
@@ -1059,7 +1110,8 @@
         }
       ],
       "title": "Backup Called",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "injured",
@@ -1097,7 +1149,8 @@
         }
       ],
       "title": "Injured",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_pursuit",
@@ -1135,7 +1188,8 @@
         }
       ],
       "title": "Guard Pursuit",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_confused",
@@ -1166,7 +1220,9 @@
         }
       ],
       "title": "Guard Confused",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "technical_failure",
@@ -1204,7 +1260,8 @@
         }
       ],
       "title": "Technical Failure",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "intel_gathered",
@@ -1224,7 +1281,9 @@
         }
       ],
       "title": "Intel Gathered",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_patrol",
@@ -1262,7 +1321,8 @@
         }
       ],
       "title": "Guard Patrol",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "locked_door",
@@ -1300,7 +1360,8 @@
         }
       ],
       "title": "Locked Door",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "lost_in_building",
@@ -1338,7 +1399,8 @@
         }
       ],
       "title": "Lost In Building",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "timing_wrong",
@@ -1376,7 +1438,8 @@
         }
       ],
       "title": "Timing Wrong",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_returns",
@@ -1414,7 +1477,8 @@
         }
       ],
       "title": "Guard Returns",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "ladder_breaks",
@@ -1452,7 +1516,8 @@
         }
       ],
       "title": "Ladder Breaks",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "equipment_lost",
@@ -1494,7 +1559,8 @@
         }
       ],
       "title": "Equipment Lost",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "vent_damage",
@@ -1532,7 +1598,8 @@
         }
       ],
       "title": "Vent Damage",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "stuck_in_vent",
@@ -1570,7 +1637,8 @@
         }
       ],
       "title": "Stuck In Vent",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "driver_suspicious",
@@ -1608,7 +1676,8 @@
         }
       ],
       "title": "Driver Suspicious",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "driver_fight",
@@ -1646,7 +1715,8 @@
         }
       ],
       "title": "Driver Fight",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "lockpick_broken",
@@ -1688,7 +1758,8 @@
         }
       ],
       "title": "Lockpick Broken",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "front_bluff_success",
@@ -1708,7 +1779,9 @@
         }
       ],
       "title": "Front Bluff Success",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "patrol_passed",
@@ -1728,7 +1801,9 @@
         }
       ],
       "title": "Patrol Passed",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "body_hidden",
@@ -1748,7 +1823,9 @@
         }
       ],
       "title": "Body Hidden",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "restricted_area",
@@ -1779,7 +1856,9 @@
         }
       ],
       "title": "Restricted Area",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "vent_widened",
@@ -1799,7 +1878,9 @@
         }
       ],
       "title": "Vent Widened",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "hiding_spot",
@@ -1830,7 +1911,9 @@
         }
       ],
       "title": "Hiding Spot",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "back_exit_found",
@@ -1861,7 +1944,9 @@
         }
       ],
       "title": "Back Exit Found",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "guard_watch",
@@ -1892,7 +1977,9 @@
         }
       ],
       "title": "Guard Watch",
-      "color": "#ff9f43"
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "ambush_ready",
@@ -1923,7 +2010,9 @@
         }
       ],
       "title": "Ambush Ready",
-      "color": "#607bff"
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "final_loot",
@@ -1965,7 +2054,9 @@
         }
       ],
       "title": "Final Loot",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "outdated_info",
@@ -2003,7 +2094,8 @@
         }
       ],
       "title": "Outdated Info",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "keycard_invalid",
@@ -2041,23 +2133,23 @@
         }
       ],
       "title": "Keycard Invalid",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "equipment_dropped",
       "type": "choice",
-      "description": "In your haste to grab loot, you drop some valuable equipment.",
+      "description": "In your haste to grab loot, you drop some valuable item that you found.",
       "choices": [
         {
-          "label": "Go back for the equipment",
+          "label": "Go back for the loot",
           "success_outcomes": [
             "final_loot"
           ],
           "fail_outcomes": [
-            "guard_patrol",
             "caught_by_guard"
           ],
-          "chance": 0.5
+          "chance": 0.4
         },
         {
           "label": "Leave it and escape",
@@ -2083,7 +2175,8 @@
         }
       ],
       "title": "Equipment Dropped",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "guard_wakes",
@@ -2121,7 +2214,8 @@
         }
       ],
       "title": "Guard Wakes",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "blood_trail",
@@ -2159,7 +2253,8 @@
         }
       ],
       "title": "Blood Trail",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "rewards": []
     },
     {
       "id": "vent_collapse",
@@ -2182,7 +2277,8 @@
         }
       ],
       "title": "Vent Collapse",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "alarm_triggered",
@@ -2205,7 +2301,8 @@
         }
       ],
       "title": "Alarm Triggered",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "overwhelmed",
@@ -2228,7 +2325,8 @@
         }
       ],
       "title": "Overwhelmed",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "caught_by_guard",
@@ -2251,7 +2349,8 @@
         }
       ],
       "title": "Caught By Guard",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "dead_end",
@@ -2274,7 +2373,8 @@
         }
       ],
       "title": "Dead End",
-      "color": "#ff4d4f"
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "back_exit_escape",
@@ -2293,9 +2393,11 @@
         }
       ],
       "title": "Escape Success",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     },
-        {
+    {
       "id": "escape_success",
       "type": "end",
       "description": "You managed to escape successfully with your loot!",
@@ -2317,7 +2419,9 @@
         }
       ],
       "title": "Escape Success",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     },
     {
       "id": "maximum_loot",
@@ -2346,7 +2450,9 @@
         }
       ],
       "title": "Maximum Loot",
-      "color": "#2ecc71"
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     }
   ]
 }
