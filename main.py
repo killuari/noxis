@@ -7,6 +7,7 @@ from commands import BasicCommands
 from buttons import *
 from inventory_manager import InventoryManager
 from expedition_manager import ExpeditionManager
+from economy_manager import EconomyManager
  
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
@@ -18,6 +19,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def on_ready():
     await DatabaseManager.init_database()
     await ExpeditionManager.load_all()
+    await DatabaseManager.add_column_to_table("database.db", "last_used", "expedition", "TIMESTAMP")    
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 

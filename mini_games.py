@@ -4,12 +4,18 @@ from buttons import *
 from economy_manager import EconomyManager
 
 class LockpickGame:
-    def __init__(self, user: discord.User, target: discord.User = None, lives: int = 3, num_length: int = 4, max_num: int = 9):
+    def __init__(self, user: discord.User, target: discord.User = None, callbacks: Dict = {"success_callback": None, "fail_callback": None}, expedition = False, lives: int = 3, num_length: int = 4, max_num: int = 9):
         self.user = user
         self.target = target
         self.num_length = num_length
         self.max_num = max_num
         self.lives = lives
+        self.callbacks = callbacks
+
+        if expedition:
+            self.lives = 5
+            self.num_length = 4
+            self.max_num = 9
 
         secret_nums = [str(num) for num in random.sample(range(self.max_num + 1), self.num_length)]
         self.secret_pin = "".join(secret_nums)
@@ -30,7 +36,7 @@ class LockpickGame:
         
         await self.next_guess(interaction=interaction)
 
-    async def next_guess(self, interaction: discord.Interaction, current_guess: str = None) -> discord.Interaction:
+    async def next_guess(self, interaction: discord.Interaction, current_guess: str = None) -> Tuple[discord.Interaction, bool]:
         success = False
         wrong_input = False
 
@@ -85,6 +91,10 @@ class LockpickGame:
                         f"🚓 The police fined you **{fine:,} coins**."
                     )
                     color = discord.Color.red()
+            else:
+                callback = self.callbacks["success_callback"] if success else self.callbacks["fail_callback"]
+                await callback(interaction=interaction)
+                return
 
         if wrong_input:
             desc += f"\n\n**Wrong input! Only digits 0-{self.max_num} are allowed!**"
