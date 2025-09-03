@@ -1,0 +1,286 @@
+[
+    {
+        "item_id": "bread",
+        "name": "Bread",
+        "description": "A fresh piece of bread for sustenance",
+        "rarity": "COMMON",
+        "value": 100,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false,
+        "metadata": {
+            "nutrition": 20
+        }
+    },
+    {
+        "item_id": "water_bottle",
+        "name": "Water Bottle",
+        "description": "A bottle of drinking water",
+        "rarity": "COMMON",
+        "value": 100,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "rope",
+        "name": "Rope",
+        "description": "Sturdy rope useful for climbing or securing",
+        "rarity": "UNCOMMON",
+        "value": 250,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "iron_sword",
+        "name": "Iron Sword",
+        "description": "A solid iron sword",
+        "rarity": "UNCOMMON",
+        "value": 1000,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false,
+        "metadata": {
+            "damage": 12
+        }
+    },
+    {
+        "item_id": "wooden_shield",
+        "name": "Wooden Shield",
+        "description": "A sturdy wooden shield for protection",
+        "rarity": "UNCOMMON",
+        "value": 60,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "hammer",
+        "name": "Hammer",
+        "description": "A basic hammer, also useful for building",
+        "rarity": "RARE",
+        "value": 2500,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "nails_pack",
+        "name": "Nails Pack",
+        "description": "A bundle of nails for building and repairs",
+        "rarity": "COMMON",
+        "value": 50,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "tent",
+        "name": "Tent",
+        "description": "A simple tent for overnight stays outdoors",
+        "rarity": "RARE",
+        "value": 5000,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "blanket",
+        "name": "Blanket",
+        "description": "Keeps you warm during cold nights",
+        "rarity": "COMMON",
+        "value": 200,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "cooking_pot",
+        "name": "Cooking Pot",
+        "description": "Pot for cooking over an open fire",
+        "rarity": "UNCOMMON",
+        "value": 500,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "food_rations",
+        "name": "Food Rations",
+        "description": "Prepackaged rations for traveling",
+        "rarity": "UNCOMMON",
+        "value": 500,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "flint_and_steel",
+        "name": "Flint and Steel",
+        "description": "Used to start a fire",
+        "rarity": "UNCOMMON",
+        "value": 200,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "backpack",
+        "name": "Backpack",
+        "description": "qdh",
+        "rarity": "RARE",
+        "value": 2000,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "map",
+        "name": "Map",
+        "description": "Map of the surrounding area",
+        "rarity": "COMMON",
+        "value": 200,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "compass",
+        "name": "Compass",
+        "description": "Shows cardinal directions",
+        "rarity": "UNCOMMON",
+        "value": 400,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "lantern",
+        "name": "Lantern",
+        "description": "Oil lantern for dark areas",
+        "rarity": "UNCOMMON",
+        "value": 500,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "bow",
+        "name": "Bow",
+        "description": "A simple bow for ranged combat",
+        "rarity": "UNCOMMON",
+        "value": 800,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "arrows",
+        "name": "Arrows",
+        "description": "Standard arrows for the bow",
+        "rarity": "COMMON",
+        "value": 30,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "torch",
+        "name": "Torch",
+        "description": "A torch that provides light for a while",
+        "rarity": "COMMON",
+        "value": 300,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "mystery_box",
+        "name": "Mystery Box",
+        "description": "Contains a random reward (mostly practical items)",
+        "rarity": "EPIC",
+        "value": 2000,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false,
+        "metadata": {
+            "possible_rewards": ["bread", "water_bottle", "nails_pack", "flint_and_steel", "arrows"]
+        }
+    },
+    {
+        "item_id": "thief_mask",
+        "name": "Thief Mask",
+        "description": "A mask worn by thieves to conceal their identity during heists",
+        "rarity": "EPIC",
+        "value": 2000,
+        "usable": false,
+        "sellable": false,
+        "findable": false,
+        "unique": true
+    },
+    {
+        "item_id": "lockpick_plus",
+        "name": "Lockpick Plus",
+        "description": "A premium lockpicking tool that grants an additional attempt at cracking bank safe",
+        "rarity": "EPIC",
+        "value": 2000,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "insider_tip",
+        "name": "Insider Tip",
+        "description": "Confidential information that eliminates one wrong digit from safe combination attempts",
+        "rarity": "EPIC",
+        "value": 2000,
+        "usable": true,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "gold_bar",
+        "name": "Gold Bar",
+        "description": "A valuable gold bar worth a fortune",
+        "rarity": "RARE",
+        "value": 5000,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "jewel_bag",
+        "name": "Jewel Bag",
+        "description": "A bag filled with precious jewels and gems",
+        "rarity": "EPIC",
+        "value": 10000,
+        "usable": false,
+        "sellable": true,
+        "findable": false,
+        "unique": false
+    }
+]

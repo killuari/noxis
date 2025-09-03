@@ -308,7 +308,7 @@ class BasicCommands(commands.Cog):
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
 
-                    item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
+                    item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.COMMON))
                     quantity = random.randint(1,3)
                     found_msg += f"\n🍎 ** Also found** `{quantity} {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
@@ -319,7 +319,7 @@ class BasicCommands(commands.Cog):
                     money = random.randint(2000, 3000)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
-                    item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
+                    item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.RARE))
                     found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
@@ -656,7 +656,7 @@ class BasicCommands(commands.Cog):
     async def autocomplete_items(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         suggestions = [ 
             app_commands.Choice(name=item.name, value=item.name) 
-            for item in ITEMS.values() 
+            for item in (await ItemManager.get_all_items()) 
             if current.lower() in item.name.lower()
         ]
 
@@ -865,7 +865,7 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message("You must enter a valid target.", ephemeral=True, delete_after=8.0)
             return
         
-        if await InventoryManager.get_item_quantity(interaction.user.id, 21) <= 0:
+        if await InventoryManager.get_item_quantity(interaction.user.id, "thief_mask") <= 0:
             embed=discord.Embed(title="Error",
                                 description="You need the following item to use this command: `thief mask`",
                                 color=discord.Color.red()).set_footer(text="Try the vaultbreaker expedition to get a thief mask! (/expedition)")
@@ -930,7 +930,7 @@ class BasicCommands(commands.Cog):
         ).set_footer(text="Good luck... the vault is waiting!")
         
         lockpick_game = LockpickGame(user=interaction.user, target=target)
-        item_selection = SelectItems(interaction.user.id, (22, 23))
+        item_selection = SelectItems(interaction.user.id, ("lockpick_plus", "insider_tip"))
         await item_selection.add_buttons(callback=lockpick_game.start_game)
 
         await interaction.response.send_message(embed=embed, view=item_selection)

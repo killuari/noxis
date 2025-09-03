@@ -44,7 +44,7 @@ class DatabaseManager:
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS inventory (
                     user_id INTEGER NOT NULL,
-                    item_id INTEGER NOT NULL,
+                    item_id TEXT NOT NULL,
                     quantity INTEGER DEFAULT 1,
                     acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (user_id, item_id)
@@ -55,6 +55,11 @@ class DatabaseManager:
 
             print("Database initialized!")
 
+    @staticmethod
+    async def drop_table(table_name: str):
+        async with aiosqlite.connect("database.db") as db:
+            await db.execute(f"DROP TABLE IF EXISTS {table_name}")
+            await db.commit()
             
     @staticmethod            
     async def add_column_to_table(db_path, table_name, column_name, column_type="TEXT", default_value=None):

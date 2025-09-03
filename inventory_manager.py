@@ -5,7 +5,7 @@ from user_manager import UserManager
 
 class InventoryManager:
     @staticmethod
-    async def add_item(user_id: int, item_id: int, quantity: int = 1) -> int: # returns quantity that would exceed the max stack of specified item
+    async def add_item(user_id: int, item_id: str, quantity: int = 1) -> int: # returns quantity that would exceed the max stack of specified item
         """Fügt anzahl an item einem user inventar hinzu"""                   # returns 0 if operation was successful
         # Check if item and user exists
         if not await ItemManager.item_exists(item_id) or not await UserManager.user_exists(user_id):
@@ -14,12 +14,13 @@ class InventoryManager:
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             item = await ItemManager.get_item(item_id)
-
             item_quantity = await InventoryManager.get_item_quantity(user_id, item_id)
             
-            if item_quantity > 0:
+            if item_quantity > 0 and not item.unique:
                 await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
-            else:
+            elif item_quantity == 0:
+                if item.unique:
+                    quantity = 1
                 await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
 
             await db.commit()
@@ -27,7 +28,7 @@ class InventoryManager:
             return 0
 
     @staticmethod
-    async def remove_item(user_id: int, item_id: int, quantity: int = 1):
+    async def remove_item(user_id: int, item_id: str, quantity: int = 1):
         """Entfernt anzahl an item von einem user inv"""
         if not await ItemManager.item_exists(item_id) or not await UserManager.user_exists(user_id):
             return
@@ -45,7 +46,7 @@ class InventoryManager:
             await InventoryManager.update_inventory_value(user_id)
                 
     @staticmethod
-    async def get_item_quantity(user_id: int, item_id: int) -> int:
+    async def get_item_quantity(user_id: int, item_id: str) -> int:
         """Get quantity of specified item in user inventory"""
         if not await ItemManager.item_exists(item_id) or not await UserManager.user_exists(user_id):
             return
@@ -79,7 +80,6 @@ class InventoryManager:
             for item_values in result:
                 item = await ItemManager.get_item(item_values[1])
                 item.quantity = item_values[2]
-                item.acquired_at = datetime.datetime.strptime(item_values[-1], "%Y-%m-%d %H:%M:%S").timestamp()
                 items.append(item)
 
         return items

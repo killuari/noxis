@@ -641,7 +641,7 @@ class JobList(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
 
 class SelectItems(discord.ui.View):
-    def __init__(self, user_id: int, allowed_item_ids: Tuple[int]): 
+    def __init__(self, user_id: int, allowed_item_ids: Tuple[str]): 
         super().__init__(timeout=None)
         self.user_id = user_id
         self.allowed_item_ids = allowed_item_ids
@@ -658,11 +658,11 @@ class SelectItems(discord.ui.View):
             button.callback = self.create_callback(button)
             self.add_item(button)
 
-            self.button_mapping[button.label] = (await ItemManager.get_item(item_id)).name
+            self.button_mapping[button.label] = item_id
 
         self.callback = callback
 
-        self.items_used = {(await ItemManager.get_item(item_id)).name: False for item_id in self.allowed_item_ids}
+        self.items_used = {item_id: False for item_id in self.allowed_item_ids}
 
         self.start_button = discord.ui.Button(label="Start", style=discord.ButtonStyle.green)
         self.start_button.callback = self.create_start_callback()
@@ -690,9 +690,8 @@ class SelectItems(discord.ui.View):
                 await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
                 return
 
-            for item_name, used in self.items_used.items():
+            for item_id, used in self.items_used.items():
                 if used:
-                    item_id = (await ItemManager.get_item_by_name(item_name)).item_id
                     await InventoryManager.remove_item(interaction.user.id, item_id)
 
             await self.callback(interaction=interaction, items_used=self.items_used)
