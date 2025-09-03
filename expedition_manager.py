@@ -7,6 +7,7 @@ from buttons import SelectItems
 from items import ItemManager
 from inventory_manager import InventoryManager
 from knowledge_manager import KnowledgeManager
+from level_manager import LevelManager
 
 @dataclass
 class Expedition:
@@ -24,7 +25,7 @@ class Expedition:
 
     def __post_init__(self):
         if self.rewards is None:
-            self.rewards = {"money": 0, "items": []}
+            self.rewards = {"money": 0, "items": [], "experience": 0}
             self.losses = {"money": 0, "items": []}
 
     def get_event_callbacks(self, event_id: str) -> List:
@@ -105,6 +106,10 @@ class Expedition:
 
                     elif reward["type"] == "item":
                         items.append(reward["id"])
+
+                    elif reward["type"] == "experience":
+                        xp_amount = random.randrange(reward["amount_min"], reward["amount_max"])
+                        await LevelManager.add_experience(interaction.user.id, xp_amount)
 
                 item_names = [(await ItemManager.get_item(item_id)).name for item_id in items]
 

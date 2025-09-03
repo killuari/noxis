@@ -1363,9 +1363,9 @@
       "choices": [
         {
           "label": "Drop in and loot",
-          "success_outcomes": ["final_loot"],
+          "success_outcomes": ["lockpick_minigame"],
           "fail_outcomes": ["equipment_dropped"],
-          "chance": 0.7
+          "chance": 0.8
         }
       ],
       "title": "Vent Widened",
@@ -1798,8 +1798,13 @@
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 8000,
-          "amount_max": 12000
+          "amount_min": 14000,
+          "amount_max": 18000
+        },
+        {
+          "type": "experience",
+          "amount_min": 600,
+          "amount_max": 800
         },
         {
           "type": "item",
@@ -1824,8 +1829,13 @@
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 15000,
-          "amount_max": 20000
+          "amount_min": 20000,
+          "amount_max": 25000
+        },
+        {
+          "type": "experience",
+          "amount_min": 1000,
+          "amount_max": 1500
         },
         {
           "type": "item",

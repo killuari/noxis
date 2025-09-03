@@ -482,7 +482,8 @@ class BasicCommands(commands.Cog):
             
             await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value.capitalize()}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
                                                                         description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)           
-                                                    
+
+        await DatabaseManager.update_cmd_used(interaction.user.id)    
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
@@ -536,6 +537,7 @@ class BasicCommands(commands.Cog):
 
         webhook_url = interaction.followup.url
         view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
+
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
 
@@ -608,8 +610,9 @@ class BasicCommands(commands.Cog):
         
         timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
         embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
-        await DatabaseManager.update_cmd_used(interaction.user.id)    
+  
         await interaction.response.send_message(embed=embed)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
 
     @app_commands.command(name="inventory", description="Displays your or someones inventory")
     async def inventory(self, interaction: discord.Interaction, user: discord.User = None): 
@@ -688,6 +691,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
         
         await interaction.response.send_message(embed=embed)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     async def send_leaderboard_embed(self, interaction, category_value, update=False, view=None):
         title = ""
@@ -774,6 +778,7 @@ class BasicCommands(commands.Cog):
             return
 
         await self.send_leaderboard_embed(interaction, "total_balance", view=LeaderboardView(self, interaction.user.id, "total_balance"))
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     async def work_list(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
@@ -834,6 +839,7 @@ class BasicCommands(commands.Cog):
             return
 
         await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id = 0)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     @app_commands.command(name="bankrob", description="Try to bankrob someone")
     async def bankrob(self, interaction: discord.Interaction, target: discord.User):
