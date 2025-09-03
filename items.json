@@ -229,6 +229,28 @@
         }
     },
     {
+        "item_id": "decoy_bag",
+        "name": "Decoy Bag",
+        "description": "A fake bag filled with worthless items to throw off pursuers during a heist",
+        "rarity": "RARE",
+        "value": 2000,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
+        "item_id": "second_chance",
+        "name": "Second Chance",
+        "description": "A mysterious token that allows you to retry a failed mission or escape certain doom",
+        "rarity": "EPIC",
+        "value": 5000,
+        "usable": false,
+        "sellable": true,
+        "findable": true,
+        "unique": false
+    },
+    {
         "item_id": "thief_mask",
         "name": "Thief Mask",
         "description": "A mask worn by thieves to conceal their identity during heists",

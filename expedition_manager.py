@@ -16,7 +16,7 @@ class Expedition:
     cost: int
     events: Dict = None
     start_events: Dict = None
-    items_used: List[int] = None
+    items_used: Dict = None
     rewards: Dict = None
     losses: Dict = None
 
@@ -88,8 +88,10 @@ class Expedition:
                     elif reward["type"] == "item":
                         items.append(reward["id"])
 
-                reward_string = f"Money: {self.rewards["money"]:,}$ (+{amount:,})\n" if self.rewards["money"] > 0 else f"Money: {amount:,}$\n"
-                reward_string += f"Items: {", ".join(self.rewards["items"])} (+ {items})" if len(self.rewards["items"]) > 0 else f"Items: {", ".join(items)}"
+                item_names = [(await ItemManager.get_item(item_id)).name for item_id in items]
+
+                reward_string = f"Money: {amount:,}$\n" if amount > 0 else ""
+                reward_string += f"Items: {", ".join(item_names)}" if len(items) > 0 else ""
 
                 self.rewards["money"] += amount
                 self.rewards["items"].extend(items)
@@ -100,21 +102,28 @@ class Expedition:
                 embed.clear_fields()
 
                 penalty_string = f"Money: -{self.losses["money"]:,}$"
-                
                 embed.add_field(name="⛔ Total Losses", value=penalty_string, inline=False)
 
+                # Rewards
+                remove_uniques = []
+                await EconomyManager.add_money(interaction.user.id, self.rewards["money"])
+                for item_id in self.rewards["items"]:
+                    operational = await InventoryManager.add_item(interaction.user.id, item_id)
+                    if operational == -1:
+                        remove_uniques.append(item_id)
+
+                for item_id in remove_uniques:
+                    self.rewards["items"].remove(item_id)
+
+                item_names = [(await ItemManager.get_item(item_id)).name for item_id in self.rewards["items"]]
+
                 reward_string = f"Money: {self.rewards["money"]:,}$\n" if self.rewards["money"] > 0 else ""
-                reward_string += f"Items: {", ".join(self.rewards["items"])}" if len(self.rewards["items"]) > 0 else ""
+                reward_string += f"Items: {", ".join(item_names)}" if len(self.rewards["items"]) > 0 else ""
 
                 if reward_string == "":
                     reward_string = "Nothing"
 
                 embed.add_field(name="🏆 Total Rewards", value=reward_string, inline=False)
-
-                await EconomyManager.add_money(interaction.user.id, self.rewards["money"])
-
-                for item_id in self.rewards["items"]:
-                    await InventoryManager.add_item(interaction.user.id, (await ItemManager.get_item_by_name(item_id)).item_id)
 
             await interaction.response.edit_message(embed=embed, view=view)
 
@@ -177,7 +186,7 @@ class ExpeditionView(discord.ui.View):
         self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
         start_button = discord.ui.Button(
-            label=f"Start Expedition! Cost: {self.selected_expedition.cost}" if author_balance >= self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost}",
+            label=f"Start Expedition! Cost: {self.selected_expedition.cost:,}$" if author_balance >= self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost:,}$",
             style=discord.ButtonStyle.green if author_balance >= self.selected_expedition.cost else discord.ButtonStyle.red
         )
         start_button.callback = self.start_expedition_callback
@@ -198,12 +207,9 @@ class ExpeditionView(discord.ui.View):
         # if user doesnt have enough money in wallet, try to take it from bank
         if money_left > 0: 
             money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
-        
-        expedition = ExpeditionManager.get_expedition(expedition_id=self.selected_expedition_id)
-        allowed_item_ids = [(await ItemManager.get_item_by_name(item_name)).item_id for item_name in expedition.allowed_items]
 
-        item_selection = SelectItems(interaction.user.id, allowed_item_ids=allowed_item_ids)
-        await item_selection.add_buttons(callback=expedition.start_expedition)
+        item_selection = SelectItems(interaction.user.id, allowed_item_ids=self.selected_expedition.allowed_items)
+        await item_selection.add_buttons(callback=self.selected_expedition.start_expedition)
 
         embed = discord.Embed(
             title="Item Selection",

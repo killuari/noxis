@@ -61,7 +61,7 @@ class ItemManager:
     @classmethod
     async def item_exists(cls, item_id: str) -> bool:
         """Prüft ob Item existiert"""
-        return item_id in cls.items
+        return item_id in cls.items.keys()
 
     @classmethod
     async def get_item(cls, item_id: str) -> Optional[Item]:

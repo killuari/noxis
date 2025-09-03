@@ -5,10 +5,11 @@ from user_manager import UserManager
 
 class InventoryManager:
     @staticmethod
-    async def add_item(user_id: int, item_id: str, quantity: int = 1) -> int: # returns quantity that would exceed the max stack of specified item
+    async def add_item(user_id: int, item_id: str, quantity: int = 1) -> int: # returns -1 if user already has item and item is unique
         """Fügt anzahl an item einem user inventar hinzu"""                   # returns 0 if operation was successful
         # Check if item and user exists
         if not await ItemManager.item_exists(item_id) or not await UserManager.user_exists(user_id):
+            print("Item or User doesnt exist")
             return
         
         async with aiosqlite.connect("database.db") as db:
@@ -16,9 +17,11 @@ class InventoryManager:
             item = await ItemManager.get_item(item_id)
             item_quantity = await InventoryManager.get_item_quantity(user_id, item_id)
             
-            if item_quantity > 0 and not item.unique:
+            if item_quantity > 0:
+                if item.unique:
+                    return -1
                 await cursor.execute("UPDATE inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?", (quantity, user_id, item_id))
-            elif item_quantity == 0:
+            else:
                 if item.unique:
                     quantity = 1
                 await cursor.execute("INSERT INTO inventory (user_id, item_id, quantity) VALUES (?, ?, ?)", (user_id, item_id, quantity))
