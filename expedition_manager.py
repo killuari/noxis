@@ -39,7 +39,7 @@ class Expedition:
             else:
                 outcome = random.choice(choice["fail_outcomes"])
 
-            callbacks.append(self.create_event_callback(outcome))
+            callbacks.append(self.create_event_callback(outcome, choice))
         
         return callbacks
     
@@ -55,7 +55,7 @@ class Expedition:
 
         return {"success_callback": callbacks[0], "fail_callback": callbacks[1]}
 
-    def create_event_callback(self, event_id: str):
+    def create_event_callback(self, event_id: str, leading_choice: Dict = None):
         event = self.events[event_id]
         if event is None:
             return None
@@ -67,17 +67,29 @@ class Expedition:
             
             embed, view = event.event_to_message(interaction=interaction)
 
-            penalty_string = ""
-            if len(event.penalties) > 0:
+            lost_items = []
+            if leading_choice:
+                if "item" in leading_choice:
+                    lost_items.append(leading_choice["item"])
+                    self.items_used[leading_choice["item"]] = False
+
+            if len(event.penalties) > 0 or len(lost_items) > 0:
+                items = lost_items
+                amount = 0
+
                 for penalty in event.penalties:
                     if penalty["type"] == "currency":
                         amount = random.randrange(penalty["amount_min"], penalty["amount_max"])
 
-                penalty_string = f"Money: -{amount:,}$"
+                item_names = [(await ItemManager.get_item(item_id)).name for item_id in items]
+
+                penalty_string = f"Money: -{amount:,}$\n" if amount > 0 else ""
+                penalty_string += f"Items: {", ".join(item_names)}" if len(items) > 0 else ""
 
                 embed.add_field(name="💸 You lost", value=penalty_string, inline=False)
 
                 self.losses["money"] += amount
+                self.losses["items"].extend(items)
 
                 money_left = await EconomyManager.remove_money(interaction.user.id, amount, bank=False)
                 if money_left > 0:
@@ -107,7 +119,17 @@ class Expedition:
             if event.type == "end":
                 embed.clear_fields()
 
-                penalty_string = f"Money: -{self.losses["money"]:,}$"
+                for item_id in self.losses["items"]:
+                    await InventoryManager.remove_item(interaction.user.id, item_id)
+
+                item_names = [(await ItemManager.get_item(item_id)).name for item_id in self.losses["items"]]
+
+                penalty_string = f"Money: -{self.losses["money"]:,}$\n" if self.losses["money"] > 0 else ""
+                penalty_string += f"Items: {", ".join(item_names)}" if len(self.losses["items"]) > 0 else ""
+
+                if penalty_string == "":
+                    penalty_string = "Nothing"
+
                 embed.add_field(name="⛔ Total Losses", value=penalty_string, inline=False)
 
                 # Rewards
@@ -239,7 +261,7 @@ class ExpeditionView(discord.ui.View):
         if money_left > 0: 
             money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
 
-        item_selection = SelectItems(interaction.user.id, allowed_item_ids=self.selected_expedition.allowed_items)
+        item_selection = SelectItems(interaction.user.id, allowed_item_ids=self.selected_expedition.allowed_items, remove_items=False)
         await item_selection.add_buttons(callback=self.selected_expedition.start_expedition)
 
         embed = discord.Embed(

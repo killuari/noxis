@@ -641,9 +641,10 @@ class JobList(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
 
 class SelectItems(discord.ui.View):
-    def __init__(self, user_id: int, allowed_item_ids: Tuple[str]): 
+    def __init__(self, user_id: int, allowed_item_ids: Tuple[str], remove_items = True): 
         super().__init__(timeout=None)
         self.user_id = user_id
+        self.remove_items = remove_items
         self.allowed_item_ids = allowed_item_ids
         self.button_mapping = {}
 
@@ -690,9 +691,10 @@ class SelectItems(discord.ui.View):
                 await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", color=discord.Color.red()))
                 return
 
-            for item_id, used in self.items_used.items():
-                if used:
-                    await InventoryManager.remove_item(interaction.user.id, item_id)
+            if self.remove_items:
+                for item_id, used in self.items_used.items():
+                    if used:
+                        await InventoryManager.remove_item(interaction.user.id, item_id)
 
             await self.callback(interaction=interaction, items_used=self.items_used)
 

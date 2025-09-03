@@ -623,7 +623,7 @@
     {
       "id": "guard_alert",
       "type": "choice",
-      "description": "A guard becomes suspicious and starts actively searching for intruders.",
+      "description": "A guard becomes alert and starts actively searching for you.",
       "choices": [
         {
           "label": "Confront the guard",
