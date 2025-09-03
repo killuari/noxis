@@ -26,8 +26,9 @@ class Item:
     value: int = 0
     quantity: int = 0
     usable: bool = False
+    sellable: bool = True
+    unique: bool = False
     metadata: Dict = None
-    acquired_at: float = 0
 
     def __post_init__(self):
         if self.metadata is None:
@@ -75,7 +76,6 @@ class ItemManager:
                 quantity=item_dict.get("quantity", 0),
                 usable=item_dict.get("usable", False),
                 metadata=item_dict.get("metadata", {}),
-                acquired_at=item_dict.get("acquired_at", 0)
             )
         return None
     
