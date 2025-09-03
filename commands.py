@@ -145,8 +145,8 @@ class BasicCommands(commands.Cog):
 
         suggestions = [ # diesmal die comprehension auf mehrere zeilen aufgeteilt
             app_commands.Choice(name=item.name, value=item.name) 
-            for item in await InventoryManager.get_inventory(interaction.user.id) 
-            if current.lower() in item.name.lower()
+            for item in await InventoryManager.get_inventory(interaction.user.id)
+            if current.lower() in item.name.lower() and item.sellable
         ]
 
         # Discord erlaubt max. 25 Vorschläge
@@ -164,6 +164,10 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
             return
         
+        if not item.sellable:
+            await interaction.response.send_message(embed=discord.Embed(title="You can't sell this item!", color=discord.Color.red()), ephemeral=True)
+            return
+
         user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
         if user_item_quantity == 0:
             await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
@@ -478,7 +482,8 @@ class BasicCommands(commands.Cog):
             
             await interaction.response.send_message(embed=discord.Embed(title=f"🧠 Category: {category.value.capitalize()}\nYou've chosen to study! Answer the following bonus question for extra rewards:\n\n❓ """+ question,
                                                                         description=f"A) {answer_choices[0]}\nB) {answer_choices[1]}\nC) {answer_choices[2]}\nD) {answer_choices[3]}",colour=6702), view=view)           
-                                                    
+
+        await DatabaseManager.update_cmd_used(interaction.user.id)    
                                                     
     @app_commands.command(name="higherlower", description="Play higher or lower")
     async def highlower(self, interaction: discord.Interaction):
@@ -532,6 +537,7 @@ class BasicCommands(commands.Cog):
 
         webhook_url = interaction.followup.url
         view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
+
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
 
@@ -604,8 +610,9 @@ class BasicCommands(commands.Cog):
         
         timestamp = int((datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")).timestamp())
         embed.add_field(name="Info", value=f"Commands used: `{result[0]}`\nStarted playing: <t:{timestamp}:R>", inline=True)   
-        await DatabaseManager.update_cmd_used(interaction.user.id)    
+  
         await interaction.response.send_message(embed=embed)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
 
     @app_commands.command(name="inventory", description="Displays your or someones inventory")
     async def inventory(self, interaction: discord.Interaction, user: discord.User = None): 
@@ -684,6 +691,7 @@ class BasicCommands(commands.Cog):
         embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
         
         await interaction.response.send_message(embed=embed)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     async def send_leaderboard_embed(self, interaction, category_value, update=False, view=None):
         title = ""
@@ -770,6 +778,7 @@ class BasicCommands(commands.Cog):
             return
 
         await self.send_leaderboard_embed(interaction, "total_balance", view=LeaderboardView(self, interaction.user.id, "total_balance"))
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     async def work_list(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
@@ -828,32 +837,9 @@ class BasicCommands(commands.Cog):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
-        
-        async with aiosqlite.connect("database.db") as db:
-            cursor = await db.cursor()
-            await cursor.execute("SELECT expedition FROM last_used WHERE user_id=?", (interaction.user.id,))
-            result = await cursor.fetchone()
-            last_game = result[0]
-            claim_available = False
-            current_time = datetime.datetime.now()
-
-            if result is None or last_game is None:
-                claim_available = True
-            else:
-                last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
-                claim_available = current_time >= (last_game + datetime.timedelta(minutes=0))
-            
-            if not claim_available:
-                next_available = last_game + datetime.timedelta(minutes=0)
-                timestamp = int(next_available.timestamp())
-                embed=discord.Embed(title="⏰ Expedition Cooldown", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
-                await interaction.response.send_message(embed=embed)
-                return
-            
-            await cursor.execute("UPDATE last_used SET expedition=? WHERE user_id=?", (current_time, interaction.user.id))
-            await db.commit()
 
         await ExpeditionManager.send_expedition_embed(interaction=interaction, expedition_id = 0)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
         
     @app_commands.command(name="bankrob", description="Try to bankrob someone")
     async def bankrob(self, interaction: discord.Interaction, target: discord.User):
