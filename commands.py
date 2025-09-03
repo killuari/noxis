@@ -308,7 +308,7 @@ class BasicCommands(commands.Cog):
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
 
-                    item = random.choice(await ItemManager.get_items_by_rarity(Rarity.COMMON))
+                    item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.COMMON))
                     quantity = random.randint(1,3)
                     found_msg += f"\n🍎 ** Also found** `{quantity} {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
@@ -319,7 +319,7 @@ class BasicCommands(commands.Cog):
                     money = random.randint(2000, 3000)
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
-                    item = random.choice(await ItemManager.get_items_by_rarity(Rarity.RARE))
+                    item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.RARE))
                     found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
@@ -656,7 +656,7 @@ class BasicCommands(commands.Cog):
     async def autocomplete_items(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         suggestions = [ 
             app_commands.Choice(name=item.name, value=item.name) 
-            for item in ITEMS.values() 
+            for item in (await ItemManager.get_all_items()) 
             if current.lower() in item.name.lower()
         ]
 

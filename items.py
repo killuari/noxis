@@ -28,6 +28,7 @@ class Item:
     usable: bool = False
     sellable: bool = True
     unique: bool = False
+    findable: bool = True
     metadata: Dict = None
 
     def __post_init__(self):
@@ -81,16 +82,22 @@ class ItemManager:
         return None
     
     @classmethod
+    async def get_item_by_name(cls, name: str):
+        for item in cls.items.values():
+            if item["name"].lower() == name.lower():
+                return await cls.get_item(item["item_id"])
+
+    @classmethod
     async def get_items_by_rarity(cls, rarity: Rarity) -> List[Item]:
         """Holt alle Items einer Kategorie"""
-        return [cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity]
+        return [await cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity]
     
     @classmethod
     async def get_findable_items_by_rarity(cls, rarity: Rarity) -> List[Item]:
         """Holt alle Items einer Kategorie"""
-        return [cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity and item["findable"]]
+        return [await cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity and item["findable"]]
     
     @classmethod
     async def get_all_items(cls) -> List[Item]:
         """Holt alle verfügbaren Items"""
-        return [cls.get_item(item["item_id"]) for item in cls.items.values()]
+        return [await cls.get_item(item["item_id"]) for item in cls.items.values()]

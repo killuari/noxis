@@ -7,6 +7,7 @@
         "value": 100,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false,
         "metadata": {
             "nutrition": 20
@@ -20,6 +21,7 @@
         "value": 100,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -30,6 +32,7 @@
         "value": 250,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -40,6 +43,7 @@
         "value": 1000,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false,
         "metadata": {
             "damage": 12
@@ -53,6 +57,7 @@
         "value": 60,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -63,6 +68,7 @@
         "value": 2500,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -73,6 +79,7 @@
         "value": 50,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -83,6 +90,7 @@
         "value": 5000,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -93,6 +101,7 @@
         "value": 200,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -103,6 +112,7 @@
         "value": 500,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -113,6 +123,7 @@
         "value": 500,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -123,6 +134,7 @@
         "value": 200,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -133,6 +145,7 @@
         "value": 2000,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -143,6 +156,7 @@
         "value": 200,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -153,6 +167,7 @@
         "value": 400,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -163,6 +178,7 @@
         "value": 500,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -173,6 +189,7 @@
         "value": 800,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -183,6 +200,7 @@
         "value": 30,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -193,6 +211,7 @@
         "value": 300,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -203,6 +222,7 @@
         "value": 2000,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false,
         "metadata": {
             "possible_rewards": ["bread", "water_bottle", "nails_pack", "flint_and_steel", "arrows"]
@@ -216,6 +236,7 @@
         "value": 2000,
         "usable": false,
         "sellable": false,
+        "findable": false,
         "unique": true
     },
     {
@@ -226,6 +247,7 @@
         "value": 2000,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -236,6 +258,7 @@
         "value": 2000,
         "usable": true,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -246,6 +269,7 @@
         "value": 5000,
         "usable": false,
         "sellable": true,
+        "findable": true,
         "unique": false
     },
     {
@@ -256,6 +280,7 @@
         "value": 10000,
         "usable": false,
         "sellable": true,
+        "findable": false,
         "unique": false
     }
 ]
