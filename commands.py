@@ -841,7 +841,7 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message("You must enter a valid target.", ephemeral=True, delete_after=8.0)
             return
         
-        if await InventoryManager.get_item_quantity(interaction.user.id, 21) <= 0:
+        if await InventoryManager.get_item_quantity(interaction.user.id, "thief_mask") <= 0:
             embed=discord.Embed(title="Error",
                                 description="You need the following item to use this command: `thief mask`",
                                 color=discord.Color.red()).set_footer(text="Try the vaultbreaker expedition to get a thief mask! (/expedition)")
@@ -906,7 +906,7 @@ class BasicCommands(commands.Cog):
         ).set_footer(text="Good luck... the vault is waiting!")
         
         lockpick_game = LockpickGame(user=interaction.user, target=target)
-        item_selection = SelectItems(interaction.user.id, (22, 23))
+        item_selection = SelectItems(interaction.user.id, ("lockpick_plus", "insider_tip"))
         await item_selection.add_buttons(callback=lockpick_game.start_game)
 
         await interaction.response.send_message(embed=embed, view=item_selection)

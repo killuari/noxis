@@ -86,6 +86,11 @@ class ItemManager:
         return [cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity]
     
     @classmethod
+    async def get_findable_items_by_rarity(cls, rarity: Rarity) -> List[Item]:
+        """Holt alle Items einer Kategorie"""
+        return [cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity and item["findable"]]
+    
+    @classmethod
     async def get_all_items(cls) -> List[Item]:
         """Holt alle verfügbaren Items"""
         return [cls.get_item(item["item_id"]) for item in cls.items.values()]
