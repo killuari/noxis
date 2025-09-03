@@ -259,7 +259,13 @@ class EventView(discord.ui.View):
             button_callbacks = self.expedition.get_event_callbacks(event.event_id)
 
             for idx, choice in enumerate(event.choices):
-                button = discord.ui.Button(label=choice["label"])
+                disabled = False
+                style = discord.ButtonStyle.secondary
+                if "item" in choice:
+                    disabled = not self.expedition.items_used[choice["item"]]
+                    style = discord.ButtonStyle.primary
+
+                button = discord.ui.Button(label=choice["label"], style=style, disabled=disabled)
                 button.callback = button_callbacks[idx]
                 self.add_item(button)
 

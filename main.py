@@ -20,7 +20,7 @@ async def on_ready():
     await DatabaseManager.init_database()
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
-    
+
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
