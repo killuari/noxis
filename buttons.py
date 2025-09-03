@@ -671,7 +671,7 @@ class SelectItems(discord.ui.View):
     def create_callback(self, button):
         async def click(interaction: discord.Interaction):
             if interaction.user.id != self.user_id:
-                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", color=discord.Color.red()))
                 return
             
             button.style = discord.ButtonStyle.blurple if button.style == discord.ButtonStyle.secondary else discord.ButtonStyle.secondary
@@ -687,7 +687,7 @@ class SelectItems(discord.ui.View):
     def create_start_callback(self):
         async def start_callback(interaction: discord.Interaction):
             if interaction.user.id != self.user_id:
-                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", description="Try /bankrob if you want to play yourself!", color=discord.Color.red()))
+                await interaction.response.send_message(embed=discord.Embed(title="You are not the player.", color=discord.Color.red()))
                 return
 
             for item_id, used in self.items_used.items():

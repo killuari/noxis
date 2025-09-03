@@ -1,4 +1,4 @@
-import os, json, discord, random
+import os, json, discord, random, aiosqlite, datetime
 from typing import List, Dict
 from economy_manager import EconomyManager
 from dataclasses import dataclass
@@ -6,6 +6,7 @@ from mini_games import LockpickGame
 from buttons import SelectItems
 from items import ItemManager
 from inventory_manager import InventoryManager
+from knowledge_manager import KnowledgeManager
 
 @dataclass
 class Expedition:
@@ -16,6 +17,7 @@ class Expedition:
     cost: int
     events: Dict = None
     start_events: Dict = None
+    author_id: int = None
     items_used: Dict = None
     rewards: Dict = None
     losses: Dict = None
@@ -59,6 +61,10 @@ class Expedition:
             return None
         
         async def event_callback(interaction: discord.Interaction):
+            if interaction.user.id != self.author_id:
+                await interaction.response.send_message("This is not your expedition.", ephemeral=True)
+                return
+            
             embed, view = event.event_to_message(interaction=interaction)
 
             penalty_string = ""
@@ -182,6 +188,7 @@ class ExpeditionView(discord.ui.View):
         self.author_balance = author_balance
         self.selected_expedition_id = current_expedition_id
         self.selected_expedition = ExpeditionManager.get_expedition(self.selected_expedition_id)
+        self.selected_expedition.author_id = author_id
 
         self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
@@ -195,13 +202,37 @@ class ExpeditionView(discord.ui.View):
 
     async def start_expedition_callback(self, interaction: discord.Interaction):
         if self.author_id != interaction.user.id:
-            await interaction.response.send_message(f"Only {self.interaction.user.name} can use this button!", ephemeral=True)
+            await interaction.response.send_message("This is not your expedition!", ephemeral=True)
             return
         
         if await EconomyManager.get_total_balance(self.author_id) < self.selected_expedition.cost:      # Umändern falls wir uns doch nur fürs wallet entscheiden und zeilen 244 & 248 
             await interaction.response.send_message(f"You dont have enough money to start a expedition!", ephemeral=True)
             return
         
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT expedition FROM last_used WHERE user_id=?", (interaction.user.id,))
+            result = await cursor.fetchone()
+            last_game = result[0]
+            claim_available = False
+            current_time = datetime.datetime.now()
+
+            if result is None or last_game is None:
+                claim_available = True
+            else:
+                last_game = datetime.datetime.strptime(last_game, "%Y-%m-%d %H:%M:%S.%f")
+                claim_available = current_time >= (last_game + datetime.timedelta(minutes=10))
+            
+            if not claim_available:
+                next_available = last_game + datetime.timedelta(minutes=10)
+                timestamp = int(next_available.timestamp())
+                embed=discord.Embed(title="⏰ Expedition Cooldown", description=f"🛑 Slow down! It's available <t:{timestamp}:R>", color=discord.Color.yellow()).set_footer(text= await KnowledgeManager.get_random_tip())
+                await interaction.response.send_message(embed=embed)
+                return
+            
+            await cursor.execute("UPDATE last_used SET expedition=? WHERE user_id=?", (current_time, interaction.user.id))
+            await db.commit()
+
         money_left = await EconomyManager.remove_money(self.author_id, 10000, False)
 
         # if user doesnt have enough money in wallet, try to take it from bank
@@ -317,12 +348,13 @@ class ExpeditionManager:
             print("Expedition doesnt exist")
             return
 
+        allowed_item_names = [(await ItemManager.get_item(item_id)).name for item_id in expedition.allowed_items]
         embed = discord.Embed(
             title="Choose an Expedition",
             color=discord.Color.from_str("#607bff"),
         ).add_field(name="Name", value=expedition.name, inline=False
         ).add_field(name="Description", value=expedition.description, inline=False
-        ).add_field(name="Allowed Items", value=", ".join(expedition.allowed_items), inline=False)
+        ).add_field(name="Allowed Items", value=", ".join(allowed_item_names), inline=False)
 
         if not update:
             await interaction.response.send_message(embed=embed, view=ExpeditionView(author_id=interaction.user.id, 

@@ -79,7 +79,7 @@
             "alarm_minor",
             "noise_made"
           ],
-          "chance": 0.6
+          "chance": 0.5
         },
         {
           "label": "Follow the tunnels further",
@@ -88,10 +88,9 @@
             "back_exit_found"
           ],
           "fail_outcomes": [
-            "time_wasted",
-            "lost_in_tunnels"
+            "time_wasted"
           ],
-          "chance": 0.8
+          "chance": 0.7
         }
       ],
       "title": "Start Sewer",
