@@ -57,21 +57,21 @@ class ItemManager:
             
         print("Successfully loaded all items!")
 
-    @staticmethod
-    async def item_exists(item_id: str) -> bool:
+    @classmethod
+    async def item_exists(cls, item_id: str) -> bool:
         """Prüft ob Item existiert"""
-        return item_id in ItemManager.items
+        return item_id in cls.items
 
-    @staticmethod
-    async def get_item(item_id: str) -> Optional[Item]:
+    @classmethod
+    async def get_item(cls, item_id: str) -> Optional[Item]:
         """Holt Item-Definition aus dem items Dict und wandelt es in ein Item-Objekt um"""
-        item_dict = ItemManager.items.get(item_id)
+        item_dict = cls.items.get(item_id)
         if item_dict:
             return Item(
                 item_id=item_dict["item_id"],
                 name=item_dict["name"],
                 description=item_dict["description"],
-                rarity=Rarity[item_dict["rarity"].upper()],
+                rarity=Rarity[item_dict["rarity"]],
                 value=item_dict.get("value", 0),
                 quantity=item_dict.get("quantity", 0),
                 usable=item_dict.get("usable", False),
@@ -79,20 +79,12 @@ class ItemManager:
             )
         return None
     
-    @staticmethod
-    async def get_item_by_name(name: str) -> Optional[Item]:
-        """Holt das komplette Item-Objekt anhand des Namens"""
-        for item in ITEMS.values():
-            if item.name.lower() == name.lower():
-                return item
-        return None
-    
-    @staticmethod
-    async def get_items_by_rarity(rarity: Rarity) -> List[Item]:
+    @classmethod
+    async def get_items_by_rarity(cls, rarity: Rarity) -> List[Item]:
         """Holt alle Items einer Kategorie"""
-        return [item for item in ITEMS.values() if item.rarity == rarity]
+        return [cls.get_item(item["item_id"]) for item in cls.items.values() if Rarity[item["rarity"]] == rarity]
     
-    @staticmethod
-    async def get_all_items() -> List[Item]:
+    @classmethod
+    async def get_all_items(cls) -> List[Item]:
         """Holt alle verfügbaren Items"""
-        return list(ITEMS.values())
+        return [cls.get_item(item["item_id"]) for item in cls.items.values()]
