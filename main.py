@@ -16,6 +16,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 @client.event
 async def on_ready():
+    await DatabaseManager.drop_table("inventory")
     await DatabaseManager.init_database()
     await ExpeditionManager.load_all()
     await ItemManager.load_all()

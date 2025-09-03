@@ -73,8 +73,9 @@ class ItemManager:
                 description=item_dict["description"],
                 rarity=Rarity[item_dict["rarity"]],
                 value=item_dict.get("value", 0),
-                quantity=item_dict.get("quantity", 0),
                 usable=item_dict.get("usable", False),
+                sellable=item_dict.get("sellable", True),
+                unique=item_dict.get("unique", False),
                 metadata=item_dict.get("metadata", {}),
             )
         return None

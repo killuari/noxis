@@ -54,6 +54,11 @@ class DatabaseManager:
 
             print("Database initialized!")
 
+    @staticmethod
+    async def drop_table(table_name: str):
+        async with aiosqlite.connect("database.db") as db:
+            await db.execute(f"DROP TABLE IF EXISTS {table_name}")
+            await db.commit()
             
     @staticmethod            
     async def add_column_to_table(db_path, table_name, column_name, column_type="TEXT", default_value=None):
