@@ -1,7 +1,11 @@
 import os, json, discord, random
-from typing import List
+from typing import List, Dict
 from economy_manager import EconomyManager
 from dataclasses import dataclass
+from mini_games import LockpickGame
+from buttons import SelectItems
+from items import ItemManager
+from inventory_manager import InventoryManager
 
 @dataclass
 class Expedition:
@@ -10,44 +14,138 @@ class Expedition:
     description: str
     allowed_items: List[str]
     cost: int
-    events: dict = None
-    start_events: dict = None
+    events: Dict = None
+    start_events: Dict = None
+    items_used: List[int] = None
+    rewards: Dict = None
+    losses: Dict = None
 
-    def get_event_callbacks(self, event_id: str):
+    def __post_init__(self):
+        if self.rewards is None:
+            self.rewards = {"money": 0, "items": []}
+            self.losses = {"money": 0, "items": []}
+
+    def get_event_callbacks(self, event_id: str) -> List:
         event = self.events[event_id]
-        callbacks = []
         if event is None:
             return None
         
+        callbacks = []
         for choice in event.choices:
             if random.random() <= choice["chance"]:
                 outcome = random.choice(choice["success_outcomes"])
             else:
                 outcome = random.choice(choice["fail_outcomes"])
 
-            new_event = self.events[outcome]
-
-            async def event_callback(interaction: discord.Interaction):
-                embed, view = new_event.event_to_message()
-                await interaction.response.edit_message(embed=embed, view=view)
-
-            callbacks.append(event_callback)
+            callbacks.append(self.create_event_callback(outcome))
         
         return callbacks
+    
+    def get_minigame_callbacks(self, event_id: str) -> Dict:
+        event = self.events[event_id]
+        if event is None:
+            return None
+        
+        outcomes = (random.choice(event.outcomes["success_outcomes"]), random.choice(event.outcomes["fail_outcomes"]))
+        callbacks = []
+        for outcome in outcomes:
+            callbacks.append(self.create_event_callback(outcome))
+
+        return {"success_callback": callbacks[0], "fail_callback": callbacks[1]}
+
+    def create_event_callback(self, event_id: str):
+        event = self.events[event_id]
+        if event is None:
+            return None
+        
+        async def event_callback(interaction: discord.Interaction):
+            embed, view = event.event_to_message(interaction=interaction)
+
+            penalty_string = ""
+            if len(event.penalties) > 0:
+                for penalty in event.penalties:
+                    if penalty["type"] == "currency":
+                        amount = random.randrange(penalty["amount_min"], penalty["amount_max"])
+
+                penalty_string = f"Money: -{amount:,}$"
+
+                embed.add_field(name="💸 You lost", value=penalty_string, inline=False)
+
+                self.losses["money"] += amount
+
+                money_left = await EconomyManager.remove_money(interaction.user.id, amount, bank=False)
+                if money_left > 0:
+                    await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
+
+            if len(event.rewards) > 0:
+                items = []
+                amount = 0
+
+                for reward in event.rewards:
+                    if reward["type"] == "currency":
+                        amount = random.randrange(reward["amount_min"], reward["amount_max"])
+
+                    elif reward["type"] == "item":
+                        items.append(reward["id"])
+
+                reward_string = f"Money: {self.rewards["money"]:,}$ (+{amount:,})\n" if self.rewards["money"] > 0 else f"Money: {amount:,}$\n"
+                reward_string += f"Items: {", ".join(self.rewards["items"])} (+ {items})" if len(self.rewards["items"]) > 0 else f"Items: {", ".join(items)}"
+
+                self.rewards["money"] += amount
+                self.rewards["items"].extend(items)
+
+                embed.add_field(name="💰 You found", value=reward_string, inline=False)
+
+            if event.type == "end":
+                embed.clear_fields()
+
+                penalty_string = f"Money: -{self.losses["money"]:,}$"
+                
+                embed.add_field(name="⛔ Total Losses", value=penalty_string, inline=False)
+
+                reward_string = f"Money: {self.rewards["money"]:,}$\n" if self.rewards["money"] > 0 else ""
+                reward_string += f"Items: {", ".join(self.rewards["items"])}" if len(self.rewards["items"]) > 0 else ""
+
+                if reward_string == "":
+                    reward_string = "Nothing"
+
+                embed.add_field(name="🏆 Total Rewards", value=reward_string, inline=False)
+
+                await EconomyManager.add_money(interaction.user.id, self.rewards["money"])
+
+                for item_id in self.rewards["items"]:
+                    await InventoryManager.add_item(interaction.user.id, (await ItemManager.get_item_by_name(item_id)).item_id)
+
+            await interaction.response.edit_message(embed=embed, view=view)
+
+        return event_callback
+    
+    async def start_expedition(self, interaction: discord.Interaction, items_used: Dict):
+        self.items_used = items_used
+
+        start_event = random.choice(list(self.start_events.values()))
+        embed, view = start_event.event_to_message(interaction=interaction)
+
+        await interaction.response.edit_message(embed=embed, view=view)
             
 @dataclass
 class ExpeditionEvent:
-    expedition_id: int
     event_id: str
+    expedition: Expedition
     type: str
+    title: str
     description: str
-    choices: List[dict] = None
-    rewards: List[dict] = None
+    color: str
+    outcomes: Dict = None
+    choices: List[Dict] = None
+    rewards: List[Dict] = None
+    penalties: List[Dict] = None
 
-    def event_to_message(self):
-        embed = discord.Embed(title=self.description)
-        view = EventView(event=self)
+    def event_to_message(self, interaction: discord.Interaction):
+        embed = discord.Embed(title=self.title, description=self.description, color=discord.Color.from_str(self.color))
+        view = EventView(event=self, interaction=interaction)
         return (embed, view)
+            
 
 class ExpeditionDropdown(discord.ui.Select):
     def __init__(self, author_id: int, current_expedition_id: int = 0, options = ...):
@@ -79,8 +177,8 @@ class ExpeditionView(discord.ui.View):
         self.add_item(ExpeditionDropdown(author_id=author_id, current_expedition_id=current_expedition_id))
 
         start_button = discord.ui.Button(
-            label=f"Start Expedition! Cost: {self.selected_expedition.cost}" if author_balance > self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost}",
-            style=discord.ButtonStyle.green if author_balance > self.selected_expedition.cost else discord.ButtonStyle.red
+            label=f"Start Expedition! Cost: {self.selected_expedition.cost}" if author_balance >= self.selected_expedition.cost else f"Too Expensive! Cost: {self.selected_expedition.cost}",
+            style=discord.ButtonStyle.green if author_balance >= self.selected_expedition.cost else discord.ButtonStyle.red
         )
         start_button.callback = self.start_expedition_callback
 
@@ -91,29 +189,62 @@ class ExpeditionView(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use this button!", ephemeral=True)
             return
         
-        if (await EconomyManager.get_balance(self.author_id))[0] < self.selected_expedition.cost:
-            await interaction.response.send_message(f"You dont have enough money on your wallet!", ephemeral=True)
+        if await EconomyManager.get_total_balance(self.author_id) < self.selected_expedition.cost:      # Umändern falls wir uns doch nur fürs wallet entscheiden und zeilen 244 & 248 
+            await interaction.response.send_message(f"You dont have enough money to start a expedition!", ephemeral=True)
             return
         
-          
-        await ExpeditionManager.start_expedition(interaction=interaction, expedition_id=self.selected_expedition_id)
+        money_left = await EconomyManager.remove_money(self.author_id, 10000, False)
+
+        # if user doesnt have enough money in wallet, try to take it from bank
+        if money_left > 0: 
+            money_left = await EconomyManager.remove_money(interaction.user.id, money_left, bank=True)
+        
+        expedition = ExpeditionManager.get_expedition(expedition_id=self.selected_expedition_id)
+        allowed_item_ids = [(await ItemManager.get_item_by_name(item_name)).item_id for item_name in expedition.allowed_items]
+
+        item_selection = SelectItems(interaction.user.id, allowed_item_ids=allowed_item_ids)
+        await item_selection.add_buttons(callback=expedition.start_expedition)
+
+        embed = discord.Embed(
+            title="Item Selection",
+            description="Pick the gear you want to bring along on your expedition.",
+            color=discord.Color.from_str("#607bff")
+        )
+        await interaction.response.edit_message(embed=embed, view=item_selection)
 
 class EventView(discord.ui.View):
-    def __init__(self, event: ExpeditionEvent, timeout = 180):
+    def __init__(self, event: ExpeditionEvent, interaction: discord.Interaction = None, timeout = 180):
         super().__init__(timeout=timeout)
-        expedition = ExpeditionManager.get_expedition(expedition_id=event.expedition_id)
+        self.event = event
+        self.expedition = event.expedition
 
         if event.type == "start" or event.type == "choice":
-            button_callbacks = expedition.get_event_callbacks(event.event_id)
+            button_callbacks = self.expedition.get_event_callbacks(event.event_id)
+
             for idx, choice in enumerate(event.choices):
                 button = discord.ui.Button(label=choice["label"])
                 button.callback = button_callbacks[idx]
                 self.add_item(button)
-        elif event.type == "end":
-            print("end")
+
+        elif event.type == "minigame":
+            button = discord.ui.Button(label="Start")
+            button.callback = self.create_minigame_callback(minigame=event.event_id, interaction=interaction)
+            self.add_item(button)
+
+    def create_minigame_callback(self, minigame: str, interaction: discord.Interaction):
+        callbacks = self.expedition.get_minigame_callbacks(self.event.event_id)
+        game = ExpeditionManager.games[minigame](user=interaction.user, callbacks=callbacks, expedition=True)
+
+        async def callback(interaction: discord.Interaction):
+            await game.start_game(interaction=interaction)
+
+        return callback
 
 class ExpeditionManager:
     expeditions = {}
+    games = {
+        "lockpick_minigame": LockpickGame
+    }
 
     @classmethod
     async def load_all(cls, folder="expeditions"):
@@ -139,36 +270,38 @@ class ExpeditionManager:
     def get_expedition(cls, expedition_id: int) -> Expedition:
         expedition_dict = cls.expeditions.get(expedition_id)
 
-        events = {}
-        start_events = {}
-        for event_dict in expedition_dict["events"]:
-            event = ExpeditionEvent(
-                expedition_id=expedition_dict["id"],
-                event_id=event_dict["id"],
-                type=event_dict["type"],
-                description=event_dict["description"],
-            )
-
-            if event.type == "start":
-                event.choices = event_dict["choices"]
-                events[event.event_id] = event
-                start_events[event.event_id] = event
-            elif event.type == "choice":
-                event.choices = event_dict["choices"]
-                events[event.event_id] = event
-            elif event.type == "end":
-                event.rewards = event_dict["rewards"]
-                events[event.event_id] = event
-
         expedition = Expedition(
             expedition_id=expedition_dict["id"],
             name=expedition_dict["name"],
             description=expedition_dict["description"],
             allowed_items=expedition_dict["allowed_items"],
             cost=expedition_dict["cost"],
-            events=events,
-            start_events=start_events
         )
+
+        events = {}
+        start_events = {}
+        for event_dict in expedition_dict["events"]:
+            event = ExpeditionEvent(
+                expedition=expedition,
+                event_id=event_dict["id"],
+                type=event_dict["type"],
+                title=event_dict["title"],
+                description=event_dict["description"],
+                color=event_dict["color"],
+                choices=event_dict["choices"],
+                rewards=event_dict["rewards"],
+                penalties=event_dict["penalties"]
+            )
+
+            if event.type == "start":
+                start_events[event.event_id] = event
+            elif event.type == "minigame":
+                event.outcomes = {"success_outcomes": event_dict["success_outcomes"], "fail_outcomes": event_dict["fail_outcomes"]}
+            events[event.event_id] = event
+
+        expedition.events = events
+        expedition.start_events = start_events
+
         return expedition
     
     @staticmethod
@@ -187,16 +320,10 @@ class ExpeditionManager:
 
         if not update:
             await interaction.response.send_message(embed=embed, view=ExpeditionView(author_id=interaction.user.id, 
-                                                                                     author_balance=(await EconomyManager.get_balance(interaction.user.id))[0]))
+                                                                                     author_balance=await EconomyManager.get_total_balance(interaction.user.id)))
         else:
             await interaction.response.edit_message(embed=embed, 
                                                     view=ExpeditionView(author_id=interaction.user.id, 
-                                                                        author_balance=(await EconomyManager.get_balance(interaction.user.id))[0], 
+                                                                        author_balance=await EconomyManager.get_total_balance(interaction.user.id), 
                                                                         current_expedition_id=expedition_id))
-    @staticmethod
-    async def start_expedition(interaction: discord.Interaction, expedition_id: int):
-        expedition = ExpeditionManager.get_expedition(expedition_id=expedition_id)
-        start_event = random.choice(list(expedition.start_events.values()))
-        embed, view = start_event.event_to_message()
-
-        await interaction.response.edit_message(embed=embed, view=view)
+        

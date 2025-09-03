@@ -7,6 +7,7 @@ from commands import BasicCommands
 from buttons import *
 from inventory_manager import InventoryManager
 from expedition_manager import ExpeditionManager
+from economy_manager import EconomyManager
  
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)

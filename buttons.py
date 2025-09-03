@@ -5,7 +5,6 @@ from level_manager import *
 from economy_manager import *
 from inventory_manager import *
 from knowledge_manager import *
-from expedition_manager import ExpeditionManager
 from mini_games import *
 
 

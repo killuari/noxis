@@ -2,7 +2,10 @@
   "id": 0,
   "name": "Vaultbreaker",
   "description": "A high-stakes vault job under the cover of night.",
-  "allowed_items": ["decoy_bag", "second_chance"],
+  "allowed_items": [
+    "decoy_bag",
+    "second_chance"
+  ],
   "cost": 10000,
   "events": [
     {
@@ -12,23 +15,43 @@
       "choices": [
         {
           "label": "Climb down to the back door",
-          "success_outcomes": ["vault_entry"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "vault_entry"
+          ],
+          "fail_outcomes": [
+            "noise_made",
+            "guard_alert"
+          ],
           "chance": 0.8
         },
         {
           "label": "Enter through the roof vent",
-          "success_outcomes": ["sneak_success"],
-          "fail_outcomes": ["caught_on_camera"],
+          "success_outcomes": [
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "vent_damage",
+            "noise_made"
+          ],
           "chance": 0.7
         },
         {
           "label": "Wait and observe",
-          "success_outcomes": ["guard_pattern_found"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "guard_pattern_found",
+            "blueprint_found"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_alert"
+          ],
+          "chance": 0.9
         }
-      ]
+      ],
+      "title": "Start Rooftop",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_sewer",
@@ -37,23 +60,44 @@
       "choices": [
         {
           "label": "Push it open quietly",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "vault_corridor",
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "noise_made",
+            "guard_alert"
+          ],
           "chance": 0.7
         },
         {
           "label": "Force it open",
-          "success_outcomes": ["rushed_entry"],
-          "fail_outcomes": ["alarm_triggered"],
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "noise_made"
+          ],
           "chance": 0.6
         },
         {
           "label": "Follow the tunnels further",
-          "success_outcomes": ["hidden_entry"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "hidden_entry",
+            "back_exit_found"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "lost_in_tunnels"
+          ],
+          "chance": 0.8
         }
-      ]
+      ],
+      "title": "Start Sewer",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
     {
       "id": "start_frontdoor",
@@ -62,77 +106,200 @@
       "choices": [
         {
           "label": "Bluff the guard",
-          "success_outcomes": ["sneak_success"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "sneak_success",
+            "front_bluff_success"
+          ],
+          "fail_outcomes": [
+            "guard_suspicious",
+            "identity_questioned"
+          ],
           "chance": 0.6
         },
         {
           "label": "Rush inside",
-          "success_outcomes": ["rushed_entry"],
-          "fail_outcomes": ["alarm_triggered"],
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "guard_fight"
+          ],
           "chance": 0.5
         },
         {
           "label": "Pretend to deliver a package",
-          "success_outcomes": ["front_bluff_success"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "front_bluff_success",
+            "keycard_acquired"
+          ],
+          "fail_outcomes": [
+            "guard_suspicious",
+            "identity_questioned"
+          ],
           "chance": 0.7
         }
-      ]
+      ],
+      "title": "Start Frontdoor",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
-
+    {
+      "id": "start_truck",
+      "type": "start",
+      "description": "A late-night delivery truck stops by; you slip in with the driver.",
+      "choices": [
+        {
+          "label": "Hide in the truck and jump out inside",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "driver_suspicious"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Confront the driver and take his ID",
+          "success_outcomes": [
+            "keycard_acquired",
+            "restricted_area"
+          ],
+          "fail_outcomes": [
+            "driver_fight"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "title": "Start Truck",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "start_service_door",
+      "type": "start",
+      "description": "You find an unlocked service door used by staff.",
+      "choices": [
+        {
+          "label": "Slip in with the staff",
+          "success_outcomes": [
+            "guard_pattern_found",
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "identity_questioned",
+            "guard_suspicious"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Pick the lock quietly",
+          "success_outcomes": [
+            "vault_corridor",
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "noise_made"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "title": "Start Service Door",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
     {
       "id": "vault_entry",
       "type": "choice",
-      "description": "You approach the vault door. The guard is still here!",
+      "description": "You approach the vault door. The guard is still here.",
       "choices": [
         {
           "label": "Knock him out",
-          "success_outcomes": ["fight_guard"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "guard_fight",
+            "alarm_minor"
+          ],
           "chance": 0.7
         },
         {
           "label": "Sneak past",
-          "success_outcomes": ["sneak_success"],
-          "fail_outcomes": ["sneak_fail", "caught_by_guard"],
+          "success_outcomes": [
+            "sneak_success",
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "noise_made"
+          ],
           "chance": 0.6
         },
         {
           "label": "Distract him with noise",
-          "success_outcomes": ["guard_distracted"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "guard_distracted",
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "guard_suspicious",
+            "backup_called"
+          ],
           "chance": 0.7
         }
-      ]
+      ],
+      "title": "Vault Entry",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
-
     {
-      "id": "fight_guard",
+      "id": "guard_fight",
       "type": "choice",
       "description": "The guard fights back fiercely!",
       "choices": [
         {
           "label": "Overpower him",
-          "success_outcomes": ["guard_knocked_out", "rushed_entry"],
-          "fail_outcomes": ["caught_by_guard", "alarm_triggered"],
-          "chance": 0.7
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "injured"
+          ],
+          "chance": 0.4
         },
         {
           "label": "Run inside",
-          "success_outcomes": ["rushed_entry", "vault_corridor"],
-          "fail_outcomes": ["alarm_triggered", "escape_caught"],
-          "chance": 0.5
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "guard_pursuit"
+          ],
+          "chance": 0.6
         },
         {
           "label": "Throw smoke bomb",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.8
+          "success_outcomes": [
+            "guard_confused"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "guard_pursuit"
+          ],
+          "chance": 0.7
         }
-      ]
+      ],
+      "title": "Guard Fight",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "sneak_success",
       "type": "choice",
@@ -140,51 +307,43 @@
       "choices": [
         {
           "label": "Disable cameras",
-          "success_outcomes": ["cameras_disabled", "vault_corridor"],
-          "fail_outcomes": ["caught_on_camera", "alarm_triggered"],
+          "success_outcomes": [
+            "cameras_disabled"
+          ],
+          "fail_outcomes": [
+            "alarm_minor"
+          ],
           "chance": 0.8
         },
         {
-          "label": "Ignore cameras",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["caught_on_camera"],
-          "chance": 0.6
-        },
-        {
           "label": "Loop camera feed",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "sneak_fail",
-      "type": "choice",
-      "description": "You trip and make noise. The guard notices!",
-      "choices": [
+          "success_outcomes": [
+            "vault_corridor",
+            "cameras_disabled"
+          ],
+          "fail_outcomes": [
+            "technical_failure"
+          ],
+          "chance": 0.9
+        },
         {
-          "label": "Fight him",
-          "success_outcomes": ["fight_guard"],
-          "fail_outcomes": ["caught_by_guard"],
+          "label": "Plant a bug for later",
+          "success_outcomes": [
+            "blueprint_found",
+            "intel_gathered"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "guard_suspicious"
+          ],
           "chance": 0.6
-        },
-        {
-          "label": "Run away",
-          "success_outcomes": ["escape_fail"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.5
-        },
-        {
-          "label": "Hide behind crates",
-          "success_outcomes": ["guard_distracted"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
         }
-      ]
+      ],
+      "title": "Sneak Success",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "cameras_disabled",
       "type": "choice",
@@ -192,25 +351,44 @@
       "choices": [
         {
           "label": "Head to the main vault",
-          "success_outcomes": ["lockpick_minigame"],
-          "fail_outcomes": ["alarm_triggered"],
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "lost_in_building"
+          ],
           "chance": 0.8
         },
         {
           "label": "Check the side room",
-          "success_outcomes": ["side_loot_room"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "side_loot_room"
+          ],
+          "fail_outcomes": [
+            "locked_door",
+            "guard_patrol"
+          ],
           "chance": 0.7
         },
         {
           "label": "Search for blueprints",
-          "success_outcomes": ["blueprint_found"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "blueprint_found",
+            "restricted_area"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.9
         }
-      ]
+      ],
+      "title": "Cameras Disabled",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "guard_pattern_found",
       "type": "choice",
@@ -218,19 +396,33 @@
       "choices": [
         {
           "label": "Move when guard turns",
-          "success_outcomes": ["vault_entry"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "vault_entry",
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "timing_wrong",
+            "guard_alert"
+          ],
           "chance": 0.9
         },
         {
           "label": "Distract with a pebble",
-          "success_outcomes": ["guard_distracted"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "guard_distracted"
+          ],
+          "fail_outcomes": [
+            "guard_suspicious",
+            "backup_called"
+          ],
           "chance": 0.8
         }
-      ]
+      ],
+      "title": "Guard Pattern Found",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "guard_distracted",
       "type": "choice",
@@ -238,19 +430,32 @@
       "choices": [
         {
           "label": "Slip past",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_returns",
+            "timing_wrong"
+          ],
+          "chance": 0.9
         },
         {
           "label": "Ambush him",
-          "success_outcomes": ["guard_knocked_out"],
-          "fail_outcomes": ["caught_by_guard"],
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "guard_fight",
+            "backup_called"
+          ],
           "chance": 0.7
         }
-      ]
+      ],
+      "title": "Guard Distracted",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "hidden_entry",
       "type": "choice",
@@ -258,19 +463,33 @@
       "choices": [
         {
           "label": "Climb up",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "vault_corridor",
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "ladder_breaks",
+            "noise_made"
+          ],
+          "chance": 0.9
         },
         {
           "label": "Set a trap for guards",
-          "success_outcomes": ["trap_set"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "trap_set"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "time_wasted"
+          ],
+          "chance": 0.8
         }
-      ]
+      ],
+      "title": "Hidden Entry",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "trap_set",
       "type": "choice",
@@ -278,13 +497,21 @@
       "choices": [
         {
           "label": "Proceed to corridor",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "lost_in_building",
+            "guard_patrol"
+          ],
+          "chance": 0.9
         }
-      ]
+      ],
+      "title": "Trap Set",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
     },
-
     {
       "id": "blueprint_found",
       "type": "choice",
@@ -292,378 +519,20 @@
       "choices": [
         {
           "label": "Use blueprint to navigate",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "front_bluff_success",
-      "type": "choice",
-      "description": "The guard believes your package story and lets you in.",
-      "choices": [
-        {
-          "label": "Head towards vault corridor",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "vault_corridor",
-      "type": "choice",
-      "description": "You're in the main vault corridor. Heavy footsteps echo in the distance.",
-      "choices": [
-        {
-          "label": "Hide in a side room",
-          "success_outcomes": ["side_loot_room"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.8
-        },
-        {
-          "label": "Move towards the main vault",
-          "success_outcomes": ["lockpick_minigame"],
-          "fail_outcomes": ["patrol_encounter"],
-          "chance": 0.7
-        },
-        {
-          "label": "Follow the footsteps quietly",
-          "success_outcomes": ["guard_watch"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.6
-        },
-        {
-          "label": "Set up an ambush",
-          "success_outcomes": ["ambush_ready"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
-        }
-      ]
-    },
-
-    {
-      "id": "rushed_entry",
-      "type": "choice",
-      "description": "You're inside but time is running out. Alarms might go off any moment.",
-      "choices": [
-        {
-          "label": "Rush to the vault",
-          "success_outcomes": ["vault_rushed"],
-          "fail_outcomes": ["alarm_triggered", "patrol_encounter"],
-          "chance": 0.6
-        },
-        {
-          "label": "Find a place to hide",
-          "success_outcomes": ["hiding_spot"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
-        },
-        {
-          "label": "Look for a back exit",
-          "success_outcomes": ["back_exit_found"],
-          "fail_outcomes": ["dead_end"],
-          "chance": 0.5
-        }
-      ]
-    },
-
-    {
-      "id": "guard_knocked_out",
-      "type": "choice",
-      "description": "The guard is unconscious. You have some time before he's discovered.",
-      "choices": [
-        {
-          "label": "Hide the body",
-          "success_outcomes": ["body_hidden"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Take his keycard",
-          "success_outcomes": ["keycard_acquired"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Proceed immediately",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["body_discovered"],
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "outdated_info"
+          ],
           "chance": 0.8
         }
-      ]
+      ],
+      "title": "Blueprint Found",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
-
-    {
-      "id": "lockpick_minigame",
-      "type": "minigame",
-      "description": "You need to play lockpick.",
-      "game": "lockpick",
-      "success_outcomes": ["vault_opened"],
-      "fail_outcomes": ["alarm_triggered"]
-    },
-
-    {
-      "id": "side_loot_room",
-      "type": "choice",
-      "description": "You find a room filled with safety deposit boxes and loose valuables.",
-      "choices": [
-        {
-          "label": "Grab what you can quickly",
-          "success_outcomes": ["loot_boxes"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Search thoroughly for best items",
-          "success_outcomes": ["premium_loot"],
-          "fail_outcomes": ["caught_by_guard", "patrol_encounter"],
-          "chance": 0.6
-        },
-        {
-          "label": "Set up for a bigger heist later",
-          "success_outcomes": ["intel_gathered"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "patrol_encounter",
-      "type": "choice",
-      "description": "You encounter a security patrol making their rounds.",
-      "choices": [
-        {
-          "label": "Duck behind cover",
-          "success_outcomes": ["patrol_passed"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
-        },
-        {
-          "label": "Create a distraction",
-          "success_outcomes": ["patrol_distracted"],
-          "fail_outcomes": ["alarm_triggered"],
-          "chance": 0.6
-        },
-        {
-          "label": "Confront them directly",
-          "success_outcomes": ["multiple_guards_fight"],
-          "fail_outcomes": ["overwhelmed"],
-          "chance": 0.4
-        },
-        {
-          "label": "Retreat to previous area",
-          "success_outcomes": ["tactical_retreat"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.8
-        }
-      ]
-    },
-
-    {
-      "id": "guard_watch",
-      "type": "choice",
-      "description": "You observe the guard's routine from the shadows.",
-      "choices": [
-        {
-          "label": "Wait for the perfect moment",
-          "success_outcomes": ["perfect_timing"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Follow him to learn the layout",
-          "success_outcomes": ["layout_learned"],
-          "fail_outcomes": ["caught_following"],
-          "chance": 0.8
-        }
-      ]
-    },
-
-    {
-      "id": "ambush_ready",
-      "type": "choice",
-      "description": "You've set up a perfect ambush position in the corridor.",
-      "choices": [
-        {
-          "label": "Wait for the next guard",
-          "success_outcomes": ["guard_ambushed"],
-          "fail_outcomes": ["ambush_failed"],
-          "chance": 0.8
-        },
-        {
-          "label": "Abandon ambush and proceed",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "vault_rushed",
-      "type": "choice",
-      "description": "You reach the vault in a hurry. The lock seems more complex than expected.",
-      "choices": [
-        {
-          "label": "Force it with tools",
-          "success_outcomes": ["vault_damaged"],
-          "fail_outcomes": ["alarm_triggered"],
-          "chance": 0.5
-        },
-        {
-          "label": "Try a quick pick",
-          "success_outcomes": ["lucky_break"],
-          "fail_outcomes": ["lockpick_failed"],
-          "chance": 0.4
-        }
-      ]
-    },
-
-    {
-      "id": "hiding_spot",
-      "type": "choice",
-      "description": "You find a maintenance closet to hide in while things cool down.",
-      "choices": [
-        {
-          "label": "Wait it out",
-          "success_outcomes": ["coast_clear"],
-          "fail_outcomes": ["discovered_hiding"],
-          "chance": 0.7
-        },
-        {
-          "label": "Listen for information",
-          "success_outcomes": ["overhear_intel"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "back_exit_found",
-      "type": "choice",
-      "description": "You discover an emergency exit that might lead outside.",
-      "choices": [
-        {
-          "label": "Take the exit now",
-          "success_outcomes": ["early_escape"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Mark it and continue the heist",
-          "success_outcomes": ["exit_marked"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "body_hidden",
-      "type": "choice",
-      "description": "You've successfully hidden the unconscious guard's body.",
-      "choices": [
-        {
-          "label": "Continue to the vault",
-          "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "keycard_acquired",
-      "type": "choice",
-      "description": "The guard's keycard might open restricted areas.",
-      "choices": [
-        {
-          "label": "Try the keycard on the vault",
-          "success_outcomes": ["vault_opened"],
-          "fail_outcomes": ["keycard_invalid"],
-          "chance": 0.6
-        },
-        {
-          "label": "Explore restricted areas first",
-          "success_outcomes": ["restricted_area"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
-        }
-      ]
-    },
-
-    {
-      "id": "vault_opened",
-      "type": "choice",
-      "description": "The vault door swings open, revealing treasures beyond your wildest dreams.",
-      "choices": [
-        {
-          "label": "Grab the cash",
-          "success_outcomes": ["loot_cash"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Go for the jewels",
-          "success_outcomes": ["loot_jewels"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Take the gold bars",
-          "success_outcomes": ["loot_gold"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Try to take everything",
-          "success_outcomes": ["maximum_loot"],
-          "fail_outcomes": ["too_greedy"],
-          "chance": 0.3
-        }
-      ]
-    },
-
-    {
-      "id": "vault_blown_open",
-      "type": "choice",
-      "description": "The explosion worked but was louder than expected. You need to move fast!",
-      "choices": [
-        {
-          "label": "Grab whatever you can see",
-          "success_outcomes": ["loot_rushed"],
-          "fail_outcomes": [],
-          "chance": 1
-        },
-        {
-          "label": "Look for the most valuable items",
-          "success_outcomes": ["explosive_loot"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.6
-        }
-      ]
-    },
-
-    {
-      "id": "hack_success",
-      "type": "choice",
-      "description": "Your hacking skills pay off and the electronic lock disengages.",
-      "choices": [
-        {
-          "label": "Enter the vault",
-          "success_outcomes": ["vault_opened"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
     {
       "id": "vent_found",
       "type": "choice",
@@ -671,87 +540,271 @@
       "choices": [
         {
           "label": "Crawl through the vent",
-          "success_outcomes": ["vent_entry"],
-          "fail_outcomes": ["vent_stuck"],
-          "chance": 0.7
-        },
-        {
-          "label": "Try to widen the vent opening",
-          "success_outcomes": ["vent_widened"],
-          "fail_outcomes": ["noise_made"],
-          "chance": 0.6
-        }
-      ]
-    },
-
-    {
-      "id": "patrol_passed",
-      "type": "choice",
-      "description": "The patrol passes by without noticing you.",
-      "choices": [
-        {
-          "label": "Continue to the vault",
-          "success_outcomes": ["lockpick_minigame"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "multiple_guards_fight",
-      "type": "choice",
-      "description": "You're facing multiple guards at once. This is getting dangerous!",
-      "choices": [
-        {
-          "label": "Fight with everything you've got",
-          "success_outcomes": ["guards_defeated"],
-          "fail_outcomes": ["overwhelmed"],
-          "chance": 0.3
-        },
-        {
-          "label": "Use smoke bomb and escape",
-          "success_outcomes": ["tactical_retreat"],
-          "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.7
-        }
-      ]
-    },
-
-    {
-      "id": "perfect_timing",
-      "type": "choice",
-      "description": "You've found the perfect window of opportunity.",
-      "choices": [
-        {
-          "label": "Move to the vault",
-          "success_outcomes": ["lockpick_minigame"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "restricted_area",
-      "type": "choice",
-      "description": "The keycard grants you access to a high-security area with advanced safes.",
-      "choices": [
-        {
-          "label": "Crack the advanced safes",
-          "success_outcomes": ["premium_loot"],
-          "fail_outcomes": ["advanced_alarm"],
+          "success_outcomes": [
+            "vent_entry"
+          ],
+          "fail_outcomes": [
+            "vent_damage",
+            "stuck_in_vent"
+          ],
           "chance": 0.5
         },
         {
-          "label": "Take photos for future reference",
-          "success_outcomes": ["intel_gathered"],
-          "fail_outcomes": [],
-          "chance": 1
+          "label": "Try to widen the vent opening",
+          "success_outcomes": [
+            "vent_widened"
+          ],
+          "fail_outcomes": [
+            "noise_made",
+            "vent_damage"
+          ],
+          "chance": 0.8
         }
-      ]
+      ],
+      "title": "Vent Found",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
-
+    {
+      "id": "vault_corridor",
+      "type": "choice",
+      "description": "You're in the main vault corridor. Heavy footsteps echo in the distance.",
+      "choices": [
+        {
+          "label": "Hide in a side room",
+          "success_outcomes": [
+            "side_loot_room",
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "locked_door"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Move towards the main vault",
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "lost_in_building"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Follow the footsteps quietly",
+          "success_outcomes": [
+            "guard_watch",
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "backup_called"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Set up an ambush",
+          "success_outcomes": [
+            "ambush_ready"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Vault Corridor",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "guard_knocked_out",
+      "type": "choice",
+      "description": "The guard is unconscious. You have some time before he's discovered.",
+      "choices": [
+        {
+          "label": "Hide the body",
+          "success_outcomes": [
+            "body_hidden"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "blood_trail"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Take his keycard",
+          "success_outcomes": [
+            "keycard_acquired"
+          ],
+          "fail_outcomes": [
+            "guard_wakes",
+            "blood_trail"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Proceed immediately",
+          "success_outcomes": [
+            "vault_corridor",
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "body_discovered",
+            "guard_patrol"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "title": "Guard Knocked Out",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "lockpick_minigame",
+      "type": "minigame",
+      "title": "Lockpick Minigame",
+      "description": "To succeed, you must crack a **4-digit security code**.",
+      "game": "lockpick",
+      "success_outcomes": [
+        "vault_opened"
+      ],
+      "fail_outcomes": [
+        "lockpick_broken",
+        "alarm_minor"
+      ],
+      "color": "#607bff",
+      "choices": [],
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "side_loot_room",
+      "type": "choice",
+      "description": "You find a room filled with safety deposit boxes and loose valuables.",
+      "choices": [
+        {
+          "label": "Grab what you can quickly",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Search thoroughly for best items",
+          "success_outcomes": [
+            "maximum_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "time_wasted"
+          ],
+          "chance": 0.2
+        },
+        {
+          "label": "Set up for a bigger heist",
+          "success_outcomes": [
+            "blueprint_found"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "outdated_info"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Side Loot Room",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "keycard_acquired",
+      "type": "choice",
+      "description": "The guard's keycard might open restricted areas.",
+      "choices": [
+        {
+          "label": "Try the keycard on the vault",
+          "success_outcomes": [
+            "vault_opened"
+          ],
+          "fail_outcomes": [
+            "keycard_invalid",
+            "alarm_minor"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Explore restricted areas first",
+          "success_outcomes": [
+            "restricted_area"
+          ],
+          "fail_outcomes": [
+            "keycard_invalid",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Keycard Acquired",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "vault_opened",
+      "type": "choice",
+      "description": "The vault door swings open, revealing treasures beyond your wildest dreams.",
+      "choices": [
+        {
+          "label": "Grab the cash",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Go for the jewels",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Try to take everything",
+          "success_outcomes": [
+            "maximum_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "overwhelmed"
+          ],
+          "chance": 0.3
+        }
+      ],
+      "title": "Vault Opened",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
     {
       "id": "vent_entry",
       "type": "choice",
@@ -759,343 +812,1642 @@
       "choices": [
         {
           "label": "Start looting",
-          "success_outcomes": ["vault_opened"],
-          "fail_outcomes": [],
-          "chance": 1
-        }
-      ]
-    },
-
-    {
-      "id": "guards_defeated",
-      "type": "choice",
-      "description": "Against all odds, you managed to defeat the multiple guards.",
-      "choices": [
-        {
-          "label": "Quick loot and escape",
-          "success_outcomes": ["loot_rushed"],
-          "fail_outcomes": [],
-          "chance": 1
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.6
         },
         {
-          "label": "Take time to loot properly",
-          "success_outcomes": ["combat_loot"],
-          "fail_outcomes": ["reinforcements_arrive"],
+          "label": "Scout the room first",
+          "success_outcomes": [
+            "blueprint_found",
+            "guard_watch"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Vent Entry",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "noise_made",
+      "type": "choice",
+      "description": "Your movement creates noise that echoes through the building. Guards are getting suspicious.",
+      "choices": [
+        {
+          "label": "Hide and wait",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Move quickly before they arrive",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "backup_called"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 100,
+          "amount_max": 300
+        }
+      ],
+      "title": "Noise Made",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "guard_alert",
+      "type": "choice",
+      "description": "A guard becomes suspicious and starts actively searching for intruders.",
+      "choices": [
+        {
+          "label": "Confront the guard",
+          "success_outcomes": [
+            "guard_fight"
+          ],
+          "fail_outcomes": [
+            "backup_called",
+            "overwhelmed"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Try to avoid him",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "caught_by_guard",
+            "backup_called"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Guard Alert",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "time_wasted",
+      "type": "choice",
+      "description": "You've spent too much time on preparation. Dawn is approaching and security will change shifts soon.",
+      "choices": [
+        {
+          "label": "Rush to the vault now",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "alarm_minor"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Abort and try another entrance",
+          "success_outcomes": [
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "lost_in_building",
+            "caught_by_guard"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 150,
+          "amount_max": 400
+        }
+      ],
+      "title": "Time Wasted",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "alarm_minor",
+      "type": "choice",
+      "description": "A minor alarm is triggered, but hasn't alerted the full security yet. You have moments to act.",
+      "choices": [
+        {
+          "label": "Disable the alarm quickly",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "alarm_triggered"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Run for the vault before backup arrives",
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "alarm_triggered"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 700
+        }
+      ],
+      "title": "Alarm Minor",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "guard_suspicious",
+      "type": "choice",
+      "description": "The guard is getting suspicious of your presence but hasn't acted yet.",
+      "choices": [
+        {
+          "label": "Try to convince him you belong here",
+          "success_outcomes": [
+            "front_bluff_success"
+          ],
+          "fail_outcomes": [
+            "identity_questioned",
+            "backup_called"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Create a distraction and slip away",
+          "success_outcomes": [
+            "guard_distracted"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "backup_called"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Guard Suspicious",
+      "color": "#ff4d4f",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "identity_questioned",
+      "type": "choice",
+      "description": "The guard is asking for your identification and authorization to be here.",
+      "choices": [
+        {
+          "label": "Show fake credentials",
+          "success_outcomes": [
+            "front_bluff_success"
+          ],
+          "fail_outcomes": [
+            "caught_by_guard",
+            "backup_called"
+          ],
+          "chance": 0.4
+        },
+        {
+          "label": "Knock him out before he can react",
+          "success_outcomes": [
+            "guard_fight"
+          ],
+          "fail_outcomes": [
+            "backup_called",
+            "alarm_minor"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 450
+        }
+      ],
+      "title": "Identity Questioned",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "backup_called",
+      "type": "choice",
+      "description": "The guard has called for backup. More security is on the way.",
+      "choices": [
+        {
+          "label": "Fight your way through",
+          "success_outcomes": [
+            "guard_fight"
+          ],
+          "fail_outcomes": [
+            "overwhelmed",
+            "caught_by_guard"
+          ],
+          "chance": 0.3
+        },
+        {
+          "label": "Find another route quickly",
+          "success_outcomes": [
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "lost_in_building",
+            "overwhelmed"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 400,
+          "amount_max": 800
+        },
+        {
+          "type": "random_item",
+          "chance": 0.3
+        }
+      ],
+      "title": "Backup Called",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "injured",
+      "type": "choice",
+      "description": "You're hurt from the fight but still mobile. Blood might leave a trail.",
+      "choices": [
+        {
+          "label": "Push through the pain",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "blood_trail",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Find medical supplies",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "blood_trail"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 250,
+          "amount_max": 600
+        }
+      ],
+      "title": "Injured",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "guard_pursuit",
+      "type": "choice",
+      "description": "A guard is actively chasing you through the building.",
+      "choices": [
+        {
+          "label": "Try to lose him in the corridors",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "lost_in_building",
+            "caught_by_guard"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Set a trap to stop him",
+          "success_outcomes": [
+            "trap_set"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "caught_by_guard"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Guard Pursuit",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "guard_confused",
+      "type": "choice",
+      "description": "The smoke bomb worked, but the guard is still nearby and confused.",
+      "choices": [
+        {
+          "label": "Sneak past while he's disoriented",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "noise_made"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Knock him out while he can't see",
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "guard_fight",
+            "backup_called"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Guard Confused",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "technical_failure",
+      "type": "choice",
+      "description": "Your electronic equipment malfunctions at a critical moment.",
+      "choices": [
+        {
+          "label": "Try to fix it quickly",
+          "success_outcomes": [
+            "cameras_disabled"
+          ],
+          "fail_outcomes": [
+            "equipment_lost",
+            "alarm_minor"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Abandon the tech approach",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "time_wasted"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 700
+        }
+      ],
+      "title": "Technical Failure",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "intel_gathered",
+      "type": "choice",
+      "description": "You successfully plant a listening device and gather valuable intelligence.",
+      "choices": [
+        {
+          "label": "Use the intel immediately",
+          "success_outcomes": [
+            "blueprint_found"
+          ],
+          "fail_outcomes": [
+            "outdated_info",
+            "guard_patrol"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Intel Gathered",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "guard_patrol",
+      "type": "choice",
+      "description": "You encounter a routine security patrol making their rounds.",
+      "choices": [
+        {
+          "label": "Hide until they pass",
+          "success_outcomes": [
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "time_wasted"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Create a diversion",
+          "success_outcomes": [
+            "guard_distracted"
+          ],
+          "fail_outcomes": [
+            "backup_called",
+            "alarm_minor"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 150,
+          "amount_max": 350
+        }
+      ],
+      "title": "Guard Patrol",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "locked_door",
+      "type": "choice",
+      "description": "The door you need is locked with an electronic lock.",
+      "choices": [
+        {
+          "label": "Try to hack the lock",
+          "success_outcomes": [
+            "restricted_area"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "technical_failure"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Find another way",
+          "success_outcomes": [
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "lost_in_building"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 100,
+          "amount_max": 300
+        }
+      ],
+      "title": "Locked Door",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "lost_in_building",
+      "type": "choice",
+      "description": "You've gotten turned around in the maze-like interior of the bank.",
+      "choices": [
+        {
+          "label": "Retrace your steps",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Try to find an exit",
+          "success_outcomes": [
+            "back_exit_found"
+          ],
+          "fail_outcomes": [
+            "dead_end",
+            "guard_patrol"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Lost In Building",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "timing_wrong",
+      "type": "choice",
+      "description": "Your timing was off and you're caught in an awkward position.",
+      "choices": [
+        {
+          "label": "Freeze and hope they don't notice",
+          "success_outcomes": [
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "caught_by_guard"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Make a run for it",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_pursuit",
+            "alarm_minor"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 100,
+          "amount_max": 250
+        }
+      ],
+      "title": "Timing Wrong",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "guard_returns",
+      "type": "choice",
+      "description": "The distracted guard returns sooner than expected.",
+      "choices": [
+        {
+          "label": "Duck into the nearest room",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "locked_door",
+            "guard_alert"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Confront him directly",
+          "success_outcomes": [
+            "guard_fight"
+          ],
+          "fail_outcomes": [
+            "backup_called",
+            "overwhelmed"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 150,
+          "amount_max": 400
+        }
+      ],
+      "title": "Guard Returns",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "ladder_breaks",
+      "type": "choice",
+      "description": "The old ladder gives way under your weight, but you manage to catch yourself.",
+      "choices": [
+        {
+          "label": "Climb up despite the damage",
+          "success_outcomes": [
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "injured",
+            "noise_made"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Find another route",
+          "success_outcomes": [
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "lost_in_building"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 450
+        }
+      ],
+      "title": "Ladder Breaks",
+      "color": "#ff4d4f",
+      "rewards": []
+    },
+    {
+      "id": "equipment_lost",
+      "type": "choice",
+      "description": "Some of your equipment is damaged or lost in the chaos.",
+      "choices": [
+        {
+          "label": "Continue without it",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "technical_failure",
+            "lockpick_broken"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Try to improvise replacements",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 800
+        },
+        {
+          "type": "random_item",
           "chance": 0.4
         }
-      ]
-    },
-
-    {
-      "id": "alarm_triggered",
-      "type": "end",
-      "description": "The alarm blares and security swarms the building. Your heist is over.",
+      ],
+      "title": "Equipment Lost",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "dead_end",
-      "type": "end", 
-      "description": "You find yourself in a dead end with no way out as guards close in.",
+      "id": "vent_damage",
+      "type": "choice",
+      "description": "The ventilation system is damaged and making noise. Guards might investigate.",
+      "choices": [
+        {
+          "label": "Try to muffle the sound",
+          "success_outcomes": [
+            "vent_entry"
+          ],
+          "fail_outcomes": [
+            "stuck_in_vent",
+            "guard_alert"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Abandon the vent approach",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "lost_in_building"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Vent Damage",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "body_discovered",
-      "type": "end",
-      "description": "The unconscious guard is discovered and the alarm is raised.",
+      "id": "stuck_in_vent",
+      "type": "choice",
+      "description": "You're wedged in the ventilation system and struggling to move.",
+      "choices": [
+        {
+          "label": "Force your way through",
+          "success_outcomes": [
+            "vent_entry"
+          ],
+          "fail_outcomes": [
+            "vent_collapse",
+            "noise_made"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Try to back out carefully",
+          "success_outcomes": [
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "vent_collapse",
+            "time_wasted"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 250,
+          "amount_max": 600
+        }
+      ],
+      "title": "Stuck In Vent",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "lockpick_failed",
-      "type": "end",
-      "description": "Your lockpicking attempt fails and triggers the security system.",
+      "id": "driver_suspicious",
+      "type": "choice",
+      "description": "The truck driver is getting suspicious of your presence in his vehicle.",
+      "choices": [
+        {
+          "label": "Try to bluff your way out",
+          "success_outcomes": [
+            "front_bluff_success"
+          ],
+          "fail_outcomes": [
+            "driver_fight",
+            "backup_called"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Jump out and find another way",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "injured",
+            "guard_alert"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 150,
+          "amount_max": 350
+        }
+      ],
+      "title": "Driver Suspicious",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "explosion_backfire",
-      "type": "end",
-      "description": "The explosives backfire and trap you in the rubble.",
+      "id": "driver_fight",
+      "type": "choice",
+      "description": "The truck driver fights back when you try to take his credentials.",
+      "choices": [
+        {
+          "label": "Overpower him quickly",
+          "success_outcomes": [
+            "keycard_acquired"
+          ],
+          "fail_outcomes": [
+            "injured",
+            "noise_made"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Flee the scene",
+          "success_outcomes": [
+            "hidden_entry"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "time_wasted"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Driver Fight",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "hack_failed",
-      "type": "end",
-      "description": "Your hacking attempt fails and locks down the entire system.",
+      "id": "lockpick_broken",
+      "type": "choice",
+      "description": "Your lockpicking tools break at a critical moment.",
+      "choices": [
+        {
+          "label": "Try to force the lock",
+          "success_outcomes": [
+            "vault_opened"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "equipment_lost"
+          ],
+          "chance": 0.4
+        },
+        {
+          "label": "Look for another way in",
+          "success_outcomes": [
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 400,
+          "amount_max": 900
+        },
+        {
+          "type": "random_item",
+          "chance": 0.5
+        }
+      ],
+      "title": "Lockpick Broken",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "overwhelmed",
-      "type": "end",
-      "description": "The guards overpower you and the heist ends in capture.",
-      "rewards": []
+      "id": "front_bluff_success",
+      "type": "choice",
+      "description": "The guard believes your story and lets you proceed.",
+      "choices": [
+        {
+          "label": "Head towards vault corridor",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "lost_in_building"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Front Bluff Success",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
-      "id": "caught_following",
-      "type": "end",
-      "description": "The guard notices you following him and raises the alarm.",
-      "rewards": []
+      "id": "patrol_passed",
+      "type": "choice",
+      "description": "The patrol passes by without noticing you.",
+      "choices": [
+        {
+          "label": "Continue to the vault",
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "lost_in_building"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Patrol Passed",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
     },
     {
-      "id": "ambush_failed",
-      "type": "end",
-      "description": "Your ambush fails and you're caught off guard by security.",
-      "rewards": []
+      "id": "body_hidden",
+      "type": "choice",
+      "description": "You've successfully hidden the unconscious guard's body.",
+      "choices": [
+        {
+          "label": "Continue to the vault",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "time_wasted"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Body Hidden",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
     },
     {
-      "id": "discovered_hiding",
-      "type": "end",
-      "description": "Your hiding spot is discovered during a routine security sweep.",
+      "id": "restricted_area",
+      "type": "choice",
+      "description": "The keycard grants you access to a high-security area with advanced safes.",
+      "choices": [
+        {
+          "label": "Crack the advanced safes",
+          "success_outcomes": [
+            "maximum_loot"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "technical_failure"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Take photos for future reference",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_lost"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Restricted Area",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "vent_widened",
+      "type": "choice",
+      "description": "After widening the vent, you gain easier access to the vault.",
+      "choices": [
+        {
+          "label": "Drop in and loot",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Vent Widened",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "hiding_spot",
+      "type": "choice",
+      "description": "You find a maintenance closet to hide in while things cool down.",
+      "choices": [
+        {
+          "label": "Wait it out",
+          "success_outcomes": [
+            "patrol_passed"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Listen for information",
+          "success_outcomes": [
+            "intel_gathered"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "time_wasted"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "title": "Hiding Spot",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "back_exit_found",
+      "type": "choice",
+      "description": "You discover an emergency exit that might lead outside.",
+      "choices": [
+        {
+          "label": "Take the exit now",
+          "success_outcomes": [
+            "back_exit_escape"
+          ],
+          "fail_outcomes": [
+            "locked_door",
+            "guard_patrol"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Mark it and continue the heist",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "time_wasted"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Back Exit Found",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "guard_watch",
+      "type": "choice",
+      "description": "You observe the guard's routine from the shadows.",
+      "choices": [
+        {
+          "label": "Wait for the perfect moment",
+          "success_outcomes": [
+            "lockpick_minigame"
+          ],
+          "fail_outcomes": [
+            "timing_wrong",
+            "guard_alert"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Follow him to learn the layout",
+          "success_outcomes": [
+            "blueprint_found"
+          ],
+          "fail_outcomes": [
+            "guard_alert",
+            "lost_in_building"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "title": "Guard Watch",
+      "color": "#ff9f43",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "ambush_ready",
+      "type": "choice",
+      "description": "You've set up a perfect ambush position in the corridor.",
+      "choices": [
+        {
+          "label": "Wait for the next guard",
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "backup_called",
+            "timing_wrong"
+          ],
+          "chance": 0.8
+        },
+        {
+          "label": "Abandon ambush and proceed",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_lost"
+          ],
+          "chance": 0.9
+        }
+      ],
+      "title": "Ambush Ready",
+      "color": "#607bff",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "final_loot",
+      "type": "choice",
+      "description": "It's time to pick what to take. Your choices now determine whether you escape successfully.",
+      "choices": [
+        {
+          "label": "Grab stacks of cash and run",
+          "success_outcomes": [
+            "escape_success"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Pocket jewels and slip out",
+          "success_outcomes": [
+            "escape_success"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "equipment_dropped"
+          ],
+          "chance": 0.9
+        },
+        {
+          "label": "Try to take more (risky)",
+          "success_outcomes": [
+            "maximum_loot"
+          ],
+          "fail_outcomes": [
+            "overwhelmed",
+            "caught_by_guard"
+          ],
+          "chance": 0.4
+        }
+      ],
+      "title": "Final Loot",
+      "color": "#2ecc71",
+      "rewards": [],
+      "penalties": []
+    },
+    {
+      "id": "outdated_info",
+      "type": "choice",
+      "description": "The information you found is outdated and leads you astray.",
+      "choices": [
+        {
+          "label": "Try to adapt and continue",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "lost_in_building",
+            "guard_patrol"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Retreat and find current intel",
+          "success_outcomes": [
+            "intel_gathered"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_alert"
+          ],
+          "chance": 0.7
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Outdated Info",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
       "id": "keycard_invalid",
-      "type": "end",
-      "description": "The keycard doesn't work and triggers a security lockdown.",
+      "type": "choice",
+      "description": "The keycard doesn't work on this lock. Security might have been updated.",
+      "choices": [
+        {
+          "label": "Try to hack the system manually",
+          "success_outcomes": [
+            "restricted_area"
+          ],
+          "fail_outcomes": [
+            "alarm_minor",
+            "technical_failure"
+          ],
+          "chance": 0.5
+        },
+        {
+          "label": "Find another approach",
+          "success_outcomes": [
+            "vent_found"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 250,
+          "amount_max": 600
+        }
+      ],
+      "title": "Keycard Invalid",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "too_greedy",
-      "type": "end",
-      "description": "You try to carry too much and get caught while struggling with the weight.",
+      "id": "equipment_dropped",
+      "type": "choice",
+      "description": "In your haste to grab loot, you drop some valuable item that you found.",
+      "choices": [
+        {
+          "label": "Go back for the loot",
+          "success_outcomes": [
+            "final_loot"
+          ],
+          "fail_outcomes": [
+            "caught_by_guard"
+          ],
+          "chance": 0.4
+        },
+        {
+          "label": "Leave it and escape",
+          "success_outcomes": [
+            "escape_success"
+          ],
+          "fail_outcomes": [
+            "guard_patrol",
+            "time_wasted"
+          ],
+          "chance": 0.8
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 700
+        },
+        {
+          "type": "random_item",
+          "chance": 0.6
+        }
+      ],
+      "title": "Equipment Dropped",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "vent_stuck",
-      "type": "end",
-      "description": "You get stuck in the ventilation system and can't escape.",
+      "id": "guard_wakes",
+      "type": "choice",
+      "description": "The knocked-out guard regains consciousness sooner than expected.",
+      "choices": [
+        {
+          "label": "Knock him out again",
+          "success_outcomes": [
+            "guard_knocked_out"
+          ],
+          "fail_outcomes": [
+            "guard_fight",
+            "backup_called"
+          ],
+          "chance": 0.7
+        },
+        {
+          "label": "Run before he can raise alarm",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_pursuit",
+            "backup_called"
+          ],
+          "chance": 0.6
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        }
+      ],
+      "title": "Guard Wakes",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "noise_made",
-      "type": "end",
-      "description": "The noise from modifying the vent alerts security to your location.",
+      "id": "blood_trail",
+      "type": "choice",
+      "description": "Your injury is leaving a blood trail that guards might follow.",
+      "choices": [
+        {
+          "label": "Try to clean it up",
+          "success_outcomes": [
+            "hiding_spot"
+          ],
+          "fail_outcomes": [
+            "time_wasted",
+            "guard_patrol"
+          ],
+          "chance": 0.6
+        },
+        {
+          "label": "Move quickly before they notice",
+          "success_outcomes": [
+            "vault_corridor"
+          ],
+          "fail_outcomes": [
+            "guard_pursuit",
+            "caught_by_guard"
+          ],
+          "chance": 0.5
+        }
+      ],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 800
+        }
+      ],
+      "title": "Blood Trail",
+      "color": "#ff4d4f",
       "rewards": []
     },
     {
-      "id": "advanced_alarm",
+      "id": "vent_collapse",
       "type": "end",
-      "description": "The advanced security system in the restricted area catches you.",
-      "rewards": []
+      "description": "The ventilation system collapses, trapping you inside until security finds you.",
+      "rewards": [],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 1000,
+          "amount_max": 3000
+        },
+        {
+          "type": "random_item",
+          "chance": 0.8
+        },
+        {
+          "type": "death",
+          "chance": 0.1
+        }
+      ],
+      "title": "Vent Collapse",
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
-      "id": "reinforcements_arrive",
+      "id": "alarm_triggered",
       "type": "end",
-      "description": "Security reinforcements arrive while you're still looting.",
-      "rewards": []
+      "description": "The alarm blares and security swarms the building. Your heist is over.",
+      "rewards": [],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 500,
+          "amount_max": 2000
+        },
+        {
+          "type": "random_item",
+          "chance": 0.4
+        },
+        {
+          "type": "death",
+          "chance": 0.02
+        }
+      ],
+      "title": "Alarm Triggered",
+      "color": "#ff4d4f",
+      "choices": []
+    },
+    {
+      "id": "overwhelmed",
+      "type": "end",
+      "description": "Multiple guards converge on your position and overpower you completely.",
+      "rewards": [],
+      "penalties": [
+        {
+          "type": "death",
+          "chance": 0.2
+        },
+        {
+          "type": "random_item",
+          "chance": 0.8
+        },
+        {
+          "type": "currency",
+          "amount_min": 800,
+          "amount_max": 2500
+        }
+      ],
+      "title": "Overwhelmed",
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
       "id": "caught_by_guard",
       "type": "end",
-      "description": "The guard overpowers you and the heist is over.",
-      "rewards": []
+      "description": "A guard catches you in the act and the heist ends in capture.",
+      "rewards": [],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 100,
+          "amount_max": 1000
+        },
+        {
+          "type": "random_item",
+          "chance": 0.7
+        },
+        {
+          "type": "death",
+          "chance": 0.03
+        }
+      ],
+      "title": "Caught By Guard",
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
-      "id": "caught_on_camera",
+      "id": "dead_end",
       "type": "end",
-      "description": "The cameras caught your face. Authorities are alerted.",
-      "rewards": []
+      "description": "You find yourself cornered with no way out as security closes in.",
+      "rewards": [],
+      "penalties": [
+        {
+          "type": "currency",
+          "amount_min": 300,
+          "amount_max": 800
+        },
+        {
+          "type": "random_item",
+          "chance": 0.5
+        },
+        {
+          "type": "death",
+          "chance": 0.05
+        }
+      ],
+      "title": "Dead End",
+      "color": "#ff4d4f",
+      "choices": []
     },
     {
-      "id": "escape_fail",
+      "id": "back_exit_escape",
       "type": "end",
-      "description": "You failed to escape and got trapped inside.",
-      "rewards": []
-    },
-    {
-      "id": "escape_caught",
-      "type": "end",
-      "description": "You almost made it out, but got caught during your escape.",
-      "rewards": []
-    },
-    {
-      "id": "early_escape",
-      "type": "end",
-      "description": "You escape early but with minimal loot. At least you're free.",
+      "description": "You managed to escape through the back exit!",
       "rewards": [
-        {"type": "currency", "amount_min": 200, "amount_max": 800}
-      ]
-    },
-    {
-      "id": "tactical_retreat",
-      "type": "end",
-      "description": "You make a tactical retreat and escape with some intel for next time.",
-      "rewards": [
-        {"type": "currency", "amount_min": 100, "amount_max": 500},
-        {"type": "item", "id": "intel_notes", "chance": 1}
-      ]
+        {
+          "type": "currency",
+          "amount_min": 200,
+          "amount_max": 500
+        },
+        {
+          "type": "item",
+          "id": "thief_mask",
+          "chance": 1
+        }
+      ],
+      "title": "Escape Success",
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     },
     {
       "id": "escape_success",
       "type": "end",
       "description": "You managed to escape successfully with your loot!",
       "rewards": [
-        {"type": "currency", "amount_min": 1000, "amount_max": 5000},
-        {"type": "item", "id": "thief_mask", "chance": 0.5}
-      ]
-    },
-    {
-      "id": "loot_cash",
-      "type": "end",
-      "description": "You grab stacks of cash and run.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2000, "amount_max": 6000}
-      ]
-    },
-    {
-      "id": "loot_jewels",
-      "type": "end",
-      "description": "You pocket precious jewels and prepare to flee.",
-      "rewards": [
-        {"type": "currency", "amount_min": 3000, "amount_max": 7000},
-        {"type": "item", "id": "jewel_bag", "chance": 1}
-      ]
-    },
-    {
-      "id": "loot_gold",
-      "type": "end",
-      "description": "You heft heavy gold bars into your bag.",
-      "rewards": [
-        {"type": "currency", "amount_min": 4000, "amount_max": 9000},
-        {"type": "item", "id": "gold_bar", "chance": 1}
-      ]
-    },
-    {
-      "id": "loot_boxes",
-      "type": "end",
-      "description": "You crack open safety boxes and scoop valuables.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2500, "amount_max": 6500}
-      ]
-    },
-    {
-      "id": "loot_rushed",
-      "type": "end",
-      "description": "You hastily grab whatever you can as the alarm blares.",
-      "rewards": [
-        {"type": "currency", "amount_min": 500, "amount_max": 2000}
-      ]
-    },
-    {
-      "id": "premium_loot",
-      "type": "end",
-      "description": "You carefully select the most valuable items and escape with premium loot.",
-      "rewards": [
-        {"type": "currency", "amount_min": 5000, "amount_max": 12000},
-        {"type": "item", "id": "rare_artifact", "chance": 0.7}
-      ]
+        {
+          "type": "currency",
+          "amount_min": 8000,
+          "amount_max": 12000
+        },
+        {
+          "type": "item",
+          "id": "thief_mask",
+          "chance": 1
+        },
+        {
+          "type": "item",
+          "id": "gold_bar",
+          "chance": 0.4
+        }
+      ],
+      "title": "Escape Success",
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     },
     {
       "id": "maximum_loot",
       "type": "end",
       "description": "Against all odds, you manage to take everything valuable and escape.",
       "rewards": [
-        {"type": "currency", "amount_min": 8000, "amount_max": 15000},
-        {"type": "item", "id": "gold_bar", "chance": 1},
-        {"type": "item", "id": "jewel_bag", "chance": 1}
-      ]
-    },
-    {
-      "id": "explosive_loot",
-      "type": "end",
-      "description": "You grab valuable items from the blown vault before security arrives.",
-      "rewards": [
-        {"type": "currency", "amount_min": 3500, "amount_max": 8000},
-        {"type": "item", "id": "explosion_debris", "chance": 0.5}
-      ]
-    },
-    {
-      "id": "combat_loot",
-      "type": "end",
-      "description": "After defeating the guards, you take your time to gather quality loot.",
-      "rewards": [
-        {"type": "currency", "amount_min": 4500, "amount_max": 9500},
-        {"type": "item", "id": "guard_weapon", "chance": 0.8}
-      ]
-    },
-    {
-      "id": "intel_gathered",
-      "type": "end",
-      "description": "You escape with valuable intelligence for future heists.",
-      "rewards": [
-        {"type": "currency", "amount_min": 800, "amount_max": 2000},
-        {"type": "item", "id": "bank_blueprints", "chance": 1}
-      ]
-    },
-    {
-      "id": "lucky_break",
-      "type": "end",
-      "description": "Your rushed lockpicking somehow works perfectly. You grab the loot and run.",
-      "rewards": [
-        {"type": "currency", "amount_min": 3000, "amount_max": 7500},
-        {"type": "item", "id": "lucky_coin", "chance": 1}
-      ]
-    },
-    {
-      "id": "coast_clear",
-      "type": "end",
-      "description": "After waiting it out, you emerge to find the coast clear and complete your heist.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2000, "amount_max": 5500}
-      ]
-    },
-    {
-      "id": "overhear_intel",
-      "type": "end",
-      "description": "While hiding, you overhear valuable information about other banks.",
-      "rewards": [
-        {"type": "currency", "amount_min": 500, "amount_max": 1500},
-        {"type": "item", "id": "overheard_intel", "chance": 1}
-      ]
-    },
-    {
-      "id": "exit_marked",
-      "type": "end",
-      "description": "You mark the exit route and complete your heist with a perfect escape plan.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2500, "amount_max": 6000},
-        {"type": "item", "id": "escape_route_map", "chance": 1}
-      ]
-    },
-    {
-      "id": "vault_damaged",
-      "type": "end",
-      "description": "You force open the damaged vault and grab what you can before escaping.",
-      "rewards": [
-        {"type": "currency", "amount_min": 1500, "amount_max": 4000}
-      ]
-    },
-    {
-      "id": "patrol_distracted",
-      "type": "end",
-      "description": "Your distraction works perfectly, allowing you to complete the heist unnoticed.",
-      "rewards": [
-        {"type": "currency", "amount_min": 3000, "amount_max": 7000}
-      ]
-    },
-    {
-      "id": "layout_learned",
-      "type": "end",
-      "description": "You learn the complete bank layout and escape with both loot and knowledge.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2000, "amount_max": 5000},
-        {"type": "item", "id": "detailed_layout", "chance": 1}
-      ]
-    },
-    {
-      "id": "guard_ambushed",
-      "type": "end",
-      "description": "Your ambush succeeds perfectly, clearing the way for a clean heist.",
-      "rewards": [
-        {"type": "currency", "amount_min": 3500, "amount_max": 8000},
-        {"type": "item", "id": "ambush_gear", "chance": 0.6}
-      ]
-    },
-    {
-      "id": "vent_widened",
-      "type": "end",
-      "description": "After widening the vent, you gain easy access to the vault.",
-      "rewards": [
-        {"type": "currency", "amount_min": 2800, "amount_max": 6500}
-      ]
+        {
+          "type": "currency",
+          "amount_min": 15000,
+          "amount_max": 20000
+        },
+        {
+          "type": "item",
+          "id": "thief_mask",
+          "chance": 1
+        },
+        {
+          "type": "item",
+          "id": "gold_bar",
+          "chance": 1
+        },
+        {
+          "type": "item",
+          "id": "jewel_bag",
+          "chance": 0.5
+        }
+      ],
+      "title": "Maximum Loot",
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
     }
   ]
 }
