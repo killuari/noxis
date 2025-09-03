@@ -145,8 +145,8 @@ class BasicCommands(commands.Cog):
 
         suggestions = [ # diesmal die comprehension auf mehrere zeilen aufgeteilt
             app_commands.Choice(name=item.name, value=item.name) 
-            for item in await InventoryManager.get_inventory(interaction.user.id) 
-            if current.lower() in item.name.lower()
+            for item in await InventoryManager.get_inventory(interaction.user.id)
+            if current.lower() in item.name.lower() and item.sellable
         ]
 
         # Discord erlaubt max. 25 Vorschläge
@@ -164,6 +164,10 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
             return
         
+        if not item.sellable:
+            await interaction.response.send_message(embed=discord.Embed(title="You can't sell this item!", color=discord.Color.red()), ephemeral=True)
+            return
+
         user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
         if user_item_quantity == 0:
             await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
