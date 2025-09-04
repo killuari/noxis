@@ -730,7 +730,7 @@ class ShopModal(discord.ui.Modal):
         
         await InventoryManager.add_item(user_id=self.interaction.user.id, item_id=self.item.item_id, quantity=quantity)
         await EconomyManager.remove_money(user_id=self.interaction.user.id, amount=quantity*self.item.value)
-        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)))
+        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), webhook_url=interaction.followup.url)
 
         await interaction.response.send_message(embed=discord.Embed(title="Success", description=f"You successfully bought {quantity}x {self.item.name}", color=discord.Color.green()), ephemeral=True)
 
