@@ -29,6 +29,7 @@ class Item:
     sellable: bool = True
     unique: bool = False
     findable: bool = True
+    buyable: bool = False
     metadata: Dict = None
 
     def __post_init__(self):
@@ -101,3 +102,8 @@ class ItemManager:
     async def get_all_items(cls) -> List[Item]:
         """Holt alle verfügbaren Items"""
         return [await cls.get_item(item["item_id"]) for item in cls.items.values()]
+    
+    @classmethod
+    async def get_buyable_items(cls) -> List[Item]:
+        """Holt alle verfügbaren Items"""
+        return [await cls.get_item(item["item_id"]) for item in cls.items.values() if item["buyable"]]
