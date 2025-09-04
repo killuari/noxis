@@ -20,7 +20,7 @@
           "label": "Enter through the roof vent",
           "success_outcomes": ["vent_found"],
           "fail_outcomes": ["vent_damage","noise_made"],
-          "chance": 0.7
+          "chance": 0.8
         },
         {
           "label": "Wait and observe",
@@ -41,7 +41,7 @@
       "choices": [
         {
           "label": "Push it open quietly",
-          "success_outcomes": ["vault_corridor","hidden_entry"],
+          "success_outcomes": ["hidden_entry"],
           "fail_outcomes": ["noise_made","guard_alert"],
           "chance": 0.7
         },
@@ -49,13 +49,13 @@
           "label": "Force it open",
           "success_outcomes": ["vault_corridor"],
           "fail_outcomes": ["alarm_minor","noise_made"],
-          "chance": 0.5
+          "chance": 0.7
         },
         {
           "label": "Follow the tunnels further",
           "success_outcomes": ["hidden_entry","back_exit_found"],
           "fail_outcomes": ["time_wasted"],
-          "chance": 0.7
+          "chance": 0.8
         }
       ],
       "title": "Start Sewer",
@@ -141,7 +141,7 @@
     {
       "id": "vault_entry",
       "type": "choice",
-      "description": "You approach the vault door. The guard is still here.",
+      "description": "You approach the vault door. There is still a guard.",
       "choices": [
         {
           "label": "Knock him out",
@@ -234,12 +234,12 @@
           "label": "Head to the main vault",
           "success_outcomes": ["lockpick_minigame"],
           "fail_outcomes": ["guard_patrol","lost_in_building"],
-          "chance": 0.8
+          "chance": 0.6
         },
         {
           "label": "Check the side room",
           "success_outcomes": ["side_loot_room"],
-          "fail_outcomes": ["locked_door","guard_patrol"],
+          "fail_outcomes": ["locked_door"],
           "chance": 0.7
         },
         {
@@ -315,8 +315,8 @@
         {
           "label": "Climb up",
           "success_outcomes": ["vent_found"],
-          "fail_outcomes": ["ladder_breaks","noise_made"],
-          "chance": 0.9
+          "fail_outcomes": ["ladder_breaks"],
+          "chance": 0.8
         },
         {
           "label": "Set a trap for guards",
@@ -576,7 +576,7 @@
         {
           "label": "Start looting",
           "success_outcomes": ["lockpick_minigame"],
-          "fail_outcomes": ["guard_patrol","equipment_dropped"],
+          "fail_outcomes": ["guard_patrol"],
           "chance": 0.6
         },
         {
@@ -599,7 +599,7 @@
         {
           "label": "Hide and wait",
           "success_outcomes": ["hiding_spot"],
-          "fail_outcomes": ["guard_patrol","equipment_dropped"],
+          "fail_outcomes": ["guard_patrol"],
           "chance": 0.7
         },
         {
@@ -992,14 +992,14 @@
         {
           "label": "Retrace your steps",
           "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["time_wasted","guard_patrol"],
+          "fail_outcomes": ["guard_patrol"],
           "chance": 0.7
         },
         {
           "label": "Try to find an exit",
           "success_outcomes": ["back_exit_found"],
-          "fail_outcomes": ["dead_end","guard_patrol"],
-          "chance": 0.5
+          "fail_outcomes": ["dead_end"],
+          "chance": 0.8
         }
       ],
       "penalties": [
@@ -1085,8 +1085,8 @@
         {
           "label": "Find another route",
           "success_outcomes": ["vent_found"],
-          "fail_outcomes": ["time_wasted","lost_in_building"],
-          "chance": 0.8
+          "fail_outcomes": ["lost_in_building"],
+          "chance": 0.9
         }
       ],
       "penalties": [
@@ -1339,7 +1339,7 @@
       "description": "The keycard grants you access to a high-security area with advanced safes.",
       "choices": [
         {
-          "label": "Crack the advanced safes",
+          "label": "Try to crack the advanced safes",
           "success_outcomes": ["maximum_loot"],
           "fail_outcomes": ["alarm_minor","technical_failure"],
           "chance": 0.4
@@ -1404,14 +1404,14 @@
         {
           "label": "Take the exit now",
           "success_outcomes": ["back_exit_escape"],
-          "fail_outcomes": ["locked_door","guard_patrol"],
+          "fail_outcomes": ["locked_door"],
           "chance": 0.8
         },
         {
           "label": "Mark it and continue the heist",
           "success_outcomes": ["vault_corridor"],
           "fail_outcomes": ["guard_patrol","time_wasted"],
-          "chance": 0.9
+          "chance": 0.75
         }
       ],
       "title": "Back Exit Found",
@@ -1480,13 +1480,13 @@
           "label": "Pocket jewels and slip out",
           "success_outcomes": ["escape_success"],
           "fail_outcomes": ["guard_patrol", "equipment_dropped"],
-          "chance": 0.9
+          "chance": 0.6
         },
         {
-          "label": "Try to take more (risky)",
+          "label": "Try to take everything",
           "success_outcomes": ["maximum_loot"],
           "fail_outcomes": ["overwhelmed", "caught_by_guard"],
-          "chance": 0.4
+          "chance": 0.3
         }
       ],
       "title": "Final Loot",
@@ -1502,14 +1502,14 @@
         {
           "label": "Try to adapt and continue",
           "success_outcomes": ["vault_corridor"],
-          "fail_outcomes": ["lost_in_building","guard_patrol"],
-          "chance": 0.6
+          "fail_outcomes": ["lost_in_building"],
+          "chance": 0.5
         },
         {
           "label": "Retreat and find current intel",
           "success_outcomes": ["intel_gathered"],
           "fail_outcomes": ["time_wasted","guard_alert"],
-          "chance": 0.7
+          "chance": 0.8
         }
       ],
       "penalties": [
@@ -1566,8 +1566,8 @@
         {
           "label": "Leave it and escape",
           "success_outcomes": ["escape_success"],
-          "fail_outcomes": ["guard_patrol","time_wasted"],
-          "chance": 0.8
+          "fail_outcomes": ["time_wasted"],
+          "chance": 0.9
         }
       ],
       "penalties": [
@@ -1773,12 +1773,12 @@
     {
       "id": "back_exit_escape",
       "type": "end",
-      "description": "You managed to escape through the back exit!",
+      "description": "You managed to escape through the back exit! ",
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 200,
-          "amount_max": 500
+          "amount_min": 2500,
+          "amount_max": 5000
         },
         {
           "type": "item",
