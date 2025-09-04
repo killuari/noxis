@@ -1005,6 +1005,8 @@ class BasicCommands(commands.Cog):
                 color=discord.Color.from_str("#607bff")
             )
 
+            await LevelManager.add_experience(user_id=interaction.user.id, amount=random.randrange(50, 100), webhook_url=interaction.followup.url)
+
         else: # falls wir ein item usable = True machen aber es hier noch nicht implementiert haben
             embed = discord.Embed(
                 title="This item currently does nothing",
