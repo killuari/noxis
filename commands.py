@@ -134,7 +134,7 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="Invalid amount. Please enter a number or 'max'.", color=discord.Color.red()), ephemeral=True)
             return
 
-    async def autocomplete_items_in_inventory(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+    async def autocomplete_sellable_items_in_inventory(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         if not await UserManager.user_exists(interaction.user.id):
             return []
         
@@ -153,7 +153,7 @@ class BasicCommands(commands.Cog):
         return suggestions[:25]
 
     @app_commands.command(name="sell", description="Sell items from your inventory")
-    @app_commands.autocomplete(item=autocomplete_items_in_inventory)
+    @app_commands.autocomplete(item=autocomplete_sellable_items_in_inventory)
     async def sell(self, interaction: discord.Interaction, item: str, quantity: int = 1):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
@@ -948,4 +948,70 @@ class BasicCommands(commands.Cog):
         await shop_view.add_buttons()
 
         await interaction.response.send_message(embed=embed, view=shop_view)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
+
+    async def autocomplete_usable_items_in_inventory(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        if not await UserManager.user_exists(interaction.user.id):
+            return []
+
+        suggestions = [ 
+            app_commands.Choice(name=item.name, value=item.name) 
+            for item in await InventoryManager.get_inventory(interaction.user.id)
+            if current.lower() in item.name.lower() and item.usable
+        ]
+
+        # Discord erlaubt max. 25 Vorschläge
+        return suggestions[:25]
+
+    @app_commands.command(name="use", description="Use one of your items")
+    @app_commands.autocomplete(item=autocomplete_usable_items_in_inventory)
+    async def use(self, interaction: discord.Interaction, item: str):
+        if not await UserManager.user_exists(interaction.user.id):
+            await get_started(interaction, interaction.user.id)
+            return
+        
+        item = await ItemManager.get_item_by_name(item)
+        if not item:
+            await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        if not item.usable:
+            await interaction.response.send_message(embed=discord.Embed(title="You can't use this item!", color=discord.Color.red()), ephemeral=True)
+            return
+
+        user_item_quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
+        if user_item_quantity == 0:
+            await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
+            return
+
+        if item.item_id == "mystery_box":
+            possible_rewards = item.metadata["possible_rewards"]
+
+            items = [entry["item_id"] for entry in possible_rewards]
+            weights = [int(entry.get("weight", 0)) for entry in possible_rewards]
+
+            if not items:
+                raise ValueError("possible_rewards is empty.")
+            if not any(weights):
+                raise ValueError("All weights are zero.")
+
+            got_item_id = random.choices(items, weights=weights, k=1)[0]
+            got_item = await ItemManager.get_item(got_item_id)
+            await InventoryManager.add_item(interaction.user.id, got_item_id)
+
+            embed = discord.Embed(
+                title="Opened Mystery Box",
+                description=f"You got `1x {got_item.name}`!",
+                color=discord.Color.from_str("#607bff")
+            )
+
+        else: # falls wir ein item usable = True machen aber es hier noch nicht implementiert haben
+            embed = discord.Embed(
+                title="This item currently does nothing",
+                description="You still lost it haha",
+                color=discord.Color.orange()
+            )
+
+        await InventoryManager.remove_item(interaction.user.id, item.item_id)
+        await interaction.response.send_message(embed=embed)
         await DatabaseManager.update_cmd_used(interaction.user.id)

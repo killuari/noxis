@@ -24,9 +24,9 @@
     "buyable": true,
     "metadata": {
       "possible_rewards": [
-        { "item_id": "bread",          "weight": 40 },
-        { "item_id": "decoy_bag",      "weight": 30 },
-        { "item_id": "second_chance",  "weight": 20 },
+        { "item_id": "rope",          "weight": 40 },
+        { "item_id": "lockpick_plus",      "weight": 30 },
+        { "item_id": "decoy_bag",  "weight": 20 },
         { "item_id": "gold_bar",       "weight": 6  },
         { "item_id": "jewel_bag",      "weight": 4  }
       ]
@@ -74,7 +74,7 @@
     "description": "A premium lockpicking tool that grants an additional attempt at cracking bank safe",
     "rarity": "UNCOMMON",
     "value": 500,
-    "usable": true,
+    "usable": false,
     "sellable": true,
     "findable": true,
     "unique": false,
@@ -86,7 +86,7 @@
     "description": "Confidential information that eliminates one wrong digit from safe combination attempts",
     "rarity": "RARE",
     "value": 2000,
-    "usable": true,
+    "usable": false,
     "sellable": true,
     "findable": true,
     "unique": false,
