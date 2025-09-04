@@ -21,8 +21,6 @@ async def on_ready():
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
 
-    await EconomyManager.add_money(572023654385188884, 50000)
-
     await client.add_cog(BasicCommands(client))    
     await client.tree.sync()
 
