@@ -72,19 +72,19 @@
           "label": "Bluff the guard",
           "success_outcomes": ["sneak_success","front_bluff_success"],
           "fail_outcomes": ["guard_suspicious","identity_questioned"],
-          "chance": 0.5
+          "chance": 0.7
         },
         {
           "label": "Rush inside",
           "success_outcomes": ["vault_corridor"],
           "fail_outcomes": ["alarm_minor","guard_fight"],
-          "chance": 0.1
+          "chance": 0.6
         },
         {
           "label": "Pretend to deliver a package",
           "success_outcomes": ["front_bluff_success"],
           "fail_outcomes": ["guard_suspicious","identity_questioned"],
-          "chance": 0.7
+          "chance": 0.9
         }
       ],
       "title": "Start Frontdoor",
@@ -105,7 +105,7 @@
         },
         {
           "label": "Confront the driver and take his ID",
-          "success_outcomes": ["keycard_acquired","restricted_area"],
+          "success_outcomes": ["keycard_acquired"],
           "fail_outcomes": ["driver_fight"],
           "chance": 0.5
         }
@@ -437,7 +437,7 @@
           "label": "Take his keycard",
           "success_outcomes": ["keycard_acquired"],
           "fail_outcomes": ["guard_wakes","blood_trail"],
-          "chance": 0.6
+          "chance": 0.7
         },
         {
           "label": "Proceed immediately",
@@ -486,8 +486,8 @@
       "title": "Lockpick Minigame",
       "description": "To succeed, you must crack a **4-digit security code**.",
       "game": "lockpick",
-      "success_outcomes": ["vault_opened"],
-      "fail_outcomes": ["lockpick_broken","alarm_minor"],
+      "success_outcomes": ["final_loot"],
+      "fail_outcomes": ["lockpick_broken"],
       "color": "#607bff",
       "choices": [],
       "rewards": [],
@@ -500,7 +500,7 @@
       "choices": [
         {
           "label": "Grab what you can quickly",
-          "success_outcomes": ["final_loot"],
+          "success_outcomes": ["escape_success"],
           "fail_outcomes": ["guard_patrol","equipment_dropped"],
           "chance": 0.9
         },
@@ -509,12 +509,6 @@
           "success_outcomes": ["maximum_loot"],
           "fail_outcomes": ["guard_patrol","time_wasted"],
           "chance": 0.2
-        },
-        {
-          "label": "Set up for a bigger heist",
-          "success_outcomes": ["blueprint_found"],
-          "fail_outcomes": ["guard_patrol","outdated_info"],
-          "chance": 0.7
         }
       ],
       "title": "Side Loot Room",
@@ -529,41 +523,18 @@
       "choices": [
         {
           "label": "Try the keycard on the vault",
-          "success_outcomes": ["vault_opened"],
-          "fail_outcomes": ["keycard_invalid","alarm_minor"],
-          "chance": 0.6
+          "success_outcomes": ["final_loot"],
+          "fail_outcomes": ["keycard_invalid"],
+          "chance": 0.7
         },
         {
           "label": "Explore restricted areas first",
           "success_outcomes": ["restricted_area"],
-          "fail_outcomes": ["keycard_invalid","guard_patrol"],
-          "chance": 0.7
+          "fail_outcomes": ["guard_patrol"],
+          "chance": 0.8
         }
       ],
       "title": "Keycard Acquired",
-      "color": "#2ecc71",
-      "rewards": [],
-      "penalties": []
-    },
-    {
-      "id": "vault_opened",
-      "type": "choice",
-      "description": "The vault door swings open, revealing treasures beyond your wildest dreams.",
-      "choices": [
-        {
-          "label": "Grab the cash",
-          "success_outcomes": ["escape_success"],
-          "fail_outcomes": ["equipment_dropped"],
-          "chance": 0.9
-        },
-        {
-          "label": "Try to take everything",
-          "success_outcomes": ["maximum_loot"],
-          "fail_outcomes": ["overwhelmed"],
-          "chance": 0.3
-        }
-      ],
-      "title": "Vault Opened",
       "color": "#2ecc71",
       "rewards": [],
       "penalties": []
@@ -837,13 +808,13 @@
           "label": "Try to lose him in the corridors",
           "success_outcomes": ["hiding_spot"],
           "fail_outcomes": ["lost_in_building","caught_by_guard"],
-          "chance": 0.6
+          "chance": 0.7
         },
         {
           "label": "Set a trap to stop him",
           "success_outcomes": ["trap_set"],
           "fail_outcomes": ["equipment_lost","caught_by_guard"],
-          "chance": 0.5
+          "chance": 0.7
         }
       ],
       "penalties": [
@@ -964,7 +935,7 @@
           "label": "Try to hack the lock",
           "success_outcomes": ["restricted_area"],
           "fail_outcomes": ["alarm_minor","technical_failure"],
-          "chance": 0.5
+          "chance": 0.8
         },
         {
           "label": "Find another way",
@@ -1022,13 +993,13 @@
           "label": "Freeze and hope they don't notice",
           "success_outcomes": ["patrol_passed"],
           "fail_outcomes": ["guard_alert","caught_by_guard"],
-          "chance": 0.5
+          "chance": 0.6
         },
         {
           "label": "Make a run for it",
           "success_outcomes": ["vault_corridor"],
           "fail_outcomes": ["guard_pursuit","alarm_minor"],
-          "chance": 0.5
+          "chance": 0.6
         }
       ],
       "penalties": [
@@ -1256,7 +1227,7 @@
       "choices": [
         {
           "label": "Try to force the lock",
-          "success_outcomes": ["vault_opened"],
+          "success_outcomes": ["final_loot"],
           "fail_outcomes": ["alarm_minor","equipment_lost"],
           "chance": 0.3
         },
@@ -1270,8 +1241,8 @@
       "penalties": [
         {
           "type": "currency",
-          "amount_min": 400,
-          "amount_max": 900
+          "amount_min": 200,
+          "amount_max": 400
         },
         {
           "type": "random_item",
@@ -1340,12 +1311,12 @@
       "choices": [
         {
           "label": "Try to crack the advanced safes",
-          "success_outcomes": ["maximum_loot"],
+          "success_outcomes": ["escape_success"],
           "fail_outcomes": ["alarm_minor","technical_failure"],
-          "chance": 0.4
+          "chance": 0.5
         },
         {
-          "label": "Try to get to the vault",
+          "label": "Try to get to the main vault",
           "success_outcomes": ["vault_corridor"],
           "fail_outcomes": ["guard_patrol","equipment_lost"],
           "chance": 0.9
@@ -1474,19 +1445,26 @@
           "label": "Grab stacks of cash and run",
           "success_outcomes": ["escape_success"],
           "fail_outcomes": ["guard_patrol", "equipment_dropped"],
-          "chance": 0.9
+          "chance": 0.95
         },
         {
-          "label": "Pocket jewels and slip out",
-          "success_outcomes": ["escape_success"],
-          "fail_outcomes": ["guard_patrol", "equipment_dropped"],
-          "chance": 0.6
+          "label": "Pocket gold bars and slip out",
+          "success_outcomes": ["gold_escape"],
+          "fail_outcomes": ["caught_by_guard", "equipment_dropped"],
+          "chance": 0.7
         },
         {
           "label": "Try to take everything",
           "success_outcomes": ["maximum_loot"],
           "fail_outcomes": ["overwhelmed", "caught_by_guard"],
           "chance": 0.3
+        },
+        {
+          "label": "Use decoy bag to buy yourself some time and take everything you can.",
+          "item": "decoy_bag",
+          "success_outcomes": ["maximum_loot"],
+          "fail_outcomes": ["equipment_dropped"],
+          "chance": 0.85
         }
       ],
       "title": "Final Loot",
@@ -1516,7 +1494,7 @@
         {
           "type": "currency",
           "amount_min": 200,
-          "amount_max": 500
+          "amount_max": 400
         }
       ],
       "title": "Outdated Info",
@@ -1532,7 +1510,7 @@
           "label": "Try to hack the system manually",
           "success_outcomes": ["restricted_area"],
           "fail_outcomes": ["alarm_minor","technical_failure"],
-          "chance": 0.5
+          "chance": 0.6
         },
         {
           "label": "Find another approach",
@@ -1544,8 +1522,8 @@
       "penalties": [
         {
           "type": "currency",
-          "amount_min": 250,
-          "amount_max": 600
+          "amount_min": 200,
+          "amount_max": 400
         }
       ],
       "title": "Keycard Invalid",
@@ -1561,20 +1539,20 @@
           "label": "Go back for the loot",
           "success_outcomes": ["final_loot"],
           "fail_outcomes": ["caught_by_guard"],
-          "chance": 0.5
+          "chance": 0.6
         },
         {
           "label": "Leave it and escape",
           "success_outcomes": ["escape_success"],
-          "fail_outcomes": ["time_wasted"],
+          "fail_outcomes": ["caught_by_guard"],
           "chance": 0.9
         }
       ],
       "penalties": [
         {
           "type": "currency",
-          "amount_min": 300,
-          "amount_max": 700
+          "amount_min": 200,
+          "amount_max": 400
         },
         {
           "type": "random_item",
@@ -1606,8 +1584,8 @@
       "penalties": [
         {
           "type": "currency",
-          "amount_min": 200,
-          "amount_max": 500
+          "amount_min": 100,
+          "amount_max": 300
         }
       ],
       "title": "Guard Wakes",
@@ -1658,8 +1636,8 @@
       "penalties": [
         {
           "type": "currency",
-          "amount_min": 1000,
-          "amount_max": 3000
+          "amount_min": 500,
+          "amount_max": 1000
         },
         {
           "type": "random_item",
@@ -1683,7 +1661,7 @@
         {
           "type": "currency",
           "amount_min": 500,
-          "amount_max": 2000
+          "amount_max": 1000
         },
         {
           "type": "random_item",
@@ -1715,7 +1693,7 @@
         {
           "type": "currency",
           "amount_min": 800,
-          "amount_max": 2500
+          "amount_max": 1000
         }
       ],
       "title": "Overwhelmed",
@@ -1773,12 +1751,12 @@
     {
       "id": "back_exit_escape",
       "type": "end",
-      "description": "You managed to escape through the back exit! ",
+      "description": "You managed to escape through the back exit! You took some loose valuables while escaping!",
       "rewards": [
         {
           "type": "currency",
-          "amount_min": 2500,
-          "amount_max": 5000
+          "amount_min": 10000,
+          "amount_max": 11000
         },
         {
           "type": "item",
@@ -1810,11 +1788,37 @@
           "type": "item",
           "id": "thief_mask",
           "chance": 1
+        }
+      ],
+      "title": "Escape Success",
+      "color": "#2ecc71",
+      "choices": [],
+      "penalties": []
+    },
+    {
+      "id": "gold_escape",
+      "type": "end",
+      "description": "You managed to escape successfully with your loot!",
+      "rewards": [
+        {
+          "type": "currency",
+          "amount_min": 12000,
+          "amount_max": 15000
+        },
+        {
+          "type": "experience",
+          "amount_min": 800,
+          "amount_max": 1000
+        },
+        {
+          "type": "item",
+          "id": "thief_mask",
+          "chance": 1
         },
         {
           "type": "item",
           "id": "gold_bar",
-          "chance": 0.4
+          "chance": 1
         }
       ],
       "title": "Escape Success",
