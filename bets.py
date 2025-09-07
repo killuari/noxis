@@ -7,13 +7,15 @@ from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
 from typing import Optional, List, Dict
+from discord import ui, TextStyle
 
 class BetManager:
     API_BASE = 'https://api.the-odds-api.com/v4/'
     BL_KEY = 'soccer_germany_bundesliga'
     API_KEY = '35e92ee26bf991936c0b6278a8cbe2bc'
     TZ = ZoneInfo("Europe/Berlin")
-    CACHE_FILE = 'matches_cache.json'
+    CACHE_FILE = 'bets/matches_cache.json'
+    BETS_PLACED_FILE = 'bets/bets_placed.json'
     
     @staticmethod
     def parse_iso_to_utc(dt_str: Optional[str]) -> Optional[datetime]:
@@ -75,7 +77,7 @@ class BetManager:
         now_utc = datetime.now(timezone.utc)
         end_utc = now_utc + timedelta(days=7)
         filtered = []
-        for ev in events:
+        for idx, ev in enumerate(events):
             ct = cls.parse_iso_to_utc(ev.get("commence_time"))
 
             if not ct:
@@ -87,6 +89,7 @@ class BetManager:
             away = ev.get("away_team")
             odds = cls.avg_price_for_outcomes(ev, home, away)
             filtered.append({
+                "id": idx,
                 "commence_time_utc": ct.isoformat(),  # Convert to string for JSON serialization
                 "home": home,
                 "away": away,
@@ -185,7 +188,7 @@ class BetManager:
 
     @staticmethod
     def build_embed_for_matches(matches: List[dict]) -> discord.Embed:
-        embed = discord.Embed(title="Matches (next 7 days)", description="Matches and averaged Home / Draw / Away odds", color=0x1F8B4C)
+        embed = discord.Embed(title="Matches (next 7 days)", description="Matches and averaged Home / Draw / Away odds", color=discord.Color.from_str("#607bff"))
 
         if not matches:
             embed.add_field(name="No matches", value="No available matches with odds in the next 7 days.", inline=False)
@@ -217,6 +220,178 @@ class BetManager:
 
         embed.set_footer(text="Odds provided by https://the-odds-api.com/")
         return embed
+
+# Modal zum Platzieren einer Wette
+class PlaceBetModal(ui.Modal):
+    def __init__(self, match: dict, option: str = "Home"):
+        super().__init__(title=f"{match['home']} vs {match['away']}")
+        self.amount = ui.TextInput(
+            label="Place Bet",
+            style=TextStyle.short,
+            placeholder="1000",
+            required=True,
+            max_length=12
+        )
+        self.add_item(self.amount)
+        self._match = match
+        self.outcome = option
+
+    async def on_submit(self, interaction: discord.Interaction):
+        # parse amount
+        amount_text = self.amount.value
+        try:
+            amount = int(amount_text)
+            if amount <= 0:
+                raise ValueError("Amount must be positive")
+        except Exception:
+            await interaction.response.send_message("Invalid stake amount.", ephemeral=True)
+            return
+
+        match = self._match
+
+        # map outcome -> odds key (adjust if your structure differs)
+        outcome_key = self.outcome.lower()
+        try:
+            raw_odd = match.get("odds", {}).get(outcome_key, 0) or 0
+            odds = float(raw_odd)
+        except Exception:
+            odds = 0.0
+
+        potential_return = int(amount * odds)  # stake * odds
+
+        # format amounts in English style with 2 decimals
+        stake_str = f"{amount:,}"
+        potential_str = f"{potential_return:,}"
+        odds_str = f"{odds:g}"  # compact representation
+
+        # Build the confirmation message (receipt style)
+        embed = discord.Embed(
+            title="Bet confirmed", 
+            description=f"""
+                **Match:** {match.get('home')} vs {match.get('away')}
+                **Selection:** {self.outcome}
+                **Stake:** `{stake_str}$`
+                **Odds:** `{odds_str}`
+                **Potential return:** `{potential_str}$`
+            """,
+            color=discord.Color.green()
+        )
+
+        # TODO: persist the bet to your DB / file here before confirming
+
+        # send ephemeral confirmation to the user
+        await interaction.response.send_message(embed=embed)
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception):
+        await interaction.response.send_message("Fehler beim Platzieren der Wette.", ephemeral=True)
+
+class PlaceBetDropdown(discord.ui.Select):
+    def __init__(self, button: ui.Button, author_id: int):
+        self.author_id = author_id
+        self.button = button
+
+        options = [
+            discord.SelectOption(label=option_str,
+                                 value=option_str, 
+                                 default=option_str=="Home")
+            for option_str in ("Home", "Draw", "Away")
+        ]
+        super().__init__(options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message("This is not your bet.", ephemeral=True)
+            return
+        
+        self.button.option = self.values[0]
+
+        await interaction.response.defer(ephemeral=True)
+
+# Button als eigene Klasse — aber eine neue Instanz pro Match erzeugen!
+class PlaceBetButton(ui.Button):
+    def __init__(self, match: dict, author_id: int, option: str = None):
+        # label & style hier setzen
+        super().__init__(label="Place Bet", style=discord.ButtonStyle.primary)
+        self.match = match
+        self.option = option
+        self.author_id = author_id
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message("This is not your bet.", ephemeral=True)
+            return
+        
+        if not self.option:
+            await interaction.response.send_message(view=MatchLayoutView(self.match, author_id=self.author_id))
+        else:
+            await interaction.response.send_modal(PlaceBetModal(self.match, self.option))
+
+class MatchLayoutView(ui.LayoutView):
+    def __init__(self, match: Dict, author_id: int):
+        super().__init__()
+
+        self.author_id = author_id
+            
+        odds = match["odds"]
+        line = f"**{match['home']}** vs **{match['away']}**\n"
+        line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
+        
+        text = ui.TextDisplay(line)
+        btn = PlaceBetButton(match, author_id=author_id, option="Home")
+        section = ui.Section(text, accessory=btn)
+        select_menu = PlaceBetDropdown(btn, author_id=author_id)
+        select_menu_row = ui.ActionRow(select_menu)
+
+        container = ui.Container(section, select_menu_row)
+        self.add_item(container)
+
+
+class MatchesLayoutView(ui.LayoutView):
+    def __init__(self, matches: list, author_id: int):
+        super().__init__()
+
+        self.author_id = author_id
+
+        if not matches:
+            no_text = ui.TextDisplay("Keine verfügbaren Matches in den nächsten 7 Tagen.")
+            container = ui.Container(no_text, accent_color=discord.Color.red())
+            self.add_item(container)
+            return
+
+        # group matches by local date (Europe/Berlin)
+        groups = {}
+        for m in matches:
+            # Handle both datetime objects and ISO strings
+            if isinstance(m["commence_time_utc"], str):
+                commence_time = datetime.fromisoformat(m["commence_time_utc"])
+            else:
+                commence_time = m["commence_time_utc"]
+                
+            local_dt = commence_time.astimezone(BetManager.TZ)
+            date_key = local_dt.date()  # groups by YYYY-MM-DD
+            line_time = local_dt.strftime("%H:%M")
+            odds = m["odds"]
+            
+            line = f"{line_time} — {m['home']} vs {m['away']}\n"
+            line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
+            groups.setdefault(date_key, []).append((line, m))
+
+        items = []
+        # Add one field per date
+        for date_key in sorted(groups.keys(), key=lambda d: (d is None, d)):
+            pretty_date = date_key.strftime("%A, %d %b %Y")  # e.g. "Monday, 08 Sep 2025"
+            pretty_date_display = ui.TextDisplay(f"**{pretty_date}**")
+            items.append(pretty_date_display)
+
+            for (match_str, match_obj) in groups[date_key]:
+                text = ui.TextDisplay(match_str)
+                btn = PlaceBetButton(match_obj, author_id=author_id)
+                section = ui.Section(text, accessory=btn)
+                separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
+                items.extend((section, separator))
+
+        container = ui.Container(*items, accent_color=discord.Color.blurple())
+        self.add_item(container)
 
 
 class BetCommands(commands.Cog):
@@ -262,17 +437,9 @@ class BetCommands(commands.Cog):
         # Defer the response since this might take a moment
         await interaction.response.defer()
         
-        try:
-            matches = await BetManager.get_matches()
-            embed = BetManager.build_embed_for_matches(matches)
-            await interaction.followup.send(embed=embed)
-        except Exception as e:
-            error_embed = discord.Embed(
-                title="Error", 
-                description=f"Failed to fetch matches: {str(e)}", 
-                color=0xFF0000
-            )
-            await interaction.followup.send(embed=error_embed)
+        matches = await BetManager.get_matches()
+        view = MatchesLayoutView(matches, author_id=interaction.user.id)
+        await interaction.followup.send(view=view)
         
     async def bet_place(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
