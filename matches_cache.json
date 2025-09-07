@@ -1,0 +1,85 @@
+{
+  "last_updated": "2025-09-07T13:55:45.347637+00:00",
+  "matches": [
+    {
+      "commence_time_utc": "2025-09-12T18:30:00+00:00",
+      "home": "Bayer Leverkusen",
+      "away": "Eintracht Frankfurt",
+      "odds": {
+        "home": 2.31,
+        "draw": 3.818,
+        "away": 2.811
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T13:30:00+00:00",
+      "home": "1. FC Heidenheim",
+      "away": "Borussia Dortmund",
+      "odds": {
+        "home": 4.755,
+        "draw": 4.256,
+        "away": 1.65
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T13:30:00+00:00",
+      "home": "VfL Wolfsburg",
+      "away": "1. FC Köln",
+      "odds": {
+        "home": 1.993,
+        "draw": 3.502,
+        "away": 3.801
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T13:30:00+00:00",
+      "home": "FSV Mainz 05",
+      "away": "RB Leipzig",
+      "odds": {
+        "home": 2.343,
+        "draw": 3.64,
+        "away": 2.86
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T13:30:00+00:00",
+      "home": "SC Freiburg",
+      "away": "VfB Stuttgart",
+      "odds": {
+        "home": 2.979,
+        "draw": 3.552,
+        "away": 2.301
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T13:30:00+00:00",
+      "home": "Union Berlin",
+      "away": "TSG Hoffenheim",
+      "odds": {
+        "home": 2.464,
+        "draw": 3.439,
+        "away": 2.822
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-13T16:30:00+00:00",
+      "home": "Bayern Munich",
+      "away": "Hamburger SV",
+      "odds": {
+        "home": 1.072,
+        "draw": 12.477,
+        "away": 26.712
+      }
+    },
+    {
+      "commence_time_utc": "2025-09-14T13:30:00+00:00",
+      "home": "FC St. Pauli",
+      "away": "Augsburg",
+      "odds": {
+        "home": 2.194,
+        "draw": 3.39,
+        "away": 3.318
+      }
+    }
+  ]
+}
