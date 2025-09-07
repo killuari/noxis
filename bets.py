@@ -247,43 +247,10 @@ class PlaceBetModal(ui.Modal):
             await interaction.response.send_message("Invalid stake amount.", ephemeral=True)
             return
 
-        match = self._match
-
-        # map outcome -> odds key (adjust if your structure differs)
-        outcome_key = self.outcome.lower()
-        try:
-            raw_odd = match.get("odds", {}).get(outcome_key, 0) or 0
-            odds = float(raw_odd)
-        except Exception:
-            odds = 0.0
-
-        potential_return = int(amount * odds)  # stake * odds
-
-        # format amounts in English style with 2 decimals
-        stake_str = f"{amount:,}"
-        potential_str = f"{potential_return:,}"
-        odds_str = f"{odds:g}"  # compact representation
-
-        # Build the confirmation message (receipt style)
-        embed = discord.Embed(
-            title="Bet confirmed", 
-            description=f"""
-                **Match:** {match.get('home')} vs {match.get('away')}
-                **Selection:** {self.outcome}
-                **Stake:** `{stake_str}$`
-                **Odds:** `{odds_str}`
-                **Potential return:** `{potential_str}$`
-            """,
-            color=discord.Color.green()
-        )
-
-        # TODO: persist the bet to your DB / file here before confirming
+        # TODO: persist the bet to DB
 
         # send ephemeral confirmation to the user
-        await interaction.response.send_message(embed=embed)
-
-    async def on_error(self, interaction: discord.Interaction, error: Exception):
-        await interaction.response.send_message("Fehler beim Platzieren der Wette.", ephemeral=True)
+        await interaction.response.edit_message(view=BetPlacedLayoutView(self._match, amount, self.outcome))
 
 class PlaceBetDropdown(discord.ui.Select):
     def __init__(self, button: ui.Button, author_id: int):
@@ -326,6 +293,33 @@ class PlaceBetButton(ui.Button):
         else:
             await interaction.response.send_modal(PlaceBetModal(self.match, self.option))
 
+class BetPlacedLayoutView(ui.LayoutView):
+    def __init__(self, match: Dict, amount: int, outcome: str):
+        super().__init__()
+        
+         # map outcome -> odds key (adjust if your structure differs)
+        outcome_key = outcome.lower()
+        try:
+            raw_odd = match.get("odds", {}).get(outcome_key, 0) or 0
+            odds = float(raw_odd)
+        except Exception:
+            odds = 0.0
+
+        potential_return = int(amount * odds)  # stake * odds
+
+        # format amounts in English style with 2 decimals
+        stake_str = f"{amount:,}"
+        potential_str = f"{potential_return:,}"
+        odds_str = f"{odds:g}"  # compact representation
+
+        # Build the confirmation message (receipt style)
+        title = "**Bet Confirmed**"
+        description = f"**Match:** {match.get('home')} vs {match.get('away')}\n**Selection:** {outcome}\n**Stake:** `{stake_str}$`\n**Odds:** `{odds_str}`\n**Potential return:** `{potential_str}$`"
+        
+        disp1, disp2 = ui.TextDisplay(title), ui.TextDisplay(description)
+        container = ui.Container(disp1, disp2, accent_color=discord.Color.green())
+        self.add_item(container)
+
 class MatchLayoutView(ui.LayoutView):
     def __init__(self, match: Dict, author_id: int):
         super().__init__()
@@ -333,12 +327,12 @@ class MatchLayoutView(ui.LayoutView):
         self.author_id = author_id
             
         odds = match["odds"]
-        line = f"**{match['home']}** vs **{match['away']}**\n"
-        line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
+        title = f"**{match['home']}** vs **{match['away']}**"
+        description = f"Home: `{odds['home'] or '-'}`\nDraw: `{odds['draw'] or '-'}`\nAway: `{odds['away'] or '-'}`"
         
-        text = ui.TextDisplay(line)
+        disp1, disp2 = ui.TextDisplay(title), ui.TextDisplay(description)
         btn = PlaceBetButton(match, author_id=author_id, option="Home")
-        section = ui.Section(text, accessory=btn)
+        section = ui.Section(disp1, disp2, accessory=btn)
         select_menu = PlaceBetDropdown(btn, author_id=author_id)
         select_menu_row = ui.ActionRow(select_menu)
 
@@ -390,7 +384,7 @@ class MatchesLayoutView(ui.LayoutView):
                 separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
                 items.extend((section, separator))
 
-        container = ui.Container(*items, accent_color=discord.Color.blurple())
+        container = ui.Container(*items)
         self.add_item(container)
 
 
