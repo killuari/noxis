@@ -1,4 +1,4 @@
-import discord, aiohttp, json, os
+import discord, aiohttp, json, os, aiosqlite
 from discord import app_commands
 from discord.ext import commands, tasks
 from user_manager import UserManager
@@ -296,7 +296,7 @@ class PlaceBetModal(ui.Modal):
             max_length=12
         )
         self.add_item(self.amount)
-        self._match = match
+        self.match = match
         self.outcome = option
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -309,11 +309,31 @@ class PlaceBetModal(ui.Modal):
         except Exception:
             await interaction.response.send_message("Invalid stake amount.", ephemeral=True)
             return
+        
+        # map outcome -> odds key
+        outcome_key = self.outcome.lower()
+        try:
+            raw_odd = self.match.get("odds", {}).get(outcome_key, 0) or 0
+            odds = float(raw_odd)
+        except Exception:
+            odds = 0.0
 
-        # TODO: persist the bet to DB
+        potential_return = int(amount * odds)  # stake * odds
+        match_id = self.match.get("id")
+        commence_time_utc = self.match.get("commence_time_utc")
+
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, return) VALUES (?, ?, ?, ?)", (interaction.user.id, match_id, commence_time_utc, potential_return))
+            await db.commit()
+            
+        # format amounts
+        stake_str = f"{amount:,}"
+        potential_str = f"{potential_return:,}"
+        odds_str = f"{odds:g}"  # compact representation
 
         # send ephemeral confirmation to the user
-        await interaction.response.edit_message(view=BetPlacedLayoutView(self._match, amount, self.outcome))
+        await interaction.response.edit_message(view=BetPlacedLayoutView(self.match, self.outcome, stake_str, odds_str, potential_str))
 
 class PlaceBetDropdown(discord.ui.Select):
     def __init__(self, button: ui.Button, author_id: int):
@@ -357,23 +377,8 @@ class PlaceBetButton(ui.Button):
             await interaction.response.send_modal(PlaceBetModal(self.match, self.option))
 
 class BetPlacedLayoutView(ui.LayoutView):
-    def __init__(self, match: Dict, amount: int, outcome: str):
+    def __init__(self, match: Dict, outcome: str, stake_str: str, odds_str: str, potential_str: str):
         super().__init__()
-        
-         # map outcome -> odds key (adjust if your structure differs)
-        outcome_key = outcome.lower()
-        try:
-            raw_odd = match.get("odds", {}).get(outcome_key, 0) or 0
-            odds = float(raw_odd)
-        except Exception:
-            odds = 0.0
-
-        potential_return = int(amount * odds)  # stake * odds
-
-        # format amounts in English style with 2 decimals
-        stake_str = f"{amount:,}"
-        potential_str = f"{potential_return:,}"
-        odds_str = f"{odds:g}"  # compact representation
 
         # Build the confirmation message (receipt style)
         title = "**Bet Confirmed**"

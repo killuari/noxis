@@ -53,10 +53,10 @@ class DatabaseManager:
 
             # Bets Tabelle
             await db.execute("""
-                CREATE TABLE IF NOT EXISTS inventory (
+                CREATE TABLE IF NOT EXISTS bets (
                     user_id INTEGER NOT NULL,
                     match_id TEXT NOT NULL,
-                    commence_time TIMESTAMP,
+                    commence_time_utc TIMESTAMP,
                     return INTEGER,
                     PRIMARY KEY (user_id, match_id)
                 )
