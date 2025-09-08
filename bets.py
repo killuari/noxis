@@ -15,7 +15,6 @@ class BetManager:
     API_KEY = '35e92ee26bf991936c0b6278a8cbe2bc'
     TZ = ZoneInfo("Europe/Berlin")
     CACHE_FILE = 'bets/matches_cache.json'
-    BETS_PLACED_FILE = 'bets/bets_placed.json'
     
     @staticmethod
     def parse_iso_to_utc(dt_str: Optional[str]) -> Optional[datetime]:
@@ -85,11 +84,12 @@ class BetManager:
             if not (now_utc <= ct <= end_utc):
                 continue
 
+            id = ev.get("id", idx)
             home = ev.get("home_team")
             away = ev.get("away_team")
             odds = cls.avg_price_for_outcomes(ev, home, away)
             filtered.append({
-                "id": idx,
+                "id": id,
                 "commence_time_utc": ct.isoformat(),  # Convert to string for JSON serialization
                 "home": home,
                 "away": away,
@@ -98,6 +98,100 @@ class BetManager:
 
         filtered.sort(key=lambda x: x["commence_time_utc"])
         return filtered
+    
+    @classmethod
+    async def fetch_results_from_api(cls, sport_key: str, event_ids: Optional[List[str]] = None) -> Dict[str, Optional[dict]]:
+        """
+        Fetch scores for given sport/event IDs.
+        Returns a dict mapping event_id -> {
+            "id": str,
+            "commence_time_utc": Optional[str],
+            "home_team": str,
+            "away_team": str,
+            "scores": {"home": int, "away": int},
+            "result": "home" | "draw" | "away"
+        }
+        Returns event_id -> None if not completed
+        """
+        if not sport_key:
+            return {}
+
+        url = f"{cls.API_BASE}/sports/{sport_key}/scores"
+        params = {
+            "apiKey": cls.API_KEY,
+            "dateFormat": "iso"
+        }
+
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(url, params=params, timeout=20) as resp:
+                if resp.status == 401:
+                    raise RuntimeError("401 Unauthorized — check your ODDS_API_KEY.")
+                if resp.status == 429:
+                    raise RuntimeError("429 Rate limit / credits exceeded.")
+                resp.raise_for_status()
+                events = await resp.json()
+
+        results: Dict[str, Optional[dict]] = {}
+
+        for ev in events:
+            ev_id = str(ev.get("id"))
+            home = ev.get("home_team") or ""
+            away = ev.get("away_team") or ""
+            commence = ev.get("commence_time")
+
+            commence_iso = None
+            if commence:
+                try:
+                    ct = cls.parse_iso_to_utc(commence)
+                    commence_iso = ct.isoformat() if ct else None
+                except Exception:
+                    commence_iso = commence
+
+            completed = bool(ev.get("completed", False))
+
+            if not completed:
+                results[ev_id] = None
+                continue
+
+            # Scores mapping
+            scores_raw = ev.get("scores") or []
+            home_score, away_score = None, None
+            try:
+                name_to_score = {s.get("name", "").lower(): s.get("score") for s in scores_raw if s}
+                if home.lower() in name_to_score:
+                    home_score = int(name_to_score[home.lower()])
+                if away.lower() in name_to_score:
+                    away_score = int(name_to_score[away.lower()])
+                # fallback: first two entries
+                if home_score is None and len(scores_raw) >= 1:
+                    home_score = int(scores_raw[0].get("score"))
+                if away_score is None and len(scores_raw) >= 2:
+                    away_score = int(scores_raw[1].get("score"))
+            except Exception:
+                pass
+
+            # result: home / draw / away
+            result_str = "draw"
+            if home_score is not None and away_score is not None:
+                if home_score > away_score:
+                    result_str = "home"
+                elif away_score > home_score:
+                    result_str = "away"
+
+            results[ev_id] = {
+                "id": ev_id,
+                "commence_time_utc": commence_iso,
+                "home_team": home,
+                "away_team": away,
+                "scores": {
+                    "home": home_score,
+                    "away": away_score,
+                },
+                "result": result_str,
+            }
+
+        return results
+
 
     @classmethod
     def save_matches_to_cache(cls, matches: List[dict]) -> None:
@@ -185,41 +279,10 @@ class BetManager:
                             match["commence_time_utc"] = datetime.fromisoformat(match["commence_time_utc"])
                     return matches
                 return []
-
-    @staticmethod
-    def build_embed_for_matches(matches: List[dict]) -> discord.Embed:
-        embed = discord.Embed(title="Matches (next 7 days)", description="Matches and averaged Home / Draw / Away odds", color=discord.Color.from_str("#607bff"))
-
-        if not matches:
-            embed.add_field(name="No matches", value="No available matches with odds in the next 7 days.", inline=False)
-            return embed
-
-        # group matches by local date (Europe/Berlin)
-        groups = {}
-        for m in matches:
-            # Handle both datetime objects and ISO strings
-            if isinstance(m["commence_time_utc"], str):
-                commence_time = datetime.fromisoformat(m["commence_time_utc"])
-            else:
-                commence_time = m["commence_time_utc"]
-                
-            local_dt = commence_time.astimezone(BetManager.TZ)
-            date_key = local_dt.date()  # groups by YYYY-MM-DD
-            line_time = local_dt.strftime("%H:%M")
-            odds = m["odds"]
             
-            line = f"{line_time} — {m['home']} vs {m['away']}\n"
-            line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
-            groups.setdefault(date_key, []).append(line)
-
-        # Add one field per date
-        for date_key in sorted(groups.keys()):
-            pretty_date = date_key.strftime("%A, %d %b %Y")  # e.g. "Monday, 08 Sep 2025"
-            value = "\n".join(groups[date_key])
-            embed.add_field(name=pretty_date, value=value, inline=False)
-
-        embed.set_footer(text="Odds provided by https://the-odds-api.com/")
-        return embed
+    @staticmethod
+    async def add_bet_to_db():
+        pass
 
 # Modal zum Platzieren einer Wette
 class PlaceBetModal(ui.Modal):

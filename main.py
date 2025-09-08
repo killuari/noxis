@@ -8,7 +8,7 @@ from buttons import *
 from inventory_manager import InventoryManager
 from expedition_manager import ExpeditionManager
 from economy_manager import EconomyManager
-from bets import BetCommands
+from bets import BetCommands, BetManager
  
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)
@@ -25,6 +25,9 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))  
     await client.add_cog(BetCommands(client))  
     await client.tree.sync()
+
+    results = await BetManager.fetch_results_from_api(BetManager.BL_KEY, ["8b45835022e88b3ef75803d7583625cc", "58fae3c4016a86ca8909940c4d6a6111"])
+    print(results)
 
 @client.event
 async def on_guild_join(guild: discord.Guild):
