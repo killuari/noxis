@@ -363,22 +363,33 @@ class PlaceBetButton(ui.Button):
         self.option = option
         self.author_id = author_id
 
-        super().__init__(label="Place Bet", style=discord.ButtonStyle.primary)
+        style = discord.ButtonStyle.gray if not option else discord.ButtonStyle.primary
 
-    async def set_disabled(self, user_id: int, match_id: str) -> bool:
+        super().__init__(label="Place Bet", style=style)
+
+    async def set_disabled(self) -> bool:
+        user_id = self.author_id
+        match_id = self.match.get("id")
+
         async with aiosqlite.connect("database.db") as db:
-            cursor = db.cursor()
+            cursor = await db.cursor()
             await cursor.execute("SELECT user_id FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
             result = await cursor.fetchall()
 
             if result:
                 self.disabled = True
+            
+            return self.disabled
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
             await interaction.response.send_message("This is not your bet.", ephemeral=True)
             return
         
+        if await self.set_disabled():
+            await interaction.response.send_message(embed=discord.Embed(title="Bet already placed!", color=discord.Color.red()), ephemeral=True)
+            return
+
         if not self.option:
             await interaction.response.send_message(view=MatchLayoutView(self.match, author_id=self.author_id))
         else:
@@ -459,7 +470,7 @@ class MatchesLayoutView(ui.LayoutView):
                 text = ui.TextDisplay(match_str)
 
                 btn = PlaceBetButton(match_obj, author_id=self.author_id)
-                await btn.set_disabled(user_id=self.author_id, match_id=match_obj.get("id"))
+                await btn.set_disabled()
 
                 section = ui.Section(text, accessory=btn)
                 separator = ui.Separator(spacing=discord.SeparatorSpacing.large)

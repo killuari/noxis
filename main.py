@@ -26,9 +26,6 @@ async def on_ready():
     await client.add_cog(BetCommands(client))  
     await client.tree.sync()
 
-    results = await BetManager.fetch_results_from_api(BetManager.BL_KEY, ["8b45835022e88b3ef75803d7583625cc", "58fae3c4016a86ca8909940c4d6a6111"])
-    print(results)
-
 @client.event
 async def on_guild_join(guild: discord.Guild):
     all_channels = await guild.fetch_channels() 
