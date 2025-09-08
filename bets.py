@@ -357,14 +357,22 @@ class PlaceBetDropdown(discord.ui.Select):
 
         await interaction.response.defer(ephemeral=True)
 
-# Button als eigene Klasse — aber eine neue Instanz pro Match erzeugen!
 class PlaceBetButton(ui.Button):
     def __init__(self, match: dict, author_id: int, option: str = None):
-        # label & style hier setzen
-        super().__init__(label="Place Bet", style=discord.ButtonStyle.primary)
         self.match = match
         self.option = option
         self.author_id = author_id
+
+        super().__init__(label="Place Bet", style=discord.ButtonStyle.primary)
+
+    async def set_disabled(self, user_id: int, match_id: str) -> bool:
+        async with aiosqlite.connect("database.db") as db:
+            cursor = db.cursor()
+            await cursor.execute("SELECT user_id FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
+            result = await cursor.fetchall()
+
+            if result:
+                self.disabled = True
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
@@ -413,8 +421,10 @@ class MatchesLayoutView(ui.LayoutView):
         super().__init__()
 
         self.author_id = author_id
+        self.matches = matches
 
-        if not matches:
+    async def add_buttons(self):
+        if not self.matches:
             no_text = ui.TextDisplay("Keine verfügbaren Matches in den nächsten 7 Tagen.")
             container = ui.Container(no_text, accent_color=discord.Color.red())
             self.add_item(container)
@@ -422,7 +432,7 @@ class MatchesLayoutView(ui.LayoutView):
 
         # group matches by local date (Europe/Berlin)
         groups = {}
-        for m in matches:
+        for m in self.matches:
             # Handle both datetime objects and ISO strings
             if isinstance(m["commence_time_utc"], str):
                 commence_time = datetime.fromisoformat(m["commence_time_utc"])
@@ -447,7 +457,10 @@ class MatchesLayoutView(ui.LayoutView):
 
             for (match_str, match_obj) in groups[date_key]:
                 text = ui.TextDisplay(match_str)
-                btn = PlaceBetButton(match_obj, author_id=author_id)
+
+                btn = PlaceBetButton(match_obj, author_id=self.author_id)
+                await btn.set_disabled(user_id=self.author_id, match_id=match_obj.get("id"))
+
                 section = ui.Section(text, accessory=btn)
                 separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
                 items.extend((section, separator))
@@ -501,6 +514,7 @@ class BetCommands(commands.Cog):
         
         matches = await BetManager.get_matches()
         view = MatchesLayoutView(matches, author_id=interaction.user.id)
+        await view.add_buttons()
         await interaction.followup.send(view=view)
         
     async def bet_place(self, interaction: discord.Interaction):
