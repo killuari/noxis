@@ -57,6 +57,7 @@ class DatabaseManager:
                     user_id INTEGER NOT NULL,
                     match_id TEXT NOT NULL,
                     commence_time_utc TIMESTAMP,
+                    selection TEXT,
                     return INTEGER,
                     PRIMARY KEY (user_id, match_id)
                 )

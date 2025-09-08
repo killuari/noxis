@@ -6,17 +6,19 @@ from commands import get_started
 from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from discord import ui, TextStyle
 from economy_manager import EconomyManager
+
+TZ = ZoneInfo("Europe/Berlin")
 
 class BetManager:
     API_BASE = 'https://api.the-odds-api.com/v4/'
     BL_KEY = 'soccer_germany_bundesliga'
     API_KEY = '35e92ee26bf991936c0b6278a8cbe2bc'
-    TZ = ZoneInfo("Europe/Berlin")
     CACHE_FILE = 'bets/matches_cache.json'
-    
+    TZ = TZ
+
     @staticmethod
     def parse_iso_to_utc(dt_str: Optional[str]) -> Optional[datetime]:
         if not dt_str:
@@ -122,6 +124,10 @@ class BetManager:
             "apiKey": cls.API_KEY,
             "dateFormat": "iso"
         }
+
+        if event_ids:
+            # ensure strings and comma-separated
+            params["eventIds"] = ",".join(str(e) for e in event_ids)
 
         async with aiohttp.ClientSession() as sess:
             async with sess.get(url, params=params, timeout=20) as resp:
@@ -282,8 +288,75 @@ class BetManager:
                 return []
             
     @staticmethod
-    async def add_bet_to_db():
-        pass
+    async def insert_bet_into_db(user_id: int, match_id: str, commence_time_utc: datetime, selection: str, potential_return: int):
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, selection, return) VALUES (?, ?, ?, ?, ?)", (user_id, match_id, commence_time_utc, selection, potential_return))
+            await db.commit()
+
+    @staticmethod
+    async def remove_bet_from_db(user_id: int, match_id: str):
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("DELETE FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
+            await db.commit()
+
+    @staticmethod
+    async def is_bet_placed(user_id: int, match_id: str) -> bool:
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT user_id FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
+            result = await cursor.fetchall()
+
+        if result:
+            return True
+        return False
+    
+    @staticmethod
+    async def get_completed_bets() -> List[Dict[str, Any]]:
+        """
+        Return all bets where commence_time_utc is older than now - 5 hours.
+        Returned list items: {"user_id": int, "match_id": str, "selection": str, "return": int}
+        """
+
+        # cutoff = now_utc - 5 hours
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=5)
+        # normalize: remove microseconds for consistent comparisons/storage
+        cutoff_iso = cutoff.replace(microsecond=0)
+
+        results: List[Dict[str, Any]] = []
+
+        try:
+            async with aiosqlite.connect("database.db") as db:
+                # return rows as mapping for convenience
+                db.row_factory = aiosqlite.Row
+
+                query = """
+                    SELECT user_id, match_id, selection, return, commence_time_utc
+                    FROM bets
+                    WHERE commence_time_utc IS NOT NULL
+                      AND commence_time_utc <= ?
+                """
+                async with db.execute(query, (cutoff_iso,)) as cursor:
+                    rows = await cursor.fetchall()
+
+                for r in rows:
+                    try:
+                        results.append({
+                            "user_id": int(r["user_id"]),
+                            "match_id": str(r["match_id"]),
+                            "selection": r["selection"],
+                            "return": r["return"]
+                        })
+                    except Exception:
+                        # if a row is malformed, skip it but continue processing others
+                        print(f"[BetManager] Skipping malformed bet row: {dict(r)}")
+
+        except Exception as e:
+            print(f"[BetManager] get_completed_bets failed: {e}")
+            return []
+
+        return results
 
 # Modal zum Platzieren einer Wette
 class PlaceBetModal(ui.Modal):
@@ -330,10 +403,7 @@ class PlaceBetModal(ui.Modal):
         match_id = self.match.get("id")
         commence_time_utc = self.match.get("commence_time_utc")
 
-        async with aiosqlite.connect("database.db") as db:
-            cursor = await db.cursor()
-            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, return) VALUES (?, ?, ?, ?)", (interaction.user.id, match_id, commence_time_utc, potential_return))
-            await db.commit()
+        await BetManager.insert_bet_into_db(interaction.user.id, match_id, commence_time_utc, outcome_key, potential_return)
             
         # format amounts
         stake_str = f"{amount:,}"
@@ -379,22 +449,18 @@ class PlaceBetButton(ui.Button):
         user_id = self.author_id
         match_id = self.match.get("id")
 
-        async with aiosqlite.connect("database.db") as db:
-            cursor = await db.cursor()
-            await cursor.execute("SELECT user_id FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
-            result = await cursor.fetchall()
-
-            if result:
-                self.disabled = True
+        bet_placed = await BetManager.is_bet_placed(user_id, match_id)
+        if bet_placed:
+            self.disabled = True
             
-            return self.disabled
+        return bet_placed
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
             await interaction.response.send_message("This is not your bet.", ephemeral=True)
             return
         
-        if await self.set_disabled():
+        if await BetManager.is_bet_placed(self.author_id, self.match.get("id")):
             await interaction.response.send_message(embed=discord.Embed(title="Bet already placed!", color=discord.Color.red()), ephemeral=True)
             return
 
@@ -498,30 +564,56 @@ class BetCommands(commands.Cog):
 
     async def cog_load(self):
         """Start the daily update task when the cog is loaded"""
-        self.daily_odds_update.start()
-        print("[BetCommands] Daily odds update task started")
+        if not self.daily_bets_update.is_running():
+            self.daily_bets_update.start()
+            print("[BetManager] Daily odds update task started")
 
     async def cog_unload(self):
         """Stop the daily update task when the cog is unloaded"""
-        self.daily_odds_update.cancel()
-        print("[BetCommands] Daily odds update task stopped")
+        self.daily_bets_update.cancel()
+        print("[BetManager] Daily odds update task stopped")
 
-    @tasks.loop(time=time(hour=0, minute=0, second=0))  # Run daily at midnight Berlin time
-    async def daily_odds_update(self):
+    @tasks.loop(time=time(hour=3, minute=0, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
+    async def daily_bets_update(self):
         """Update odds cache daily at midnight"""
         try:
-            print("[BetCommands] Starting daily odds update...")
-            matches = await BetManager.fetch_odds_from_api(BetManager.BL_KEY)
-            BetManager.save_matches_to_cache(matches)
-            print(f"[BetCommands] Daily update completed: {len(matches)} matches cached")
-        except Exception as e:
-            print(f"[BetCommands] Daily update failed: {e}")
+            print("[BetManager] Starting daily bets update...")
 
-    @daily_odds_update.before_loop
+            matches = await BetManager.fetch_odds_from_api(sport_key=BetManager.BL_KEY)
+            BetManager.save_matches_to_cache(matches)
+            print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached")
+
+            completed_bets = await BetManager.get_completed_bets()
+            completed_bet_ids = []
+            for bet in completed_bets:
+                if bet["match_id"] not in completed_bet_ids:
+                    completed_bet_ids.append(bet["match_id"])
+
+            if not completed_bet_ids:
+                print("[BetManager] Daily bets update completed: No completed bets found")
+                return
+            
+            results = await BetManager.fetch_results_from_api(sport_key=BetManager.BL_KEY, event_ids=completed_bet_ids)
+            for result in results.values():
+                if not result:
+                    continue
+                
+                for bet in completed_bets:
+                    if bet["match_id"] == result["id"]:
+                        if bet["selection"] == result["result"]:
+                            await EconomyManager.add_money(bet["user_id"], bet["return"])
+                            embed = discord.Embed()
+
+            print(f"[BetManager] Daily bets update completed: {len(completed_bets)} completed bets evaluated")
+
+        except Exception as e:
+            print(f"[BetManager] Daily update failed: {e}")
+
+    @daily_bets_update.before_loop
     async def before_daily_update(self):
         """Wait until bot is ready before starting the loop"""
         await self.bot.wait_until_ready()
-        print("[BetCommands] Daily update task ready, waiting for midnight...")
+        print("[BetManager] Daily update task ready, waiting for midnight...")
 
     async def bets_overview(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
