@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
 from typing import Optional, List, Dict
 from discord import ui, TextStyle
+from economy_manager import EconomyManager
 
 class BetManager:
     API_BASE = 'https://api.the-odds-api.com/v4/'
@@ -307,9 +308,16 @@ class PlaceBetModal(ui.Modal):
             if amount <= 0:
                 raise ValueError("Amount must be positive")
         except Exception:
-            await interaction.response.send_message("Invalid stake amount.", ephemeral=True)
+            await interaction.response.send_message(embed=discord.Embed(title="Invalid stake amount.", color=discord.Color.red()), ephemeral=True)
             return
         
+        wallet_balance = (await EconomyManager.get_balance(interaction.user.id))[0]
+        if amount > wallet_balance:
+            await interaction.response.send_message(embed=discord.Embed(title="You don't have enough money on your wallet!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        await EconomyManager.remove_money(interaction.user.id, amount)
+
         # map outcome -> odds key
         outcome_key = self.outcome.lower()
         try:
@@ -483,9 +491,9 @@ class MatchesLayoutView(ui.LayoutView):
 class BetCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bet_group = app_commands.Group(name="bet", description="Bet related commands")
-        self.bet_group.command(name="overview", description="Shows all available matches to bet on in a league")(self.bet_overview)
-        self.bet_group.command(name="place", description="Place a bet")(self.bet_place)
+        self.bet_group = app_commands.Group(name="bets", description="Bet related commands")
+        self.bet_group.command(name="overview", description="Shows all available matches to bet on in a league")(self.bets_overview)
+        self.bet_group.command(name="placed", description="See your placed bets")(self.bets_placed)
         self.bot.tree.add_command(self.bet_group)
 
     async def cog_load(self):
@@ -515,7 +523,7 @@ class BetCommands(commands.Cog):
         await self.bot.wait_until_ready()
         print("[BetCommands] Daily update task ready, waiting for midnight...")
 
-    async def bet_overview(self, interaction: discord.Interaction):
+    async def bets_overview(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
@@ -527,8 +535,10 @@ class BetCommands(commands.Cog):
         view = MatchesLayoutView(matches, author_id=interaction.user.id)
         await view.add_buttons()
         await interaction.followup.send(view=view)
-        
-    async def bet_place(self, interaction: discord.Interaction):
+
+    async def bets_placed(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
+        
+        await interaction.response.send_message("This command doesn't work yet")
