@@ -402,7 +402,6 @@ class Inventory(discord.ui.View):
     def __init__(self, interaction, inventory, url, page, *, timeout=None):
         super().__init__(timeout=timeout)
         self.interaction = interaction
-        self.page = page
         self.inventory = inventory
         self.url = url
         self.cur_page = page
@@ -535,7 +534,6 @@ class JobList(discord.ui.View):
         self.jobs = jobs
         self.user_level = user_level
         self.user_knowledge = user_knowledge
-        self.page = page
         self.cur_page = page
         
     def get_embed(self):
@@ -739,7 +737,6 @@ class ShopView(discord.ui.View):
         super().__init__(timeout=timeout)
         self.interaction = interaction
         self.items = items
-        self.page = page
         self.cur_page = page
 
     async def add_buttons(self): # buttons wieder per factory method wegen async

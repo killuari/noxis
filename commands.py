@@ -57,7 +57,7 @@ class BasicCommands(commands.Cog):
                     rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
                     max_bank_balance = await EconomyManager.get_max_bank_capacity(user.id)
                
-                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.from_str("#607bff")))
                     await DatabaseManager.update_cmd_used(interaction.user.id)
                
                 if not user_found:

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-09-08T13:45:33.241838+00:00",
+  "last_updated": "2025-09-08T22:01:34.536222+00:00",
   "matches": [
     {
       "id": "e87e363e667c8ba1b2736e100b8a9cbb",
@@ -7,9 +7,9 @@
       "home": "Bayer Leverkusen",
       "away": "Eintracht Frankfurt",
       "odds": {
-        "home": 2.317,
-        "draw": 3.82,
-        "away": 2.816
+        "home": 2.313,
+        "draw": 3.83,
+        "away": 2.824
       }
     },
     {
@@ -18,9 +18,9 @@
       "home": "1. FC Heidenheim",
       "away": "Borussia Dortmund",
       "odds": {
-        "home": 5.01,
-        "draw": 4.422,
-        "away": 1.6
+        "home": 5.033,
+        "draw": 4.43,
+        "away": 1.598
       }
     },
     {
@@ -29,8 +29,8 @@
       "home": "VfL Wolfsburg",
       "away": "1. FC Köln",
       "odds": {
-        "home": 2.01,
-        "draw": 3.517,
+        "home": 2.013,
+        "draw": 3.522,
         "away": 3.732
       }
     },
@@ -40,7 +40,7 @@
       "home": "FSV Mainz 05",
       "away": "RB Leipzig",
       "odds": {
-        "home": 2.423,
+        "home": 2.417,
         "draw": 3.635,
         "away": 2.761
       }
@@ -51,9 +51,9 @@
       "home": "SC Freiburg",
       "away": "VfB Stuttgart",
       "odds": {
-        "home": 2.992,
-        "draw": 3.602,
-        "away": 2.288
+        "home": 2.965,
+        "draw": 3.6,
+        "away": 2.311
       }
     },
     {
@@ -62,9 +62,9 @@
       "home": "Union Berlin",
       "away": "TSG Hoffenheim",
       "odds": {
-        "home": 2.537,
-        "draw": 3.44,
-        "away": 2.737
+        "home": 2.55,
+        "draw": 3.442,
+        "away": 2.726
       }
     },
     {
@@ -74,7 +74,7 @@
       "away": "Hamburger SV",
       "odds": {
         "home": 1.074,
-        "draw": 12.892,
+        "draw": 12.839,
         "away": 27.564
       }
     },
@@ -84,7 +84,7 @@
       "home": "FC St. Pauli",
       "away": "Augsburg",
       "odds": {
-        "home": 2.243,
+        "home": 2.241,
         "draw": 3.364,
         "away": 3.255
       }
@@ -95,9 +95,9 @@
       "home": "Borussia Monchengladbach",
       "away": "Werder Bremen",
       "odds": {
-        "home": 1.869,
-        "draw": 4.084,
-        "away": 3.678
+        "home": 1.875,
+        "draw": 4.099,
+        "away": 3.673
       }
     }
   ]

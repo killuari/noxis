@@ -365,9 +365,9 @@ class PlaceBetModal(ui.Modal):
         self.amount = ui.TextInput(
             label="Place Bet",
             style=TextStyle.short,
-            placeholder="1000",
+            placeholder="10000",
             required=True,
-            max_length=12
+            max_length=8
         )
         self.add_item(self.amount)
         self.match = match
@@ -384,6 +384,10 @@ class PlaceBetModal(ui.Modal):
             await interaction.response.send_message(embed=discord.Embed(title="Invalid stake amount.", color=discord.Color.red()), ephemeral=True)
             return
         
+        if amount < 10_000:
+            await interaction.response.send_message(embed=discord.Embed(title="A minimum stake of 10k is required.", color=discord.Color.red()), ephemeral=True)
+            return
+
         wallet_balance = (await EconomyManager.get_balance(interaction.user.id))[0]
         if amount > wallet_balance:
             await interaction.response.send_message(embed=discord.Embed(title="You don't have enough money on your wallet!", color=discord.Color.red()), ephemeral=True)
@@ -445,15 +449,18 @@ class PlaceBetButton(ui.Button):
 
         super().__init__(label="Place Bet", style=style)
 
-    async def set_disabled(self) -> bool:
+    async def set_disabled(self):
         user_id = self.author_id
         match_id = self.match.get("id")
 
         bet_placed = await BetManager.is_bet_placed(user_id, match_id)
         if bet_placed:
             self.disabled = True
-            
-        return bet_placed
+
+        total_balance = await EconomyManager.get_total_balance(user_id)
+        if total_balance < 10_000:
+            self.disabled = True
+
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
@@ -502,11 +509,13 @@ class MatchLayoutView(ui.LayoutView):
 
 
 class MatchesLayoutView(ui.LayoutView):
-    def __init__(self, matches: list, author_id: int):
+    def __init__(self, matches: list, author_id: int, page: int = 1):
         super().__init__()
 
         self.author_id = author_id
         self.matches = matches
+        self.cur_page = page
+        self.total_pages = max(1, (len(self.matches)+4)//5)
 
     async def add_buttons(self):
         if not self.matches:
@@ -514,45 +523,78 @@ class MatchesLayoutView(ui.LayoutView):
             container = ui.Container(no_text, accent_color=discord.Color.red())
             self.add_item(container)
             return
+        
+        start_idx = (self.cur_page - 1) * 5
+        end_idx = start_idx + 5
 
         # group matches by local date (Europe/Berlin)
         groups = {}
-        for m in self.matches:
+        for match in self.matches[start_idx:end_idx]:
             # Handle both datetime objects and ISO strings
-            if isinstance(m["commence_time_utc"], str):
-                commence_time = datetime.fromisoformat(m["commence_time_utc"])
+            if isinstance(match["commence_time_utc"], str):
+                commence_time = datetime.fromisoformat(match["commence_time_utc"])
             else:
-                commence_time = m["commence_time_utc"]
+                commence_time = match["commence_time_utc"]
                 
             local_dt = commence_time.astimezone(BetManager.TZ)
             date_key = local_dt.date()  # groups by YYYY-MM-DD
             line_time = local_dt.strftime("%H:%M")
-            odds = m["odds"]
+            odds = match["odds"]
             
-            line = f"{line_time} — {m['home']} vs {m['away']}\n"
+            line = f"{line_time} — {match['home']} vs {match['away']}\n"
             line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
-            groups.setdefault(date_key, []).append((line, m))
+            groups.setdefault(date_key, []).append((line, match))
 
         items = []
-        # Add one field per date
         for date_key in sorted(groups.keys(), key=lambda d: (d is None, d)):
             pretty_date = date_key.strftime("%A, %d %b %Y")  # e.g. "Monday, 08 Sep 2025"
             pretty_date_display = ui.TextDisplay(f"**{pretty_date}**")
             items.append(pretty_date_display)
 
             for (match_str, match_obj) in groups[date_key]:
-                text = ui.TextDisplay(match_str)
-
                 btn = PlaceBetButton(match_obj, author_id=self.author_id)
                 await btn.set_disabled()
 
-                section = ui.Section(text, accessory=btn)
+                section = ui.Section(match_str, accessory=btn)
                 separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
                 items.extend((section, separator))
 
-        container = ui.Container(*items)
+        next_page_btn = ui.Button(label="▶", style=discord.ButtonStyle.secondary, disabled=self.cur_page == self.total_pages)
+        previous_page_btn = ui.Button(label="◀", style=discord.ButtonStyle.secondary, disabled=self.cur_page == 1)
+        next_page_btn.callback = self.next_page
+        previous_page_btn.callback = self.previous_page
+
+        action_row = ui.ActionRow(previous_page_btn, next_page_btn)
+
+        footer = ui.TextDisplay(f"Page {self.cur_page}/{self.total_pages} - You need at least 10k to place a bet!")
+
+        container = ui.Container(*items, footer, action_row)
         self.add_item(container)
 
+
+    async def previous_page(self, interaction: discord.Interaction):
+        if self.author_id != interaction.user.id:
+            await interaction.response.send_message(embed=discord.Embed(title="This is not your bet!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        if self.cur_page > 1:
+            new_view = MatchesLayoutView(self.matches, self.author_id, page=self.cur_page-1)
+            await new_view.add_buttons()
+            await interaction.response.edit_message(view=new_view)
+        else:
+            await interaction.response.defer()
+
+    async def next_page(self, interaction: discord.Interaction):
+        if self.author_id != interaction.user.id:
+            await interaction.response.send_message(embed=discord.Embed(title="This is not your bet!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        if self.cur_page < self.total_pages:
+            new_view = MatchesLayoutView(self.matches, self.author_id, page=self.cur_page+1)
+            await new_view.add_buttons()
+            await interaction.response.edit_message(view=new_view)
+        else:
+            await interaction.response.defer()
 
 class BetCommands(commands.Cog):
     def __init__(self, bot):
@@ -566,12 +608,12 @@ class BetCommands(commands.Cog):
         """Start the daily update task when the cog is loaded"""
         if not self.daily_bets_update.is_running():
             self.daily_bets_update.start()
-            print("[BetManager] Daily odds update task started")
+            print("[BetManager] Daily bets update task started")
 
     async def cog_unload(self):
         """Stop the daily update task when the cog is unloaded"""
         self.daily_bets_update.cancel()
-        print("[BetManager] Daily odds update task stopped")
+        print("[BetManager] Daily bets update task stopped")
 
     @tasks.loop(time=time(hour=3, minute=0, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
     async def daily_bets_update(self):
