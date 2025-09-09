@@ -6,9 +6,10 @@ from commands import get_started
 from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from discord import ui, TextStyle
 from economy_manager import EconomyManager
+from database_manager import DatabaseManager
 
 TZ = ZoneInfo("Europe/Berlin")
 
@@ -122,6 +123,7 @@ class BetManager:
         url = f"{cls.API_BASE}/sports/{sport_key}/scores"
         params = {
             "apiKey": cls.API_KEY,
+            "daysFrom": 2,
             "dateFormat": "iso"
         }
 
@@ -315,12 +317,12 @@ class BetManager:
     @staticmethod
     async def get_completed_bets() -> List[Dict[str, Any]]:
         """
-        Return all bets where commence_time_utc is older than now - 5 hours.
+        Return all bets where commence_time_utc is older than now - 3 hours.
         Returned list items: {"user_id": int, "match_id": str, "selection": str, "return": int}
         """
 
-        # cutoff = now_utc - 5 hours
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=5)
+        # cutoff = now_utc - 3 hours
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=3)
         # normalize: remove microseconds for consistent comparisons/storage
         cutoff_iso = cutoff.replace(microsecond=0)
 
@@ -357,6 +359,39 @@ class BetManager:
             return []
 
         return results
+    
+    def build_bet_result_embed(result: Dict, bet: Dict) -> Tuple[bool, discord.Embed]:
+        user_choice = bet.get("selection", "").lower()
+        match_result = result.get("result", "").lower()
+        is_win = user_choice == match_result
+
+        color = discord.Color.green() if is_win else discord.Color.orange()
+
+        emoji_map = {"home": "🏠", "away": "✈️", "draw": "🤝"}
+        user_emoji = emoji_map.get(user_choice, "")
+        result_emoji = emoji_map.get(match_result, "")
+
+        title = "Bet Result — Match Finished"
+        description = f"**{result['home_team']}** vs **{result['away_team']}**\n" \
+                      f"Final score: **{result['scores']['home']} — {result['scores']['away']}**"
+
+        embed = discord.Embed(title=title, description=description, color=color)
+        embed.add_field(name="Match outcome", value=f"{result_emoji} **{match_result.capitalize()}**", inline=True)
+        embed.add_field(name="Your bet", value=f"{user_emoji} **{user_choice.capitalize()}**", inline=True)
+        embed.add_field(name="Return", value=f"`{bet.get('return', 0)}`", inline=False)
+        status_text = "🎉 Congratulations — your bet won!" if is_win else "😞 Sorry — your bet lost."
+        embed.add_field(name="Status", value=status_text, inline=False)
+
+        ts_text = result.get("commence_time_utc", "")
+        try:
+            iso = ts_text.rstrip("Z")
+            ts = datetime.fromisoformat(iso)
+            embed.timestamp = ts
+        except Exception:
+            pass
+
+        embed.set_footer(text=f"Match ID: {result.get('id', '?')} • Commence (UTC): {ts_text}")
+        return (is_win, embed)
 
 # Modal zum Platzieren einer Wette
 class PlaceBetModal(ui.Modal):
@@ -615,7 +650,7 @@ class BetCommands(commands.Cog):
         self.daily_bets_update.cancel()
         print("[BetManager] Daily bets update task stopped")
 
-    @tasks.loop(time=time(hour=3, minute=0, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
+    @tasks.loop(time=time(hour=2, minute=0, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
     async def daily_bets_update(self):
         """Update odds cache daily at midnight"""
         try:
@@ -636,17 +671,20 @@ class BetCommands(commands.Cog):
                 return
             
             results = await BetManager.fetch_results_from_api(sport_key=BetManager.BL_KEY, event_ids=completed_bet_ids)
-            for result in results.values():
+            for bet in completed_bets:
+                match_id = bet.get("match_id")
+                result = results.get(match_id)
                 if not result:
                     continue
-                
-                for bet in completed_bets:
-                    if bet["match_id"] == result["id"]:
-                        if bet["selection"] == result["result"]:
-                            await EconomyManager.add_money(bet["user_id"], bet["return"])
-                            embed = discord.Embed()
 
-            print(f"[BetManager] Daily bets update completed: {len(completed_bets)} completed bets evaluated")
+                is_win, embed = BetManager.build_bet_result_embed(result, bet)
+                if is_win:
+                    await EconomyManager.add_money(bet["user_id"], bet["return"])
+
+                user = self.bot.get_user(bet["user_id"])
+                await user.send(embed=embed)
+
+                print(f"[BetManager] Daily bets update completed: {len(completed_bets)} completed bets evaluated")
 
         except Exception as e:
             print(f"[BetManager] Daily update failed: {e}")
@@ -668,7 +706,9 @@ class BetCommands(commands.Cog):
         matches = await BetManager.get_matches()
         view = MatchesLayoutView(matches, author_id=interaction.user.id)
         await view.add_buttons()
+
         await interaction.followup.send(view=view)
+        await DatabaseManager.update_cmd_used(interaction.user.id)
 
     async def bets_placed(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
