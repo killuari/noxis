@@ -15,7 +15,7 @@ from expedition_manager import ExpeditionManager, ExpeditionView
 
 # This function creates an account through button interaction
 async def get_started(interaction: discord.Interaction, user_id: int):       
-    await interaction.response.send_message(embed=discord.Embed(title="Wait something's wrong... Noxis is thinking...\n", description="Seems like you have never used a Noxis-Command before.\nIf you want to start playing click on **Get Started**.", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
+    await interaction.response.send_message(embed=discord.Embed(title="Wait something's wrong...", description="Seems like you have never used a Noxis-Command before.\nIf you want to start playing click on **Get Started**.", color=discord.Color.red()), view=GetStarted(), ephemeral=True)
 
 class BasicCommands(commands.Cog):
     def __init__(self, bot):
@@ -57,7 +57,7 @@ class BasicCommands(commands.Cog):
                     rank, leaderboard, _ = await DatabaseManager.get_ranking(user.id, "users", "total_balance")
                     max_bank_balance = await EconomyManager.get_max_bank_capacity(user.id)
                
-                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.green()))
+                    await interaction.response.send_message(embed=discord.Embed(title=f"{user.name}'s balance", description=f"Global Ranking: `{rank}/{leaderboard}`\n\n💵: `{balance:,}$`\n\n🏦: `{bank_balance:,}$ / {max_bank_balance:,}$`", color=discord.Color.from_str("#607bff")))
                     await DatabaseManager.update_cmd_used(interaction.user.id)
                
                 if not user_found:

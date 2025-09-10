@@ -51,6 +51,19 @@ class DatabaseManager:
                 )
             """)
 
+            # Bets Tabelle
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS bets (
+                    user_id INTEGER NOT NULL,
+                    match_id TEXT NOT NULL,
+                    commence_time_utc TIMESTAMP,
+                    selection TEXT,
+                    stake INTEGER,
+                    return INTEGER,
+                    PRIMARY KEY (user_id, match_id)
+                )
+            """)
+
             await db.commit()
 
             print("Database initialized!")
