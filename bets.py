@@ -799,8 +799,16 @@ class BetCommands(commands.Cog):
         try:
             print("[BetManager] Starting daily bets update...")
 
-            matches = await BetManager.fetch_odds_from_api(sport_key=BetManager.BL_KEY)
-            BetManager.save_matches_to_cache(matches)
+            matches, last_updated = BetManager.load_matches_from_cache()
+            
+            if BetManager.is_cache_valid(last_updated):
+                print("[BetManager] Cached matches already up to date")
+            
+            else:
+                print("[BetManager] Cache expired, fetching from API")
+                matches = await BetManager.fetch_odds_from_api(BetManager.BL_KEY)
+                BetManager.save_matches_to_cache(matches)
+
             print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached")
 
             completed_bets = await BetManager.get_completed_bets()
@@ -816,6 +824,7 @@ class BetCommands(commands.Cog):
             results = await BetManager.fetch_results_from_api(sport_key=BetManager.BL_KEY, event_ids=completed_bet_ids)
             for bet in completed_bets:
                 match_id = bet.get("match_id")
+                user_id = bet.get("user_id")
                 result = results.get(match_id)
                 if not result:
                     continue
@@ -824,7 +833,9 @@ class BetCommands(commands.Cog):
                 if is_win:
                     await EconomyManager.add_money(bet["user_id"], bet["return"])
 
-                user = self.bot.get_user(bet["user_id"])
+                await BetManager.remove_bet_from_db(user_id, match_id)
+
+                user = self.bot.get_user(user_id)
                 await user.send(embed=embed)
 
                 print(f"[BetManager] Daily bets update completed: {len(completed_bets)} completed bets evaluated")
