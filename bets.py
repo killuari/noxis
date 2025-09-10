@@ -45,12 +45,6 @@ class BetManager:
                             outcome_prices["home"].append(price)
                         elif away and away.lower() in name:
                             outcome_prices["away"].append(price)
-                        else:
-                            # fuzzy fallback
-                            if home and home.lower() in name:
-                                outcome_prices["home"].append(price)
-                            elif away and away.lower() in name:
-                                outcome_prices["away"].append(price)
 
         def avg(lst):
             return round(mean(lst), 3) if lst else None
@@ -92,13 +86,14 @@ class BetManager:
             home = ev.get("home_team")
             away = ev.get("away_team")
             odds = cls.avg_price_for_outcomes(ev, home, away)
-            filtered.append({
+            match_dict = {
                 "id": id,
                 "commence_time_utc": ct.isoformat(),  # Convert to string for JSON serialization
                 "home": home,
                 "away": away,
                 "odds": odds
-            })
+            }
+            filtered.append(match_dict)
 
         filtered.sort(key=lambda x: x["commence_time_utc"])
         return filtered
@@ -201,7 +196,6 @@ class BetManager:
 
         return results
 
-
     @classmethod
     def save_matches_to_cache(cls, matches: List[dict]) -> None:
         """Save matches to JSON cache file"""
@@ -290,10 +284,10 @@ class BetManager:
                 return []
             
     @staticmethod
-    async def insert_bet_into_db(user_id: int, match_id: str, commence_time_utc: datetime, selection: str, potential_return: int):
+    async def insert_bet_into_db(user_id: int, match_id: str, commence_time_utc: datetime, selection: str, stake: int, potential_return: int):
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, selection, return) VALUES (?, ?, ?, ?, ?)", (user_id, match_id, commence_time_utc, selection, potential_return))
+            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, selection, stake, return) VALUES (?, ?, ?, ?, ?, ?)", (user_id, match_id, commence_time_utc, selection, stake, potential_return))
             await db.commit()
 
     @staticmethod
@@ -315,14 +309,55 @@ class BetManager:
         return False
     
     @staticmethod
+    async def get_placed_bets(user_id: int) -> List[Dict[str, Any]]:
+        """
+        Return all bets for a given user.
+        Returned list items: {"match_id": str, "selection": str, "return": int}
+        """
+        results: List[Dict[str, Any]] = []
+
+        try:
+            async with aiosqlite.connect("database.db") as db:
+                # return rows as mapping for convenience
+                db.row_factory = aiosqlite.Row
+
+                query = """
+                    SELECT match_id, commence_time_utc, selection, stake, return
+                    FROM bets
+                    WHERE user_id = ?
+                """
+                async with db.execute(query, (user_id,)) as cursor:
+                    rows = await cursor.fetchall()
+
+                for r in rows:
+                    try:
+                        results.append({
+                            "match_id": str(r["match_id"]),
+                            "commence_time_utc": r["commence_time_utc"],
+                            "selection": r["selection"],
+                            "stake": r["stake"],
+                            "return": r["return"]
+                        })
+                    except Exception:
+                        # if a row is malformed, skip it but continue processing others
+                        print(f"[BetManager] Skipping malformed bet row: {dict(r)}")
+
+        except Exception as e:
+            print(f"[BetManager] get_placed_bets failed: {e}")
+            return []
+
+        results.sort(key=lambda x: x["commence_time_utc"])
+        return results
+
+    @staticmethod
     async def get_completed_bets() -> List[Dict[str, Any]]:
         """
-        Return all bets where commence_time_utc is older than now - 3 hours.
+        Return all bets where commence_time_utc is older than now - 2 hours.
         Returned list items: {"user_id": int, "match_id": str, "selection": str, "return": int}
         """
 
-        # cutoff = now_utc - 3 hours
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=3)
+        # cutoff = now_utc - 2 hours
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=2)
         # normalize: remove microseconds for consistent comparisons/storage
         cutoff_iso = cutoff.replace(microsecond=0)
 
@@ -360,6 +395,7 @@ class BetManager:
 
         return results
     
+    @staticmethod
     def build_bet_result_embed(result: Dict, bet: Dict) -> Tuple[bool, discord.Embed]:
         user_choice = bet.get("selection", "").lower()
         match_result = result.get("result", "").lower()
@@ -395,7 +431,7 @@ class BetManager:
 
 # Modal zum Platzieren einer Wette
 class PlaceBetModal(ui.Modal):
-    def __init__(self, match: dict, option: str = "Home"):
+    def __init__(self, match: dict, option: str = "home"):
         super().__init__(title=f"{match['home']} vs {match['away']}")
         self.amount = ui.TextInput(
             label="Place Bet",
@@ -442,7 +478,7 @@ class PlaceBetModal(ui.Modal):
         match_id = self.match.get("id")
         commence_time_utc = self.match.get("commence_time_utc")
 
-        await BetManager.insert_bet_into_db(interaction.user.id, match_id, commence_time_utc, outcome_key, potential_return)
+        await BetManager.insert_bet_into_db(interaction.user.id, match_id, commence_time_utc, outcome_key, amount, potential_return)
             
         # format amounts
         stake_str = f"{amount:,}"
@@ -456,12 +492,13 @@ class PlaceBetDropdown(discord.ui.Select):
     def __init__(self, button: ui.Button, author_id: int):
         self.author_id = author_id
         self.button = button
+        match = self.button.match
 
         options = [
-            discord.SelectOption(label=option_str,
+            discord.SelectOption(label=option_str.capitalize() if option_str not in match.keys() else match[option_str],
                                  value=option_str, 
-                                 default=option_str=="Home")
-            for option_str in ("Home", "Draw", "Away")
+                                 default=option_str=="home")
+            for option_str in ("home", "draw", "away")
         ]
         super().__init__(options=options)
 
@@ -496,7 +533,6 @@ class PlaceBetButton(ui.Button):
         if total_balance < 10_000:
             self.disabled = True
 
-
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
             await interaction.response.send_message("This is not your bet.", ephemeral=True)
@@ -507,7 +543,7 @@ class PlaceBetButton(ui.Button):
             return
 
         if not self.option:
-            await interaction.response.send_message(view=MatchLayoutView(self.match, author_id=self.author_id))
+            await interaction.response.send_message(view=PlaceBetLayoutView(self.match, author_id=self.author_id))
         else:
             await interaction.response.send_modal(PlaceBetModal(self.match, self.option))
 
@@ -515,15 +551,18 @@ class BetPlacedLayoutView(ui.LayoutView):
     def __init__(self, match: Dict, outcome: str, stake_str: str, odds_str: str, potential_str: str):
         super().__init__()
 
-        # Build the confirmation message (receipt style)
+        selection = outcome
+        if outcome.lower() in match.keys():
+            selection = f"{match[outcome.lower()]}"
+
         title = "**Bet Confirmed**"
-        description = f"**Match:** {match.get('home')} vs {match.get('away')}\n**Selection:** {outcome}\n**Stake:** `{stake_str}$`\n**Odds:** `{odds_str}`\n**Potential return:** `{potential_str}$`"
+        description = f"**Match:** {match.get('home')} vs {match.get('away')}\n**Selection:** {selection}\n**Stake:** `{stake_str}$`\n**Odds:** `{odds_str}`\n**Potential return:** `{potential_str}$`"
         
         disp1, disp2 = ui.TextDisplay(title), ui.TextDisplay(description)
         container = ui.Container(disp1, disp2, accent_color=discord.Color.green())
         self.add_item(container)
 
-class MatchLayoutView(ui.LayoutView):
+class PlaceBetLayoutView(ui.LayoutView):
     def __init__(self, match: Dict, author_id: int):
         super().__init__()
 
@@ -531,7 +570,8 @@ class MatchLayoutView(ui.LayoutView):
             
         odds = match["odds"]
         title = f"**{match['home']}** vs **{match['away']}**"
-        description = f"Home: `{odds['home'] or '-'}`\nDraw: `{odds['draw'] or '-'}`\nAway: `{odds['away'] or '-'}`"
+        description = f"**Odds:**\n"
+        description += f"{match['home']}: `{odds['home'] or '-'}`\nDraw: `{odds['draw'] or '-'}`\n{match['away']}: `{odds['away'] or '-'}`"
         
         disp1, disp2 = ui.TextDisplay(title), ui.TextDisplay(description)
         btn = PlaceBetButton(match, author_id=author_id, option="Home")
@@ -542,6 +582,102 @@ class MatchLayoutView(ui.LayoutView):
         container = ui.Container(section, select_menu_row)
         self.add_item(container)
 
+class BetsPlacedLayoutView(ui.LayoutView):
+    def __init__(self, matches: list, bets: list, author_id: int, page: int = 1):
+        super().__init__()
+
+        self.author_id = author_id
+        self.matches = matches
+        self.matches_dict = {match["id"]: match for match in matches}
+        self.bets = bets
+        self.cur_page = page
+        self.total_pages = max(1, (len(self.bets)+4)//5)
+
+        self.add_content()
+
+    def add_content(self):
+        if not self.bets:
+            no_text = ui.TextDisplay("No bets currently placed")
+            container = ui.Container(no_text, accent_color=discord.Color.red())
+            self.add_item(container)
+            return
+        
+        start_idx = (self.cur_page - 1) * 5
+        end_idx = start_idx + 5
+
+        # group matches by utc date
+        match_data = []
+        for bet in self.bets[start_idx:end_idx]:
+            match = self.matches_dict.get(bet["match_id"])
+
+            # Handle both datetime objects and ISO strings
+            if isinstance(bet["commence_time_utc"], str):
+                commence_time = datetime.fromisoformat(bet["commence_time_utc"])
+            else:
+                commence_time = bet["commence_time_utc"]
+                
+            unix_timestamp = int(commence_time.timestamp())
+
+            selection = bet["selection"].capitalize()
+            if bet["selection"] in match.keys():
+                selection = f"{match[bet["selection"]]}"
+            
+            line = f"<t:{unix_timestamp}:t> — {match['home']} vs {match['away']}\n"
+            line += f"**Selection:** {selection}\n"
+            line += f"**Stake:** `{bet["stake"]:,}$`\n"
+            line += f"**Potential Return:** `{bet["return"]:,}$`\n"
+            
+            match_data.append((unix_timestamp, line))
+
+        match_data.sort(key=lambda x: x[0])
+
+        items = []
+        current_date_timestamp = None
+
+        for unix_timestamp, line in match_data:
+            day_timestamp = (unix_timestamp // 86400) * 86400
+
+            if day_timestamp != current_date_timestamp:
+                current_date_timestamp = day_timestamp
+                pretty_date_display = ui.TextDisplay(f"**<t:{day_timestamp}:D>**")
+                items.append(pretty_date_display)
+
+            text_display = ui.TextDisplay(line)
+            separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
+            items.extend((text_display, separator))
+
+        next_page_btn = ui.Button(label="▶", style=discord.ButtonStyle.secondary, disabled=self.cur_page == self.total_pages)
+        previous_page_btn = ui.Button(label="◀", style=discord.ButtonStyle.secondary, disabled=self.cur_page == 1)
+        next_page_btn.callback = self.next_page
+        previous_page_btn.callback = self.previous_page
+
+        action_row = ui.ActionRow(previous_page_btn, next_page_btn)
+
+        footer = ui.TextDisplay(f"Page {self.cur_page}/{self.total_pages}")
+
+        container = ui.Container(*items, footer, action_row)
+        self.add_item(container)
+
+
+    async def previous_page(self, interaction: discord.Interaction):
+        if self.author_id != interaction.user.id:
+            await interaction.response.send_message(embed=discord.Embed(title="This is not your bet!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        if self.cur_page > 1:
+            await interaction.response.edit_message(view=BetsPlacedLayoutView(self.matches, self.bets, self.author_id, page=self.cur_page-1))
+        else:
+            await interaction.response.defer()
+
+    async def next_page(self, interaction: discord.Interaction):
+        if self.author_id != interaction.user.id:
+            await interaction.response.send_message(embed=discord.Embed(title="This is not your bet!", color=discord.Color.red()), ephemeral=True)
+            return
+        
+        if self.cur_page < self.total_pages:
+            await interaction.response.edit_message(view=BetsPlacedLayoutView(self.matches, self.bets, self.author_id, page=self.cur_page+1))
+        else:
+            await interaction.response.defer()
 
 class MatchesLayoutView(ui.LayoutView):
     def __init__(self, matches: list, author_id: int, page: int = 1):
@@ -554,7 +690,7 @@ class MatchesLayoutView(ui.LayoutView):
 
     async def add_buttons(self):
         if not self.matches:
-            no_text = ui.TextDisplay("Keine verfügbaren Matches in den nächsten 7 Tagen.")
+            no_text = ui.TextDisplay("No available matches in the next 7 days.")
             container = ui.Container(no_text, accent_color=discord.Color.red())
             self.add_item(container)
             return
@@ -562,8 +698,8 @@ class MatchesLayoutView(ui.LayoutView):
         start_idx = (self.cur_page - 1) * 5
         end_idx = start_idx + 5
 
-        # group matches by local date (Europe/Berlin)
-        groups = {}
+        # group matches by utc date
+        match_data = []
         for match in self.matches[start_idx:end_idx]:
             # Handle both datetime objects and ISO strings
             if isinstance(match["commence_time_utc"], str):
@@ -571,28 +707,35 @@ class MatchesLayoutView(ui.LayoutView):
             else:
                 commence_time = match["commence_time_utc"]
                 
-            local_dt = commence_time.astimezone(BetManager.TZ)
-            date_key = local_dt.date()  # groups by YYYY-MM-DD
-            line_time = local_dt.strftime("%H:%M")
+            unix_timestamp = int(commence_time.timestamp())
+
             odds = match["odds"]
             
-            line = f"{line_time} — {match['home']} vs {match['away']}\n"
+            line = f"<t:{unix_timestamp}:t> — {match['home']} vs {match['away']}\n"
+            line += "**Odds:**\n"
             line += f"Home: `{odds['home'] or '-'}` Draw: `{odds['draw'] or '-'}` Away: `{odds['away'] or '-'}`\n"
-            groups.setdefault(date_key, []).append((line, match))
+            
+            match_data.append((unix_timestamp, line, match))
+
+        match_data.sort(key=lambda x: x[0])
 
         items = []
-        for date_key in sorted(groups.keys(), key=lambda d: (d is None, d)):
-            pretty_date = date_key.strftime("%A, %d %b %Y")  # e.g. "Monday, 08 Sep 2025"
-            pretty_date_display = ui.TextDisplay(f"**{pretty_date}**")
-            items.append(pretty_date_display)
+        current_date_timestamp = None
 
-            for (match_str, match_obj) in groups[date_key]:
-                btn = PlaceBetButton(match_obj, author_id=self.author_id)
-                await btn.set_disabled()
+        for unix_timestamp, line, match_obj in match_data:
+            day_timestamp = (unix_timestamp // 86400) * 86400
 
-                section = ui.Section(match_str, accessory=btn)
-                separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
-                items.extend((section, separator))
+            if day_timestamp != current_date_timestamp:
+                current_date_timestamp = day_timestamp
+                pretty_date_display = ui.TextDisplay(f"**<t:{day_timestamp}:D>**")
+                items.append(pretty_date_display)
+
+            btn = PlaceBetButton(match_obj, author_id=self.author_id)
+            await btn.set_disabled()
+
+            section = ui.Section(line, accessory=btn)
+            separator = ui.Separator(spacing=discord.SeparatorSpacing.large)
+            items.extend((section, separator))
 
         next_page_btn = ui.Button(label="▶", style=discord.ButtonStyle.secondary, disabled=self.cur_page == self.total_pages)
         previous_page_btn = ui.Button(label="◀", style=discord.ButtonStyle.secondary, disabled=self.cur_page == 1)
@@ -715,4 +858,9 @@ class BetCommands(commands.Cog):
             await get_started(interaction, interaction.user.id)
             return
         
-        await interaction.response.send_message("This command doesn't work yet")
+        await interaction.response.defer()
+
+        bets = await BetManager.get_placed_bets(interaction.user.id)
+        matches = await BetManager.get_matches()
+
+        await interaction.followup.send(view=BetsPlacedLayoutView(matches, bets, interaction.user.id))

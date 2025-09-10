@@ -58,6 +58,7 @@ class DatabaseManager:
                     match_id TEXT NOT NULL,
                     commence_time_utc TIMESTAMP,
                     selection TEXT,
+                    stake INTEGER,
                     return INTEGER,
                     PRIMARY KEY (user_id, match_id)
                 )
