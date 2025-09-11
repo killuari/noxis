@@ -187,8 +187,9 @@ class HigherLower(discord.ui.View):
             await InventoryManager.add_item(self.user_id, item.item_id, quantity)
             answer_choice = random.choice(["Very good", "Nice guess", "Good job"])
             
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             embed=discord.Embed(title=f"CORRECT! {answer_choice}! It was in the range of +-50!",
-                                description=f"You gained:\n`{self.money:,}$`\n`{quantity}x {item.name}`",
+                                description=f"You gained:\n`{self.money:,}$`\n{quantity}x {emoji_str} {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
@@ -242,8 +243,9 @@ class HigherLower(discord.ui.View):
             await InventoryManager.add_item(self.user_id, item.item_id, quantity)
             answer_choice = random.choice(["Big Win", "Lucky guess"])
 
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             embed=discord.Embed(title=f"INSANE! {answer_choice}! The numbers were the same!",
-                                description=f"You gained:\n`{self.money:,}$`\n`{quantity}x {item.name}`",
+                                description=f"You gained:\n`{self.money:,}$`\n{quantity}x {emoji_str} {item.name}",
                                 color=discord.Color.green()
             ).set_footer(text="Let's see if you guess correctly again ;)")        
                 
@@ -420,8 +422,9 @@ class Inventory(discord.ui.View):
         start_idx = 0
         end_idx = 9
         for item in self.inventory[start_idx:end_idx]:
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             value = f"{item.value}$" if not item.unique else "Unique"
-            embed.add_field(name=f"{item.name} ({item.quantity}x)",
+            embed.add_field(name=f"{emoji_str} {item.name} ({item.quantity}x)",
                             value=f"""
                                 Rarity: `{item.rarity}`
                                 Value: `{value}`
@@ -444,8 +447,9 @@ class Inventory(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.inventory[start_idx:end_idx]:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 value = f"{item.value}$" if not item.unique else "Unique"
-                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                embed.add_field(name=f"{emoji_str} {item.name} ({item.quantity}x)",
                                 value=f"""
                                     Rarity: `{item.rarity}`
                                     Value: `{value}`
@@ -470,8 +474,9 @@ class Inventory(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
             
             for item in self.inventory[start_idx:end_idx]:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 value = f"{item.value}$" if not item.unique else "Unique"
-                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                embed.add_field(name=f"{emoji_str} {item.name} ({item.quantity}x)",
                                 value=f"""
                                     Rarity: `{item.rarity}`
                                     Value: `{value}`
@@ -495,8 +500,9 @@ class Inventory(discord.ui.View):
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
         
         for item in self.inventory[start_idx:end_idx]:
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             value = f"{item.value}$" if not item.unique else "Unique"
-            embed.add_field(name=f"{item.name} ({item.quantity}x)",
+            embed.add_field(name=f"{emoji_str} {item.name} ({item.quantity}x)",
                             value=f"""
                                 Rarity: `{item.rarity}`
                                 Value: `{value}`
@@ -659,9 +665,12 @@ class SelectItems(discord.ui.View):
         self.button_mapping = {}
 
     async def add_buttons(self, callback: callable): # das callback kriegt als argument die interaction und die items_used
-        for item_id in self.allowed_item_ids:                # hatte ich zuerst auch alles in der init aber ich brauch hier paar mal await deswegen einfach per factory method ausserhalb
+        for item_id in self.allowed_item_ids:
+            item = await ItemManager.get_item(item_id)
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             button = discord.ui.Button(
-                label=(await ItemManager.get_item(item_id)).name, 
+                label=item.name,
+                emoji=emoji_str,
                 style=discord.ButtonStyle.secondary, 
                 disabled=(await InventoryManager.get_item_quantity(user_id=self.user_id, item_id=item_id)) == 0
             )
@@ -742,7 +751,8 @@ class ShopModal(discord.ui.Modal):
         await EconomyManager.remove_money(user_id=self.interaction.user.id, amount=quantity*self.item.value)
         await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), webhook_url=interaction.followup.url)
 
-        await interaction.response.send_message(embed=discord.Embed(title="Success", description=f"You successfully bought {quantity}x {self.item.name}", color=discord.Color.green()), ephemeral=True)
+        emoji_str = f"<:{self.item.item_id}:{self.item.custom_emoji_id}>"
+        await interaction.response.send_message(embed=discord.Embed(title="Success", description=f"You successfully bought {quantity}x {emoji_str} {self.item.name}", color=discord.Color.green()), ephemeral=True)
 
 class ShopView(discord.ui.View):
     def __init__(self, interaction, items, page, timeout=None):
@@ -760,8 +770,10 @@ class ShopView(discord.ui.View):
         for idx, item in enumerate(self.items[start_idx:end_idx]):
             disabled = not user_balance >= item.value
 
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
             button = discord.ui.Button(
                 label=f"Buy {item.name}",
+                emoji=emoji_str,
                 style=discord.ButtonStyle.green if not disabled else discord.ButtonStyle.gray,
                 row=int(idx/3),
                 disabled=disabled
@@ -794,8 +806,9 @@ class ShopView(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.items[start_idx:end_idx]:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 embed.add_field(
-                    name=f"{item.name}",
+                    name=f"{emoji_str} {item.name}",
                     value=f"""
                         Rarity: {item.rarity}
                         Cost: {item.value}$
@@ -825,8 +838,9 @@ class ShopView(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
             
             for item in self.items[start_idx:end_idx]:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 embed.add_field(
-                    name=f"{item.name}",
+                    name=f"{emoji_str} {item.name}",
                     value=f"""
                         Rarity: {item.rarity}
                         Cost: {item.value}$
