@@ -783,71 +783,111 @@ class BetCommands(commands.Cog):
         self.bot.tree.add_command(self.bet_group)
 
     async def cog_load(self):
-        """Start the daily update task when the cog is loaded"""
-        if not self.daily_bets_update.is_running():
-            self.daily_bets_update.start()
-            print("[BetManager] Daily bets update task started")
+        """Start both update tasks when the cog is loaded"""
+        if not self.daily_odds_update.is_running():
+            self.daily_odds_update.start()
+            print("[BetManager] Daily odds update task started")
+        
+        if not self.bet_results_update.is_running():
+            self.bet_results_update.start()
+            print("[BetManager] Bet results update task started")
 
     async def cog_unload(self):
-        """Stop the daily update task when the cog is unloaded"""
-        self.daily_bets_update.cancel()
-        print("[BetManager] Daily bets update task stopped")
+        """Stop both update tasks when the cog is unloaded"""
+        self.daily_odds_update.cancel()
+        self.bet_results_update.cancel()
+        print("[BetManager] All update tasks stopped")
 
-    @tasks.loop(time=time(hour=3, minute=10, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
-    async def daily_bets_update(self):
-        """Update odds cache daily at midnight"""
+    @tasks.loop(time=time(hour=3, minute=0, second=0, tzinfo=TZ))  # Run daily at 3 AM Berlin Time
+    async def daily_odds_update(self):
+        """Update odds cache daily at 3 AM"""
         try:
-            print("[BetManager] Starting daily bets update...")
+            print("[BetManager] Starting daily odds update...")
 
             matches, last_updated = BetManager.load_matches_from_cache()
             
             if BetManager.is_cache_valid(last_updated):
-                print("[BetManager] Cached matches already up to date")
-            
-            else:
-                print("[BetManager] Cache expired, fetching from API")
-                matches = await BetManager.fetch_odds_from_api(BetManager.BL_KEY)
-                BetManager.save_matches_to_cache(matches)
-
-            print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached")
-
-            completed_bets = await BetManager.get_completed_bets()
-            completed_bet_ids = []
-            for bet in completed_bets:
-                if bet["match_id"] not in completed_bet_ids:
-                    completed_bet_ids.append(bet["match_id"])
-
-            if not completed_bet_ids:
-                print("[BetManager] Daily bets update completed: No completed bets found")
+                print("[BetManager] Cached matches already up to date, skipping API fetch")
                 return
             
+            print("[BetManager] Cache expired, fetching from API")
+            matches = await BetManager.fetch_odds_from_api(BetManager.BL_KEY)
+            BetManager.save_matches_to_cache(matches)
+            print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached")
+
+        except Exception as e:
+            print(f"[BetManager] Daily odds update failed: {e}")
+
+    @tasks.loop(time=[
+        time(hour=21, minute=0, second=0, tzinfo=TZ),  # 9 PM Berlin Time
+        time(hour=23, minute=0, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
+        time(hour=2, minute=0, second=0, tzinfo=TZ)    # 2 AM Berlin Time
+    ])
+    async def bet_results_update(self):
+        """Check and process completed bets at 9 PM, 11 PM, and 2 AM Berlin Time"""
+        try:
+            print("[BetManager] Starting bet results update...")
+
+            completed_bets = await BetManager.get_completed_bets()
+            
+            if not completed_bets:
+                print("[BetManager] Bet results update completed: No completed bets found")
+                return
+            
+            # Get unique match IDs to avoid duplicate API calls
+            completed_bet_ids = list(set(bet["match_id"] for bet in completed_bets))
+            print(f"[BetManager] Found {len(completed_bets)} completed bets for {len(completed_bet_ids)} matches")
+            
+            # Fetch results from API
             results = await BetManager.fetch_results_from_api(sport_key=BetManager.BL_KEY, event_ids=completed_bet_ids)
+            
+            processed_count = 0
             for bet in completed_bets:
                 match_id = bet.get("match_id")
                 user_id = bet.get("user_id")
                 result = results.get(match_id)
+                
                 if not result:
+                    print(f"[BetManager] No result found for match {match_id}, skipping")
                     continue
 
                 is_win, embed = BetManager.build_bet_result_embed(result, bet)
+                
+                # Add winnings to user balance if bet won
                 if is_win:
                     await EconomyManager.add_money(bet["user_id"], bet["return"])
 
+                # Remove bet from database
                 await BetManager.remove_bet_from_db(user_id, match_id)
 
-                user = self.bot.get_user(user_id)
-                await user.send(embed=embed)
+                # Send result to user
+                try:
+                    user = self.bot.get_user(user_id)
+                    if user:
+                        await user.send(embed=embed)
+                    else:
+                        print(f"[BetManager] Failed to send result to user {user_id}: Could not find user")
+                except Exception as e:
+                    print(f"[BetManager] Failed to send result to user {user_id}: {e}")
 
-                print(f"[BetManager] Daily bets update completed: {len(completed_bets)} completed bets evaluated")
+                processed_count += 1
+
+            print(f"[BetManager] Bet results update completed: {processed_count} completed bets processed")
 
         except Exception as e:
-            print(f"[BetManager] Daily update failed: {e}")
+            print(f"[BetManager] Bet results update failed: {e}")
 
-    @daily_bets_update.before_loop
-    async def before_daily_update(self):
-        """Wait until bot is ready before starting the loop"""
+    @daily_odds_update.before_loop
+    async def before_odds_update(self):
+        """Wait until bot is ready before starting the odds update loop"""
         await self.bot.wait_until_ready()
-        print("[BetManager] Daily update task ready, waiting for midnight...")
+        print("[BetManager] Odds update task ready, waiting for 3 AM...")
+
+    @bet_results_update.before_loop
+    async def before_results_update(self):
+        """Wait until bot is ready before starting the results update loop"""
+        await self.bot.wait_until_ready()
+        print("[BetManager] Results update task ready, waiting for next scheduled time...")
 
     async def bets_overview(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
