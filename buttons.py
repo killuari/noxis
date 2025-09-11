@@ -420,10 +420,13 @@ class Inventory(discord.ui.View):
         start_idx = 0
         end_idx = 9
         for item in self.inventory[start_idx:end_idx]:
-            embed.add_field(
-                name=f"{item.quantity}x {item.name} ({item.rarity})",
-                value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
-                inline=True)
+            value = f"{item.value}$" if not item.unique else "Unique"
+            embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                            value=f"""
+                                Rarity: `{item.rarity}`
+                                Value: `{value}`
+                            """,
+                            inline=True)
         await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
 
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
@@ -441,10 +444,13 @@ class Inventory(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
 
             for item in self.inventory[start_idx:end_idx]:
-                embed.add_field(
-                    name=f"{item.quantity}x {item.name} ({item.rarity})",
-                    value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
-                    inline=True)
+                value = f"{item.value}$" if not item.unique else "Unique"
+                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                                value=f"""
+                                    Rarity: `{item.rarity}`
+                                    Value: `{value}`
+                                """,
+                                inline=True)
 
             await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         else:
@@ -464,10 +470,13 @@ class Inventory(discord.ui.View):
             embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
             
             for item in self.inventory[start_idx:end_idx]:
-                embed.add_field(
-                    name=f"{item.quantity}x {item.name} ({item.rarity})",
-                    value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
-                    inline=True)
+                value = f"{item.value}$" if not item.unique else "Unique"
+                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                                value=f"""
+                                    Rarity: `{item.rarity}`
+                                    Value: `{value}`
+                                """,
+                                inline=True)
                 
             await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         else:
@@ -486,10 +495,13 @@ class Inventory(discord.ui.View):
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages}")
         
         for item in self.inventory[start_idx:end_idx]:
-            embed.add_field(
-                name=f"{item.quantity}x {item.name} ({item.rarity})",
-                value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
-                inline=True)
+            value = f"{item.value}$" if not item.unique else "Unique"
+            embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                            value=f"""
+                                Rarity: `{item.rarity}`
+                                Value: `{value}`
+                            """,
+                            inline=True)
 
         await interaction.response.edit_message(embed=embed, view=Inventory(self.interaction, self.inventory, self.url, self.cur_page))
         
