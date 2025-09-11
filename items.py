@@ -77,6 +77,8 @@ class ItemManager:
                 value=item_dict.get("value", 0),
                 usable=item_dict.get("usable", False),
                 sellable=item_dict.get("sellable", True),
+                findable=item_dict.get("findable", True),
+                buyable=item_dict.get("buyable", False),
                 unique=item_dict.get("unique", False),
                 metadata=item_dict.get("metadata", {}),
             )

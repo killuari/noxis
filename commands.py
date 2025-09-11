@@ -645,8 +645,12 @@ class BasicCommands(commands.Cog):
 
         for idx, item in enumerate(inventory):
             if idx < 9:
-                embed.add_field(name=f"{item.quantity}x {item.name} ({item.rarity})",
-                                value=f"Value: `{item.value}$`\nIn Total: `{item.quantity*item.value}$`",
+                value = f"{item.value}$" if not item.unique else "Unique"
+                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                                value=f"""
+                                    Rarity: `{item.rarity}`
+                                    Value: `{value}`
+                                """,
                                 inline=True)
 
         view = Inventory(interaction, inventory, url, page=1) if pages_req else discord.utils.MISSING
@@ -682,13 +686,25 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="This Item doesn't exist!", color=discord.Color.red()), ephemeral=True)
             return
         
+        item.quantity = await InventoryManager.get_item_quantity(interaction.user.id, item.item_id)
+        
+        emoji_map = {
+            True: "✅",
+            False: "❌"
+        }
+
         embed = discord.Embed(
             title=item.name,
-            description=f"{item.description}\n\nYou have a total of **{item.quantity}**",
+            description=f"{item.description}\n\n" \
+                        f"You have a total of **{item.quantity}**",
             color=discord.Color.from_str("#607bff"))
         
-        embed.add_field(name="Value", value=f"`{item.value}$`", inline=False)
-        embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=False)
+        value = f"{item.value}$" if not item.unique else "Unique"
+        embed.add_field(name="Value", value=f"`{value}`", inline=True)
+        embed.add_field(name="Rarity", value=f"`{item.rarity}`", inline=True)
+        embed.add_field(name="Usable", value=f"`{emoji_map[item.usable]}`", inline=False)
+        embed.add_field(name="Buyable", value=f"`{emoji_map[item.buyable]}`", inline=True)
+        embed.add_field(name="Sellable", value=f"`{emoji_map[item.sellable]}`", inline=True)
         
         await interaction.response.send_message(embed=embed)
         await DatabaseManager.update_cmd_used(interaction.user.id)
