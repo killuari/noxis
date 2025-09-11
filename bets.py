@@ -793,7 +793,7 @@ class BetCommands(commands.Cog):
         self.daily_bets_update.cancel()
         print("[BetManager] Daily bets update task stopped")
 
-    @tasks.loop(time=time(hour=2, minute=35, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
+    @tasks.loop(time=time(hour=2, minute=50, second=0, tzinfo=TZ))  # Run daily at 2 AM Berlin Time
     async def daily_bets_update(self):
         """Update odds cache daily at midnight"""
         try:
