@@ -2,3 +2,4 @@
 .venv
 database.db
 __pycache__
+bets/matches_cache.json
