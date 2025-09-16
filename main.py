@@ -18,8 +18,6 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 @client.event
 async def on_ready():
-    await DatabaseManager.drop_table("bets")
-
     await DatabaseManager.init_database()
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
@@ -27,9 +25,6 @@ async def on_ready():
     await client.add_cog(BasicCommands(client))  
     await client.add_cog(BetCommands(client))  
     await client.tree.sync()
-
-    await EconomyManager.add_money(572023654385188884, 150000)
-    await EconomyManager.add_money(257591194031226881, 150000)
 
 @client.event
 async def on_guild_join(guild: discord.Guild):
