@@ -1,0 +1,110 @@
+[
+    {   
+        "job_id": "cleaner",
+        "name": "Cleaner",
+        "salary": 500,
+        "cooldown": 5,
+        "required_level": 1,
+        "required_knowledge": {}
+    },
+    {
+        "job_id": "cashier",
+        "name": "Cashier",
+        "salary": 650,
+        "cooldown": 5,
+        "required_level": 1,
+        "required_knowledge": {"economics": 50}
+    },
+    {
+        "job_id": "warehouse_worker",
+        "name": "Warehouse Worker",
+        "salary": 800,
+        "cooldown": 5,
+        "required_level": 1,
+        "required_knowledge":  {"economics": 250}
+    },
+    {
+        "job_id": "head_chef",
+        "name": "Head Chef",
+        "salary": 1000,
+        "cooldown": 5,
+        "required_level": 1,
+        "required_knowledge": {"science": 50, "economics": 50, "literature": 50, "medicine": 100}
+    },
+    
+    
+    
+    
+    
+    
+    {
+        "job_id": "elementary_school_teacher",
+        "name": "Elementary School Teacher",
+        "salary": 1500,
+        "cooldown": 30,
+        "required_level": 5,
+        "required_knowledge": {"literature": 750}
+    },
+   {
+        "job_id": "electrician",
+        "name": "Electrician ",
+        "salary": 1750,
+        "cooldown": 30,
+        "required_level": 5,
+        "required_knowledge": {"science": 750}
+    },
+    {
+        "job_id": "police_officer",
+        "name": "Police Officer",
+        "salary": 2000,
+        "cooldown": 30,
+        "required_level": 5,
+        "required_knowledge": {"economics": 750}
+    },
+    {
+        "job_id": "nurse",
+        "name": "Nurse",
+        "salary": 2250,
+        "cooldown": 30,
+        "required_level": 5,
+        "required_knowledge": {"medicine": 750}
+    },
+    
+
+
+
+
+    
+    {
+        "job_id": "archeologist",
+        "name": "Archeologist",
+        "salary": 3500,
+        "cooldown": 60,
+        "required_level":15,
+        "required_knowledge": {"literature": 2000}
+    },
+    {
+        "job_id": "lawyer",
+        "name": "Lawyer",
+        "salary": 4000,
+        "cooldown": 60,
+        "required_level": 15,
+        "required_knowledge": {"economics": 2000}
+    },
+    {
+        "job_id": "doctor",
+        "name": "Doctor",
+        "salary": 4500,
+        "cooldown": 60,
+        "required_level": 15,
+        "required_knowledge": {"medicine": 2000}     
+    },
+    {
+        "job_id": "senior_software_developer",
+        "name": "Senior Software Developer",
+        "salary": 5000,
+        "cooldown": 60,
+        "required_level": 15,
+        "required_knowledge": {"science": 2000}     
+    }
+]

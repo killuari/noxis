@@ -21,6 +21,7 @@ class DatabaseManager:
                     inv_value INTEGER DEFAULT 0,
                     cmd_used INTEGER DEFAULT 0,
                     total_knowledge DEFAULT 0,
+                    job TEXT DEFAULT NULL,
                     PRIMARY KEY (user_id)
                 )
             """)
