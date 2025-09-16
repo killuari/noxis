@@ -15,9 +15,30 @@ TZ = ZoneInfo("Europe/Berlin")
 
 class BetManager:
     API_BASE = 'https://api.the-odds-api.com/v4/'
-    BL_KEY = 'soccer_germany_bundesliga'
     API_KEY = '35e92ee26bf991936c0b6278a8cbe2bc'
-    CACHE_FILE = 'bets/matches_cache.json'
+
+    BL_KEY = 'soccer_germany_bundesliga'
+    PL_KEY = 'soccer_epl'
+    CL_KEY = 'soccer_uefa_champs_league'
+
+    SPORT_KEYS = [BL_KEY, PL_KEY, CL_KEY]
+
+    CACHE_BL = 'bets/matches_cache_bl.json'
+    CACHE_PL = 'bets/matches_cache_pl.json'
+    CACHE_CL = 'bets/matches_cache_cl.json'
+    
+    COMPETITION_MAP = {
+        "bl": BL_KEY,
+        "pl": PL_KEY,
+        "cl": CL_KEY
+    }
+
+    CACHE_FILE_MAP = {
+        BL_KEY: CACHE_BL,
+        PL_KEY: CACHE_PL,
+        CL_KEY: CACHE_CL
+    }
+
     TZ = TZ
 
     @staticmethod
@@ -197,35 +218,39 @@ class BetManager:
         return results
 
     @classmethod
-    def save_matches_to_cache(cls, matches: List[dict]) -> None:
+    def save_matches_to_cache(cls, matches: List[dict], sport_key: str) -> None:
         """Save matches to JSON cache file"""
         cache_data = {
             "last_updated": datetime.now(timezone.utc).isoformat(),
             "matches": matches
         }
+
+        cache_file = cls.CACHE_FILE_MAP[sport_key]
         try:
-            with open(cls.CACHE_FILE, 'w', encoding='utf-8') as f:
+            with open(cache_file, 'w', encoding='utf-8') as f:
                 json.dump(cache_data, f, indent=2, ensure_ascii=False)
             print(f"[BetManager] Saved {len(matches)} matches to cache")
         except Exception as e:
             print(f"[BetManager] Error saving cache: {e}")
 
     @classmethod
-    def load_matches_from_cache(cls) -> tuple[List[dict], Optional[datetime]]:
+    def load_matches_from_cache(cls, sport_key: str) -> tuple[List[dict], Optional[datetime]]:
         """Load matches from JSON cache file"""
-        if not os.path.exists(cls.CACHE_FILE):
-            print(f"[BetManager] Cache file not found")
+        cache_file = cls.CACHE_FILE_MAP[sport_key]
+
+        if not os.path.exists(cache_file):
+            print(f"[BetManager] Cache file ({cache_file}) not found")
             return [], None
         
         try:
-            with open(cls.CACHE_FILE, 'r', encoding='utf-8') as f:
+            with open(cache_file, 'r', encoding='utf-8') as f:
                 cache_data = json.load(f)
             
             matches = cache_data.get("matches", [])
             last_updated_str = cache_data.get("last_updated")
             last_updated = datetime.fromisoformat(last_updated_str) if last_updated_str else None
             
-            print(f"[BetManager] Loaded {len(matches)} matches from cache (last updated: {last_updated})")
+            print(f"[BetManager] Loaded {len(matches)} matches from cache \n(file: {cache_file}, last updated: {last_updated})")
             return matches, last_updated
             
         except Exception as e:
@@ -245,11 +270,9 @@ class BetManager:
         return now_berlin.date() == last_updated_berlin.date()
 
     @classmethod
-    async def get_matches(cls) -> List[dict]:
+    async def get_matches(cls, sport_key: str) -> List[dict]:
         """Get matches - from cache if valid, otherwise fetch from API"""
-        sport_key = cls.BL_KEY
-        
-        matches, last_updated = cls.load_matches_from_cache()
+        matches, last_updated = cls.load_matches_from_cache(sport_key)
         
         if cls.is_cache_valid(last_updated):
             print("[BetManager] Using cached matches")
@@ -264,7 +287,7 @@ class BetManager:
             print("[BetManager] Cache invalid/expired, fetching from API")
             try:
                 matches = await cls.fetch_odds_from_api(sport_key)
-                cls.save_matches_to_cache(matches)
+                cls.save_matches_to_cache(matches, sport_key)
 
                 # Convert datetime strings back to datetime objects
                 for match in matches:
@@ -284,24 +307,24 @@ class BetManager:
                 return []
             
     @staticmethod
-    async def insert_bet_into_db(user_id: int, match_id: str, commence_time_utc: datetime, selection: str, stake: int, potential_return: int):
+    async def insert_bet_into_db(user_id: int, sport_key: str, match_id: str, commence_time_utc: datetime, selection: str, stake: int, potential_return: int):
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("INSERT INTO bets (user_id, match_id, commence_time_utc, selection, stake, return) VALUES (?, ?, ?, ?, ?, ?)", (user_id, match_id, commence_time_utc, selection, stake, potential_return))
+            await cursor.execute("INSERT INTO bets (user_id, sport_key, match_id, commence_time_utc, selection, stake, return) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, sport_key, match_id, commence_time_utc, selection, stake, potential_return))
             await db.commit()
 
     @staticmethod
-    async def remove_bet_from_db(user_id: int, match_id: str):
+    async def remove_bet_from_db(user_id: int, sport_key: str, match_id: str):
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("DELETE FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
+            await cursor.execute("DELETE FROM bets WHERE (user_id, sport_key, match_id) = (?, ?, ?)", (user_id, sport_key, match_id))
             await db.commit()
 
     @staticmethod
-    async def is_bet_placed(user_id: int, match_id: str) -> bool:
+    async def is_bet_placed(user_id: int, sport_key: str, match_id: str) -> bool:
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
-            await cursor.execute("SELECT user_id FROM bets WHERE (user_id, match_id) = (?, ?)", (user_id, match_id))
+            await cursor.execute("SELECT user_id FROM bets WHERE (user_id, sport_key, match_id) = (?, ?, ?)", (user_id, sport_key, match_id))
             result = await cursor.fetchall()
 
         if result:
@@ -309,7 +332,7 @@ class BetManager:
         return False
     
     @staticmethod
-    async def get_placed_bets(user_id: int) -> List[Dict[str, Any]]:
+    async def get_placed_bets(user_id: int, sport_key: str) -> List[Dict[str, Any]]:
         """
         Return all bets for a given user.
         Returned list items: {"match_id": str, "selection": str, "return": int}
@@ -324,9 +347,9 @@ class BetManager:
                 query = """
                     SELECT match_id, commence_time_utc, selection, stake, return
                     FROM bets
-                    WHERE user_id = ?
+                    WHERE (user_id, sport_key) = (?, ?)
                 """
-                async with db.execute(query, (user_id,)) as cursor:
+                async with db.execute(query, (user_id, sport_key)) as cursor:
                     rows = await cursor.fetchall()
 
                 for r in rows:
@@ -353,7 +376,7 @@ class BetManager:
     async def get_completed_bets() -> List[Dict[str, Any]]:
         """
         Return all bets where commence_time_utc is older than now - 2 hours.
-        Returned list items: {"user_id": int, "match_id": str, "selection": str, "return": int}
+        Returned list items: {"user_id": int, "sport_key": str, "match_id": str, "selection": str, "stake": int, "return": int}
         """
 
         # cutoff = now_utc - 2 hours
@@ -369,7 +392,7 @@ class BetManager:
                 db.row_factory = aiosqlite.Row
 
                 query = """
-                    SELECT user_id, match_id, selection, return, commence_time_utc
+                    SELECT user_id, sport_key, match_id, selection, stake, return, commence_time_utc
                     FROM bets
                     WHERE commence_time_utc IS NOT NULL
                       AND commence_time_utc <= ?
@@ -381,9 +404,11 @@ class BetManager:
                     try:
                         results.append({
                             "user_id": int(r["user_id"]),
+                            "sport_key": str(r["sport_key"]),
                             "match_id": str(r["match_id"]),
                             "selection": r["selection"],
-                            "return": r["return"]
+                            "stake": int(r["stake"]),
+                            "return": int(r["return"])
                         })
                     except Exception:
                         # if a row is malformed, skip it but continue processing others
@@ -398,23 +423,22 @@ class BetManager:
     @staticmethod
     def build_bet_result_embed(result: Dict, bet: Dict) -> Tuple[bool, discord.Embed]:
         user_choice = bet.get("selection", "").lower()
+        user_choice_team = result.get(f"{user_choice}_team", match_result)
         match_result = result.get("result", "").lower()
+        match_result_team = result.get(f"{match_result}_team", match_result)
+
         is_win = user_choice == match_result
-
         color = discord.Color.green() if is_win else discord.Color.orange()
-
-        emoji_map = {"home": "🏠", "away": "✈️", "draw": "🤝"}
-        user_emoji = emoji_map.get(user_choice, "")
-        result_emoji = emoji_map.get(match_result, "")
 
         title = "Bet Result — Match Finished"
         description = f"**{result['home_team']}** vs **{result['away_team']}**\n" \
                       f"Final score: **{result['scores']['home']} — {result['scores']['away']}**"
 
         embed = discord.Embed(title=title, description=description, color=color)
-        embed.add_field(name="Match outcome", value=f"{result_emoji} **{match_result.capitalize()}**", inline=True)
-        embed.add_field(name="Your bet", value=f"{user_emoji} **{user_choice.capitalize()}**", inline=True)
-        embed.add_field(name="Return", value=f"`{bet.get('return', 0)}`", inline=False)
+        embed.add_field(name="Match outcome", value=f"**{match_result_team}**", inline=True)
+        embed.add_field(name="Your bet", value=f"**{user_choice_team}**", inline=True)
+        embed.add_field(name="Stake", value=f"`{bet.get("stake"):,}$`", inline=False)
+        embed.add_field(name="Return", value=f"`{bet.get('return', 0):,}$`", inline=False)
         status_text = "🎉 Congratulations — your bet won!" if is_win else "😞 Sorry — your bet lost."
         embed.add_field(name="Status", value=status_text, inline=False)
 
@@ -426,12 +450,12 @@ class BetManager:
         except Exception:
             pass
 
-        embed.set_footer(text=f"Match ID: {result.get('id', '?')} • Commence (UTC): {ts_text}")
+        embed.set_footer(text=f"Commence (UTC): {ts_text}")
         return (is_win, embed)
 
 # Modal zum Platzieren einer Wette
 class PlaceBetModal(ui.Modal):
-    def __init__(self, match: dict, option: str = "home"):
+    def __init__(self, match: dict, sport_key: str, option: str = "home"):
         super().__init__(title=f"{match['home']} vs {match['away']}")
         self.amount = ui.TextInput(
             label="Place Bet",
@@ -442,6 +466,7 @@ class PlaceBetModal(ui.Modal):
         )
         self.add_item(self.amount)
         self.match = match
+        self.sport_key = sport_key
         self.outcome = option
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -478,7 +503,7 @@ class PlaceBetModal(ui.Modal):
         match_id = self.match.get("id")
         commence_time_utc = self.match.get("commence_time_utc")
 
-        await BetManager.insert_bet_into_db(interaction.user.id, match_id, commence_time_utc, outcome_key, amount, potential_return)
+        await BetManager.insert_bet_into_db(interaction.user.id, self.sport_key, match_id, commence_time_utc, outcome_key, amount, potential_return)
             
         # format amounts
         stake_str = f"{amount:,}"
@@ -512,8 +537,9 @@ class PlaceBetDropdown(discord.ui.Select):
         await interaction.response.defer(ephemeral=True)
 
 class PlaceBetButton(ui.Button):
-    def __init__(self, match: dict, author_id: int, option: str = None):
+    def __init__(self, match: dict, sport_key: str, author_id: int, option: str = None):
         self.match = match
+        self.sport_key = sport_key
         self.option = option
         self.author_id = author_id
 
@@ -525,7 +551,7 @@ class PlaceBetButton(ui.Button):
         user_id = self.author_id
         match_id = self.match.get("id")
 
-        bet_placed = await BetManager.is_bet_placed(user_id, match_id)
+        bet_placed = await BetManager.is_bet_placed(user_id, self.sport_key, match_id)
         if bet_placed:
             self.disabled = True
 
@@ -538,14 +564,14 @@ class PlaceBetButton(ui.Button):
             await interaction.response.send_message("This is not your bet.", ephemeral=True)
             return
         
-        if await BetManager.is_bet_placed(self.author_id, self.match.get("id")):
+        if await BetManager.is_bet_placed(self.author_id, self.sport_key, self.match.get("id")):
             await interaction.response.send_message(embed=discord.Embed(title="Bet already placed!", color=discord.Color.red()), ephemeral=True)
             return
 
         if not self.option:
-            await interaction.response.send_message(view=PlaceBetLayoutView(self.match, author_id=self.author_id))
+            await interaction.response.send_message(view=PlaceBetLayoutView(self.match, self.sport_key, author_id=self.author_id))
         else:
-            await interaction.response.send_modal(PlaceBetModal(self.match, self.option))
+            await interaction.response.send_modal(PlaceBetModal(self.match, self.sport_key, self.option))
 
 class BetPlacedLayoutView(ui.LayoutView):
     def __init__(self, match: Dict, outcome: str, stake_str: str, odds_str: str, potential_str: str):
@@ -563,10 +589,11 @@ class BetPlacedLayoutView(ui.LayoutView):
         self.add_item(container)
 
 class PlaceBetLayoutView(ui.LayoutView):
-    def __init__(self, match: Dict, author_id: int):
+    def __init__(self, match: Dict, sport_key: str, author_id: int):
         super().__init__()
 
         self.author_id = author_id
+        self.sport_key = sport_key
             
         odds = match["odds"]
         title = f"**{match['home']}** vs **{match['away']}**"
@@ -574,7 +601,7 @@ class PlaceBetLayoutView(ui.LayoutView):
         description += f"{match['home']}: `{odds['home'] or '-'}`\nDraw: `{odds['draw'] or '-'}`\n{match['away']}: `{odds['away'] or '-'}`"
         
         disp1, disp2 = ui.TextDisplay(title), ui.TextDisplay(description)
-        btn = PlaceBetButton(match, author_id=author_id, option="Home")
+        btn = PlaceBetButton(match, self.sport_key, author_id=author_id, option="Home")
         section = ui.Section(disp1, disp2, accessory=btn)
         select_menu = PlaceBetDropdown(btn, author_id=author_id)
         select_menu_row = ui.ActionRow(select_menu)
@@ -680,11 +707,12 @@ class BetsPlacedLayoutView(ui.LayoutView):
             await interaction.response.defer()
 
 class MatchesLayoutView(ui.LayoutView):
-    def __init__(self, matches: list, author_id: int, page: int = 1):
+    def __init__(self, matches: list, sport_key: str, author_id: int, page: int = 1):
         super().__init__()
 
         self.author_id = author_id
         self.matches = matches
+        self.sport_key = sport_key
         self.cur_page = page
         self.total_pages = max(1, (len(self.matches)+4)//5)
 
@@ -730,7 +758,7 @@ class MatchesLayoutView(ui.LayoutView):
                 pretty_date_display = ui.TextDisplay(f"**<t:{day_timestamp}:D>**")
                 items.append(pretty_date_display)
 
-            btn = PlaceBetButton(match_obj, author_id=self.author_id)
+            btn = PlaceBetButton(match_obj, self.sport_key, author_id=self.author_id)
             await btn.set_disabled()
 
             section = ui.Section(line, accessory=btn)
@@ -756,7 +784,7 @@ class MatchesLayoutView(ui.LayoutView):
             return
         
         if self.cur_page > 1:
-            new_view = MatchesLayoutView(self.matches, self.author_id, page=self.cur_page-1)
+            new_view = MatchesLayoutView(self.matches, self.sport_key, self.author_id, page=self.cur_page-1)
             await new_view.add_buttons()
             await interaction.response.edit_message(view=new_view)
         else:
@@ -768,7 +796,7 @@ class MatchesLayoutView(ui.LayoutView):
             return
         
         if self.cur_page < self.total_pages:
-            new_view = MatchesLayoutView(self.matches, self.author_id, page=self.cur_page+1)
+            new_view = MatchesLayoutView(self.matches, self.sport_key, self.author_id, page=self.cur_page+1)
             await new_view.add_buttons()
             await interaction.response.edit_message(view=new_view)
         else:
@@ -804,16 +832,17 @@ class BetCommands(commands.Cog):
         try:
             print("[BetManager] Starting daily odds update...")
 
-            matches, last_updated = BetManager.load_matches_from_cache()
+            for sport_key in BetManager.SPORT_KEYS:
+                matches, last_updated = BetManager.load_matches_from_cache(sport_key)
             
-            if BetManager.is_cache_valid(last_updated):
-                print("[BetManager] Cached matches already up to date, skipping API fetch")
-                return
-            
-            print("[BetManager] Cache expired, fetching from API")
-            matches = await BetManager.fetch_odds_from_api(BetManager.BL_KEY)
-            BetManager.save_matches_to_cache(matches)
-            print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached")
+                if BetManager.is_cache_valid(last_updated):
+                    print(f"[BetManager] Cached matches already up to date, skipping API fetch\n(Competition:{sport_key})")
+                    continue
+                
+                print(f"[BetManager] Cache expired, fetching from API\n(Competition:{sport_key})")
+                matches = await BetManager.fetch_odds_from_api(sport_key)
+                BetManager.save_matches_to_cache(matches, sport_key)
+                print(f"[BetManager] Daily odds update completed: {len(matches)} matches cached\n(Competition:{sport_key})")
 
         except Exception as e:
             print(f"[BetManager] Daily odds update failed: {e}")
@@ -834,18 +863,24 @@ class BetCommands(commands.Cog):
                 print("[BetManager] Bet results update completed: No completed bets found")
                 return
             
-            # Get unique match IDs to avoid duplicate API calls
-            completed_bet_ids = list(set(bet["match_id"] for bet in completed_bets))
+            # Get unique sport keys to avoid duplicate API calls
+            sport_keys = list(set(bet["sport_key"] for bet in completed_bets))
+
             print(f"[BetManager] Found {len(completed_bets)} completed bets for {len(completed_bet_ids)} matches")
             
+            results = {}
             # Fetch results from API
-            results = await BetManager.fetch_results_from_api(sport_key=BetManager.BL_KEY, event_ids=completed_bet_ids)
+            for sport_key in sport_keys:
+                completed_bet_ids = list(set(bet["match_id"] for bet in completed_bets if bet["sport_key"] == sport_key))
+                results[sport_key] = await BetManager.fetch_results_from_api(sport_key=sport_key, event_ids=completed_bet_ids)
             
             processed_count = 0
             for bet in completed_bets:
                 match_id = bet.get("match_id")
                 user_id = bet.get("user_id")
-                result = results.get(match_id)
+                sport_key = bet.get("sport_key")
+
+                result = results.get(sport_key).get(match_id)
                 
                 if not result:
                     print(f"[BetManager] No result found for match {match_id}, skipping")
@@ -858,7 +893,7 @@ class BetCommands(commands.Cog):
                     await EconomyManager.add_money(bet["user_id"], bet["return"])
 
                 # Remove bet from database
-                await BetManager.remove_bet_from_db(user_id, match_id)
+                await BetManager.remove_bet_from_db(user_id, sport_key, match_id)
 
                 # Send result to user
                 try:
@@ -889,7 +924,12 @@ class BetCommands(commands.Cog):
         await self.bot.wait_until_ready()
         print("[BetManager] Results update task ready, waiting for next scheduled time...")
 
-    async def bets_overview(self, interaction: discord.Interaction):
+    @app_commands.choices(competition=[
+        app_commands.Choice(name="Bundesliga", value="bl"),
+        app_commands.Choice(name="Premier League", value="pl"),
+        app_commands.Choice(name="Champions League", value="cl"),
+    ])
+    async def bets_overview(self, interaction: discord.Interaction, competition: str):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
@@ -897,21 +937,30 @@ class BetCommands(commands.Cog):
         # Defer the response since this might take a moment
         await interaction.response.defer()
         
-        matches = await BetManager.get_matches()
-        view = MatchesLayoutView(matches, author_id=interaction.user.id)
+        comp_key = BetManager.COMPETITION_MAP[competition]
+        matches = await BetManager.get_matches(comp_key)
+
+        view = MatchesLayoutView(matches, comp_key, author_id=interaction.user.id)
         await view.add_buttons()
 
         await interaction.followup.send(view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
 
-    async def bets_placed(self, interaction: discord.Interaction):
+    @app_commands.choices(competition=[
+        app_commands.Choice(name="Bundesliga", value="bl"),
+        app_commands.Choice(name="Premier League", value="pl"),
+        app_commands.Choice(name="Champions League", value="cl"),
+    ])
+    async def bets_placed(self, interaction: discord.Interaction, competition: str):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
             return
         
         await interaction.response.defer()
 
-        bets = await BetManager.get_placed_bets(interaction.user.id)
-        matches = await BetManager.get_matches()
+        comp_key = BetManager.COMPETITION_MAP[competition]
+        bets = await BetManager.get_placed_bets(interaction.user.id, comp_key)
+        matches = await BetManager.get_matches(comp_key)
 
         await interaction.followup.send(view=BetsPlacedLayoutView(matches, bets, interaction.user.id))
+        await DatabaseManager.update_cmd_used(interaction.user.id)
