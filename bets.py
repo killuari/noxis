@@ -866,13 +866,14 @@ class BetCommands(commands.Cog):
             # Get unique sport keys to avoid duplicate API calls
             sport_keys = list(set(bet["sport_key"] for bet in completed_bets))
 
-            print(f"[BetManager] Found {len(completed_bets)} completed bets for {len(completed_bet_ids)} matches")
+            print(f"[BetManager] Found {len(completed_bets)} completed bets")
             
             results = {}
             # Fetch results from API
             for sport_key in sport_keys:
                 completed_bet_ids = list(set(bet["match_id"] for bet in completed_bets if bet["sport_key"] == sport_key))
                 results[sport_key] = await BetManager.fetch_results_from_api(sport_key=sport_key, event_ids=completed_bet_ids)
+                
             
             processed_count = 0
             for bet in completed_bets:
