@@ -553,10 +553,10 @@ class PlaceBetButton(ui.Button):
         user_id = self.author_id
         match_id = self.match.get("id")
 
-        commence_time = datetime.fromisoformat(self.match["commence_time_utc"])
-        now = datetime.now(tz=timezone.utc)
+        commence_time_utc = self.match.get("commence_time_utc")
+        now_utc = datetime.now(tz=timezone.utc)
 
-        if commence_time < now:
+        if commence_time_utc < now_utc:
             self.disabled = True
             return
 
