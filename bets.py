@@ -435,8 +435,8 @@ class BetManager:
                       f"Final score: **{result['scores']['home']} — {result['scores']['away']}**"
 
         embed = discord.Embed(title=title, description=description, color=color)
-        embed.add_field(name="Match outcome", value=f"**{match_result_team}**", inline=True)
-        embed.add_field(name="Your bet", value=f"**{user_choice_team}**", inline=True)
+        embed.add_field(name="Match outcome", value=f"{match_result_team.capitalize()}", inline=True)
+        embed.add_field(name="Your bet", value=f"{user_choice_team.capitalize()}", inline=True)
         embed.add_field(name="Stake", value=f"`{bet.get("stake"):,}$`", inline=False)
         embed.add_field(name="Return", value=f"`{bet.get('return', 0):,}$`", inline=False)
         status_text = "🎉 Congratulations — your bet won!" if is_win else "😞 Sorry — your bet lost."
@@ -450,7 +450,6 @@ class BetManager:
         except Exception:
             pass
 
-        embed.set_footer(text=f"Commence (UTC): {ts_text}")
         return (is_win, embed)
 
 # Modal zum Platzieren einer Wette
@@ -849,7 +848,7 @@ class BetCommands(commands.Cog):
 
     @tasks.loop(time=[
         time(hour=21, minute=0, second=0, tzinfo=TZ),  # 9 PM Berlin Time
-        time(hour=23, minute=15, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
+        time(hour=23, minute=0, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
         time(hour=2, minute=0, second=0, tzinfo=TZ)    # 2 AM Berlin Time
     ])
     async def bet_results_update(self):
