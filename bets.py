@@ -432,13 +432,16 @@ class BetManager:
 
         title = "Bet Result — Match Finished"
         description = f"**{result['home_team']}** vs **{result['away_team']}**\n" \
-                      f"Final score: **{result['scores']['home']} — {result['scores']['away']}**"
+                      f"Final score: **{result['scores']['home']}** - **{result['scores']['away']}**"
 
         embed = discord.Embed(title=title, description=description, color=color)
         embed.add_field(name="Match outcome", value=f"{match_result_team.capitalize()}", inline=True)
         embed.add_field(name="Your bet", value=f"{user_choice_team.capitalize()}", inline=True)
         embed.add_field(name="Stake", value=f"`{bet.get("stake"):,}$`", inline=False)
-        embed.add_field(name="Return", value=f"`{bet.get('return', 0):,}$`", inline=False)
+
+        if is_win:
+            embed.add_field(name="Return", value=f"`{bet.get('return', 0):,}$`", inline=False)
+
         status_text = "🎉 Congratulations — your bet won!" if is_win else "😞 Sorry — your bet lost."
         embed.add_field(name="Status", value=status_text, inline=False)
 
