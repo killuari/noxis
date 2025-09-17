@@ -423,7 +423,7 @@ class BetManager:
     @staticmethod
     def build_bet_result_embed(result: Dict, bet: Dict) -> Tuple[bool, discord.Embed]:
         user_choice = bet.get("selection", "").lower()
-        user_choice_team = result.get(f"{user_choice}_team", match_result)
+        user_choice_team = result.get(f"{user_choice}_team", user_choice)
         match_result = result.get("result", "").lower()
         match_result_team = result.get(f"{match_result}_team", match_result)
 
@@ -849,7 +849,7 @@ class BetCommands(commands.Cog):
 
     @tasks.loop(time=[
         time(hour=21, minute=0, second=0, tzinfo=TZ),  # 9 PM Berlin Time
-        time(hour=23, minute=10, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
+        time(hour=23, minute=15, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
         time(hour=2, minute=0, second=0, tzinfo=TZ)    # 2 AM Berlin Time
     ])
     async def bet_results_update(self):
