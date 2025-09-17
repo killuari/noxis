@@ -849,7 +849,7 @@ class BetCommands(commands.Cog):
 
     @tasks.loop(time=[
         time(hour=21, minute=0, second=0, tzinfo=TZ),  # 9 PM Berlin Time
-        time(hour=23, minute=0, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
+        time(hour=23, minute=10, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
         time(hour=2, minute=0, second=0, tzinfo=TZ)    # 2 AM Berlin Time
     ])
     async def bet_results_update(self):
