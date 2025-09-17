@@ -553,13 +553,22 @@ class PlaceBetButton(ui.Button):
         user_id = self.author_id
         match_id = self.match.get("id")
 
+        commence_time_utc = self.match.get("commence_time_utc")
+        now_utc = datetime.now(tz=timezone.utc)
+
+        if commence_time_utc < now_utc:
+            self.disabled = True
+            return
+
         bet_placed = await BetManager.is_bet_placed(user_id, self.sport_key, match_id)
         if bet_placed:
             self.disabled = True
+            return
 
         total_balance = await EconomyManager.get_total_balance(user_id)
         if total_balance < 10_000:
             self.disabled = True
+            return
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id:
