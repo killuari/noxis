@@ -23,7 +23,10 @@ async def on_ready():
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
     await JobManager.load_all()
-
+    await DatabaseManager.add_column_to_table("users", "job", "TIMESTAMP", "NULL")
+    await DatabaseManager.add_column_to_table("last_used", "job", "TIMESTAMP", "NULL")
+    await DatabaseManager.add_column_to_table("last_used", "job_daily", "TIMESTAMP", "NULL")
+    await DatabaseManager.add_column_to_table("last_used", "job_shifts", "INTEGER", "0")
     await client.add_cog(BasicCommands(client))  
     await client.add_cog(BetCommands(client))
     await client.add_cog(JobCommands(client))  

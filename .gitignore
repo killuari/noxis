@@ -3,3 +3,6 @@
 database.db
 __pycache__
 bets/matches_cache.json
+bets/matches_cache_bl.json
+bets/matches_cache_pl.json
+bets/matches_cache_cl.json

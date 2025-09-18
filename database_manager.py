@@ -37,6 +37,9 @@ class DatabaseManager:
                     higherlower TIMESTAMP,
                     bankrob TIMESTAMP,
                     expedition TIMESTAMP,
+                    job TIMESTAMP,
+                    job_daily TIMESTAMP,
+                    job_shifts INTEGER DEFAULT 0,
                     PRIMARY KEY (user_id)
                 )
             """)
