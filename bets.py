@@ -859,8 +859,8 @@ class BetCommands(commands.Cog):
             print(f"[BetManager] Daily odds update failed: {e}")
 
     @tasks.loop(time=[
-        time(hour=21, minute=15, second=0, tzinfo=TZ),  # 9 PM Berlin Time
-        time(hour=23, minute=15, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
+        time(hour=21, minute=25, second=0, tzinfo=TZ),  # 9 PM Berlin Time
+        time(hour=23, minute=25, second=0, tzinfo=TZ),  # 11 PM Berlin Time  
         time(hour=3, minute=0, second=0, tzinfo=TZ)    # 2 AM Berlin Time
     ])
     async def bet_results_update(self):
