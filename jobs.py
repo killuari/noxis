@@ -92,8 +92,11 @@ class JobResign(discord.ui.View):
         
     async def on_timeout(self):
         try:
-            embed = self.get_embed()
-            await self.interaction.edit_original_response(embed=embed, view=None)
+            await self.interaction.edit_original_response(embed=discord.Embed(
+                                                                            title="Job application canceled",
+                                                                            description="You did not respond in time.",
+                                                                            color=discord.Color.red()),
+                                                                            view=None)
         except Exception:
             pass
 
@@ -103,6 +106,7 @@ class JobCommands(commands.Cog):
         self.bot = bot
         self.work_group = app_commands.Group(name="work", description="Job related commands")
         self.work_group.command(name="list", description="Shows all available jobs")(self.work_list)
+        self.work_group.command(name="resign", description="Resign from your current job")(self.work_resign)
         self.work_group.command(name="start", description="Start a work shift at your job")(self.work_start)
         self.bot.tree.add_command(self.work_group)
 
