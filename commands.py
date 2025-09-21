@@ -169,7 +169,8 @@ class BasicCommands(commands.Cog):
             await interaction.response.send_message(embed=discord.Embed(title="You don't have this item!", color=discord.Color.red()), ephemeral=True)
             return
         elif user_item_quantity < quantity:
-            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough `{item.name}!`", color=discord.Color.red()), ephemeral=True)
+            emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
+            await interaction.response.send_message(embed=discord.Embed(title=f"You don't have enough {emoji_str} {item.name}!", color=discord.Color.red()), ephemeral=True)
             return
         
         percentage_range = (0.7, 1)
@@ -177,7 +178,9 @@ class BasicCommands(commands.Cog):
 
         await EconomyManager.add_money(interaction.user.id, sell_value * quantity)
         await InventoryManager.remove_item(interaction.user.id, item.item_id, quantity=quantity)
-        await interaction.response.send_message(embed=discord.Embed(title="💸 Item sold!", description=f"Sold `{quantity:,} {item.name} for: {sell_value*quantity:,}$`", color=discord.Color.gold()))
+
+        emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
+        await interaction.response.send_message(embed=discord.Embed(title="💸 Item sold!", description=f"Sold {quantity:,}x {emoji_str} {item.name} for: `{sell_value*quantity:,}$`", color=discord.Color.gold()))
         await DatabaseManager.update_cmd_used(interaction.user.id)
 
     @app_commands.command(name="daily", description="Your daily reward")
@@ -310,7 +313,8 @@ class BasicCommands(commands.Cog):
 
                     item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.COMMON))
                     quantity = random.randint(1,3)
-                    found_msg += f"\n🍎 ** Also found** `{quantity} {item.name}`**!**"
+                    emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
+                    found_msg += f"\n**Also found** {quantity}x {emoji_str} {item.name}**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id, quantity)
                     experience = 50
 
@@ -320,7 +324,8 @@ class BasicCommands(commands.Cog):
                     found_msg = f"💰 **Found** `{money}$`**!**"
                     await EconomyManager.add_money(interaction.user.id, money)
                     item = random.choice(await ItemManager.get_findable_items_by_rarity(Rarity.RARE))
-                    found_msg += f"\n🍎 ** Also found** `one {item.name}`**!**"
+                    emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
+                    found_msg += f"\n🍎 ** Also found** 1x {emoji_str} {item.name}**!**"
                     await InventoryManager.add_item(interaction.user.id, item.item_id)
                     experience = 100
 
@@ -641,8 +646,9 @@ class BasicCommands(commands.Cog):
 
         for idx, item in enumerate(inventory):
             if idx < 9:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 value = f"{item.value}$" if not item.unique else "Unique"
-                embed.add_field(name=f"{item.name} ({item.quantity}x)",
+                embed.add_field(name=f"{emoji_str} {item.name} ({item.quantity}x)",
                                 value=f"""
                                     Rarity: `{item.rarity}`
                                     Value: `{value}`
@@ -688,9 +694,10 @@ class BasicCommands(commands.Cog):
             True: "✅",
             False: "❌"
         }
+        emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
 
         embed = discord.Embed(
-            title=item.name,
+            title=f"{emoji_str} {item.name}",
             description=f"{item.description}\n\n" \
                         f"You have a total of **{item.quantity}**",
             color=discord.Color.from_str("#607bff"))
@@ -896,8 +903,9 @@ class BasicCommands(commands.Cog):
 
         for idx, item in enumerate(items):
             if idx < 9:
+                emoji_str = f"<:{item.item_id}:{item.custom_emoji_id}>"
                 embed.add_field(
-                    name=f"{item.name}",
+                    name=f"{emoji_str} {item.name}",
                     value=f"""
                         Rarity: {item.rarity}
                         Cost: {item.value}$
@@ -960,9 +968,10 @@ class BasicCommands(commands.Cog):
             got_item = await ItemManager.get_item(got_item_id)
             await InventoryManager.add_item(interaction.user.id, got_item_id)
 
+            emoji_str = f"<:{got_item.item_id}:{got_item.custom_emoji_id}>"
             embed = discord.Embed(
                 title="Opened Mystery Box",
-                description=f"You got `1x {got_item.name}`!",
+                description=f"You got `1x {emoji_str} {got_item.name}`!",
                 color=discord.Color.from_str("#607bff")
             )
 

@@ -58,12 +58,13 @@ class DatabaseManager:
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS bets (
                     user_id INTEGER NOT NULL,
+                    sport_key TEXT NOT NULL,
                     match_id TEXT NOT NULL,
                     commence_time_utc TIMESTAMP,
                     selection TEXT,
                     stake INTEGER,
                     return INTEGER,
-                    PRIMARY KEY (user_id, match_id)
+                    PRIMARY KEY (user_id, sport_key, match_id)
                 )
             """)
 

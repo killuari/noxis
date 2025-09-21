@@ -25,6 +25,7 @@ class Item:
     rarity: Rarity
     value: int = 0
     quantity: int = 0
+    custom_emoji_id: int = 0
     usable: bool = False
     sellable: bool = True
     unique: bool = False
@@ -75,6 +76,7 @@ class ItemManager:
                 description=item_dict["description"],
                 rarity=Rarity[item_dict["rarity"]],
                 value=item_dict.get("value", 0),
+                custom_emoji_id=item_dict.get("custom_emoji_id", 0),
                 usable=item_dict.get("usable", False),
                 sellable=item_dict.get("sellable", True),
                 findable=item_dict.get("findable", True),
