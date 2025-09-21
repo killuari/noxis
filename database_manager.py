@@ -38,8 +38,7 @@ class DatabaseManager:
                     bankrob TIMESTAMP,
                     expedition TIMESTAMP,
                     job TIMESTAMP,
-                    job_daily TIMESTAMP,
-                    job_shifts INTEGER DEFAULT 0,
+                    resign_cooldown TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)
