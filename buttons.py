@@ -6,6 +6,7 @@ from economy_manager import *
 from inventory_manager import *
 from knowledge_manager import *
 from mini_games import *
+from jobs import JobManager
 
 
 class GetStarted(discord.ui.View):
@@ -546,17 +547,25 @@ class LeaderboardView(discord.ui.View):
                 pass
             
 class JobList(discord.ui.View):
-    def __init__(self, interaction, jobs, user_level, user_knowledge, page=1, *, timeout=300):
+    def __init__(self, interaction, jobs, user_level, user_knowledge, current_job_id=None, page=1, *, timeout=300):
         super().__init__(timeout=timeout)
         self.interaction = interaction
         self.jobs = jobs
         self.user_level = user_level
         self.user_knowledge = user_knowledge
+        self.current_job_id = current_job_id
         self.cur_page = page
         
-    def get_embed(self):
+    async def get_embed(self):
         total_pages = max(1, (len(self.jobs)+4)//5)
-        embed = discord.Embed(title="Available Jobs", description="Here are the jobs you can apply for:", color=discord.Color.from_str("#607bff"))
+
+        if self.current_job_id:
+            job = await JobManager.get_job(self.current_job_id)
+            job_name = job["name"] if job else None
+
+        description = f"Current job: {job_name if job_name else 'None'}\n\nHere are the jobs you can apply for:"
+            
+        embed = discord.Embed(title="Available Jobs", description=description, color=discord.Color.from_str("#607bff"))
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages} | Use /work apply to apply for a job")
         start_idx = (self.cur_page - 1) * 5
         end_idx = start_idx + 5
@@ -600,7 +609,7 @@ class JobList(discord.ui.View):
 
     async def on_timeout(self):
         try:
-            embed = self.get_embed()
+            embed = await self.get_embed()
             await self.interaction.edit_original_response(embed=embed, view=None)
         except Exception:
             pass
@@ -612,7 +621,7 @@ class JobList(discord.ui.View):
             return
        
         self.cur_page = 1
-        embed = self.get_embed()
+        embed = await self.get_embed()
         await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
 
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
@@ -623,8 +632,8 @@ class JobList(discord.ui.View):
        
         if self.cur_page > 1:
             self.cur_page -= 1
-            embed = self.get_embed()            
-            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
+            embed = await self.get_embed()
+            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
        
         else:
             await interaction.response.defer()
@@ -639,8 +648,8 @@ class JobList(discord.ui.View):
        
         if self.cur_page < total_pages:
             self.cur_page += 1
-            embed = self.get_embed()
-            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
+            embed = await self.get_embed()
+            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
        
         else:
             await interaction.response.defer()
@@ -653,8 +662,8 @@ class JobList(discord.ui.View):
         
         total_pages = max(1, (len(self.jobs)+4)//5)
         self.cur_page = total_pages
-        embed = self.get_embed() 
-        await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
+        embed = await self.get_embed()
+        await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
 
 class SelectItems(discord.ui.View):
     def __init__(self, user_id: int, allowed_item_ids: Tuple[str], remove_items = True): 

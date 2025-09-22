@@ -210,7 +210,6 @@ class JobCommands(commands.Cog):
         ][:25]  # Discord erlaubt max. 25 Vorschläge
 
 
-    @app_commands.command(name="work_resign", description="Resign from your current job")
     async def work_resign(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
@@ -242,15 +241,27 @@ class JobCommands(commands.Cog):
         jobs = await JobManager.get_all_jobs()
         user_level, _ = await LevelManager.get_lvl_exp(interaction.user.id)
         user_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
+        async with aiosqlite.connect("database.db") as db:
+            cursor = await db.cursor()
+            await cursor.execute("SELECT job FROM users WHERE user_id=?", (interaction.user.id,))
+            job_row = await cursor.fetchone()
+            current_job_id = job_row[0] if job_row and job_row[0] else None
+
         pages_req = len(jobs) > 5
         
         if pages_req:
-            view = JobList(interaction, jobs, user_level, user_knowledge, page=1)
-            embed = view.get_embed()
-            
+            view = JobList(interaction, jobs, user_level, user_knowledge, current_job_id=current_job_id, page=1) 
+            embed = await view.get_embed()
+
         else:
             view = discord.utils.MISSING
-            embed = discord.Embed(title="Available Jobs", description="Here are the jobs you can apply for:", color=discord.Color.from_str("#607bff"))
+            if current_job_id:
+                current_job = await JobManager.get_job(current_job_id)
+                desc = f"Current job: {current_job.name}\n\nHere are the jobs you can apply for:"
+                
+            else:
+                desc = "Current job: None\n\nHere are the jobs you can apply for:"
+            embed = discord.Embed(title="Available Jobs", description=desc, color=discord.Color.from_str("#607bff"))
             embed.set_footer(text="Page 1/1 | Use /work apply to apply for a job")
             
             for job in jobs:
@@ -262,7 +273,6 @@ class JobCommands(commands.Cog):
                     requirements_met = False
                     
                 for category, required_value in job.required_knowledge.items():
-                    
                     if required_value > 0:
                         user_knowledge_value = user_knowledge.get(category, 0)
                         if user_knowledge_value < required_value:
