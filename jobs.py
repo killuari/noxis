@@ -174,10 +174,11 @@ class JobCommands(commands.Cog):
                
         for category, required in job.required_knowledge.items():
             if user_knowledge.get(category, 0) < required:
-                missing.append(f"{category}: {required}")
+                rank_name = (await KnowledgeManager.get_knowledge_threshold(required)).capitalize()
+                missing.append(f"{category.capitalize()}: {rank_name}")
                 
         if missing:
-            await interaction.response.send_message(f"You lack the following knowledge: {', '.join(missing)}", ephemeral=True)
+            await interaction.response.send_message(f"You need these ranks in the following categories: {', '.join(missing)}", ephemeral=True)
             return
 
         async with aiosqlite.connect("database.db") as db:
