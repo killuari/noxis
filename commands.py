@@ -215,7 +215,7 @@ class BasicCommands(commands.Cog):
                     title="You successfully claimed your daily Reward!", 
                     description="`1,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
-                await LevelManager.add_experience(interaction.user.id, 200, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, 200, interaction)
                 await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(days=1)
@@ -252,7 +252,7 @@ class BasicCommands(commands.Cog):
                     title="You successfully claimed your weekly Reward!", 
                     description="`15,000$` have been added to your Wallet", 
                     color=discord.Color.green()))
-                await LevelManager.add_experience(interaction.user.id, 1000, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, 1000, interaction)
                 await DatabaseManager.update_cmd_used(interaction.user.id)
             else:
                 next_daily_time = last_daily + datetime.timedelta(weeks=1)
@@ -342,7 +342,7 @@ class BasicCommands(commands.Cog):
                     {found_msg}""", 
                     color=discord.Color.green()))
                 
-                await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, experience, interaction)
                 await DatabaseManager.update_cmd_used(interaction.user.id)
                 
             else:
@@ -417,7 +417,7 @@ class BasicCommands(commands.Cog):
                     color=discord.Color.green()
                     ).set_footer(text="Stay cautious — word might spread!"))
                 
-                await LevelManager.add_experience(interaction.user.id, experience, interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, experience, interaction)
                 await cursor.execute("UPDATE last_used SET rob=? WHERE user_id=?", (last_used, interaction.user.id))
                 await db.commit()
                 await DatabaseManager.update_cmd_used(interaction.user.id)
@@ -540,8 +540,7 @@ class BasicCommands(commands.Cog):
                         value=f"`{comparison_num}`",
                         inline=True)      
 
-        webhook_url = interaction.followup.url
-        view = HigherLower(secret_num, comparison_num, interaction.user.id, webhook_url, interaction)
+        view = HigherLower(secret_num, comparison_num, interaction.user.id, interaction)
 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
@@ -1030,7 +1029,7 @@ class BasicCommands(commands.Cog):
                 color=discord.Color.from_str("#607bff")
             )
 
-            await LevelManager.add_experience(user_id=interaction.user.id, amount=random.randrange(50, 100), webhook_url=interaction.followup.url)
+            await LevelManager.add_experience(user_id=interaction.user.id, amount=random.randrange(50, 100), interaction=interaction)
 
         else: # falls wir ein item usable = True machen aber es hier noch nicht implementiert haben
             embed = discord.Embed(

@@ -22,12 +22,11 @@ class GetStarted(discord.ui.View):
 
 
 class HigherLower(discord.ui.View):
-    def __init__(self, secret_num, comparison_num, user_id, webhook_url, interaction, *, timeout=25): # 25 sec timeout
+    def __init__(self, secret_num, comparison_num, user_id, interaction, *, timeout=25): # 25 sec timeout
         super().__init__(timeout=timeout)      
         self.secret_num = secret_num
         self.comparison_num = comparison_num
         self.user_id = user_id
-        self.webhook_url = webhook_url
         self.interaction = interaction
         self.exp_award = random.randrange(10, 45)
         self.money = random.randint(200, 400) 
@@ -69,7 +68,7 @@ class HigherLower(discord.ui.View):
             
         if self.secret_num > self.comparison_num:
             self.money = int(self.money * difficulty_factor)
-            await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
+            await LevelManager.add_experience(self.user_id, self.exp_award, self.interaction)
             await EconomyManager.add_money(self.user_id, self.money, False)
             
             embed=discord.Embed(title="Correct! It was higher!",
@@ -130,7 +129,7 @@ class HigherLower(discord.ui.View):
             
         if self.secret_num < self.comparison_num:
             self.money = int(self.money * difficulty_factor)
-            await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
+            await LevelManager.add_experience(self.user_id, self.exp_award, self.interaction)
             await EconomyManager.add_money(self.user_id, self.money, False)
                 
             embed=discord.Embed(title="Correct! It was lower!",
@@ -180,7 +179,7 @@ class HigherLower(discord.ui.View):
                                         
         if self.secret_num in range(self.comparison_num-50, self.comparison_num+51):
             self.money = int(self.money * 10) 
-            await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)                
+            await LevelManager.add_experience(self.user_id, self.exp_award, self.interaction)                
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.UNCOMMON))
             quantity = random.randint(1,3)
@@ -236,7 +235,7 @@ class HigherLower(discord.ui.View):
                     
         if self.secret_num == self.comparison_num:
             self.money = int(self.money * 100) 
-            await LevelManager.add_experience(self.user_id, self.exp_award, self.webhook_url)
+            await LevelManager.add_experience(self.user_id, self.exp_award, self.interaction)
             await EconomyManager.add_money(self.user_id, self.money, False)
             item = random.choice(await ItemManager.get_items_by_rarity(Rarity.EPIC))
             quantity = random.randint(1,3)            
@@ -321,7 +320,7 @@ class Quiz(discord.ui.View):
                 await KnowledgeManager.update_total_knowledge(self.user_id)
                 total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
                 
-                await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+                await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction)
                 self.stop()                
                 await interaction.response.edit_message(
                     embed=discord.Embed(
@@ -337,7 +336,7 @@ class Quiz(discord.ui.View):
 
                 knowledge = DEFAULT_KNOWLEDGE.copy()
                 knowledge[self.category] = total_award
-                await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)
+                await LevelManager.add_experience(self.user_id, total_xp, self.interaction)
                 await KnowledgeManager.add_knowledge(interaction.user.id, knowledge=knowledge)
                 await KnowledgeManager.update_total_knowledge(self.user_id)
                 total_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
@@ -370,7 +369,7 @@ class Quiz(discord.ui.View):
                 color=discord.Color.yellow())
         embed.set_footer(text="You have to be faster!")          
         
-        await LevelManager.add_experience(self.user_id, total_xp, self.interaction.followup.url)        
+        await LevelManager.add_experience(self.user_id, total_xp, self.interaction)        
         await self.interaction.edit_original_response(embed=embed, view=None)
             
     
@@ -395,7 +394,7 @@ class Quiz(discord.ui.View):
                 title="⏭ You chose to skip the bonus question.",
                 description=f"📖 You gained {self.award} Knowledge in {self.category.capitalize()}!\n🧠 Your total {self.category.capitalize()} Knowledge: {total_knowledge[self.category]} ({(await KnowledgeManager.get_knowledge_threshold(total_knowledge[self.category])).capitalize()})",
                 color=discord.Color.yellow())
-        await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction.followup.url)
+        await LevelManager.add_experience(interaction.user.id, total_xp, self.interaction)
         self.stop()        
         await interaction.response.edit_message(embed=embed, view=None)
 
@@ -749,7 +748,7 @@ class ShopModal(discord.ui.Modal):
         
         await InventoryManager.add_item(user_id=self.interaction.user.id, item_id=self.item.item_id, quantity=quantity)
         await EconomyManager.remove_money(user_id=self.interaction.user.id, amount=quantity*self.item.value)
-        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), webhook_url=self.interaction.followup.url)
+        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), interaction=self.interaction)
 
         emoji_str = f"<:{self.item.item_id}:{self.item.custom_emoji_id}>"
         await interaction.response.send_message(embed=discord.Embed(title="Success", description=f"You successfully bought {quantity}x {emoji_str} {self.item.name}", color=discord.Color.green()), ephemeral=True)

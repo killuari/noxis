@@ -41,8 +41,8 @@ class LevelManager:
     
     # adds experience to a user and updates their level  
     @staticmethod
-    async def add_experience(user_id: int, amount: int, webhook_url: str = None) -> None:
-        """Adds experience to a specific user and sends level up message if user levels up and webhook_url is given"""
+    async def add_experience(user_id: int, amount: int, interaction: discord.Interaction = None) -> None:
+        """Adds experience to a specific user and sends level up message if user levels up and interaction is given"""
         if not await UserManager.user_exists(user_id):
             print("Invalid user_id. User not found")
             return 
@@ -62,12 +62,11 @@ class LevelManager:
             await cursor.execute("UPDATE users SET level=?, experience=? WHERE user_id=?", (new_level, new_exp, user_id))
             await db.commit()
 
-            if new_level > cur_level and webhook_url:
-                async with aiohttp.ClientSession() as session:
-                    webhook = discord.Webhook.from_url(webhook_url, session=session)
-                    while new_level > cur_level:
-                        cur_level += 1
-                        await webhook.send(embed=discord.Embed(title="Level Up", description=f"You reached level **{cur_level}**!", color=discord.Color.gold()))
+            if new_level > cur_level and interaction:
+                channel = interaction.channel
+                while new_level > cur_level:
+                    cur_level += 1
+                    await channel.send(embed=discord.Embed(title="Level Up", description=f"{interaction.user.mention} reached level **{cur_level}**!", color=discord.Color.gold()))
             
     # sets the experience of a user to a specific amount and updates their level           
     @staticmethod
