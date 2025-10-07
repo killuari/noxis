@@ -22,12 +22,12 @@ class GetStarted(discord.ui.View):
 
 
 class HigherLower(discord.ui.View):
-    def __init__(self, secret_num, comparison_num, user_id, webhool_url, interaction, *, timeout=25): # 25 sec timeout
+    def __init__(self, secret_num, comparison_num, user_id, webhook_url, interaction, *, timeout=25): # 25 sec timeout
         super().__init__(timeout=timeout)      
         self.secret_num = secret_num
         self.comparison_num = comparison_num
         self.user_id = user_id
-        self.webhook_url = webhool_url
+        self.webhook_url = webhook_url
         self.interaction = interaction
         self.exp_award = random.randrange(10, 45)
         self.money = random.randint(200, 400) 
@@ -749,7 +749,7 @@ class ShopModal(discord.ui.Modal):
         
         await InventoryManager.add_item(user_id=self.interaction.user.id, item_id=self.item.item_id, quantity=quantity)
         await EconomyManager.remove_money(user_id=self.interaction.user.id, amount=quantity*self.item.value)
-        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), webhook_url=interaction.followup.url)
+        await LevelManager.add_experience(user_id=self.interaction.user.id, amount=min(1000, quantity*random.randrange(10, 25)), webhook_url=self.interaction.followup.url)
 
         emoji_str = f"<:{self.item.item_id}:{self.item.custom_emoji_id}>"
         await interaction.response.send_message(embed=discord.Embed(title="Success", description=f"You successfully bought {quantity}x {emoji_str} {self.item.name}", color=discord.Color.green()), ephemeral=True)

@@ -109,7 +109,7 @@ class Expedition:
 
                     elif reward["type"] == "experience":
                         xp_amount = random.randrange(reward["amount_min"], reward["amount_max"])
-                        await LevelManager.add_experience(interaction.user.id, xp_amount)
+                        await LevelManager.add_experience(interaction.user.id, xp_amount, interaction.followup.url)
 
                 item_names = [(await ItemManager.get_item(item_id)).name for item_id in items]
 
