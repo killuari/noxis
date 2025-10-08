@@ -5,7 +5,7 @@
         "salary": 500,
         "cooldown": 60,
         "required_level": 1,
-        "required_knowledge": {}
+    "required_knowledge": {}
     },
     {
         "job_id": "cashier",
@@ -13,7 +13,7 @@
         "salary": 650,
         "cooldown": 60,
         "required_level": 1,
-        "required_knowledge": {"economics": 50}
+    "required_knowledge": {"economics": "novice"}
     },
     {
         "job_id": "warehouse_worker",
@@ -21,7 +21,7 @@
         "salary": 800,
         "cooldown": 60,
         "required_level": 1,
-        "required_knowledge":  {"economics": 250}
+    "required_knowledge":  {"economics": "intermediate"}
     },
     {
         "job_id": "head_chef",
@@ -29,7 +29,7 @@
         "salary": 1000,
         "cooldown": 60,
         "required_level": 1,
-        "required_knowledge": {"science": 50, "economics": 50, "literature": 50, "medicine": 100}
+    "required_knowledge": {"science": "novice", "economics": "novice", "literature": "novice", "medicine": "novice"}
     },
     
     
@@ -43,7 +43,7 @@
         "salary": 1500,
         "cooldown": 75,
         "required_level": 5,
-        "required_knowledge": {"literature": 750}
+    "required_knowledge": {"literature": "advanced"}
     },
    {
         "job_id": "electrician",
@@ -51,7 +51,7 @@
         "salary": 1750,
         "cooldown": 75,
         "required_level": 5,
-        "required_knowledge": {"science": 750}
+    "required_knowledge": {"science": "advanced"}
     },
     {
         "job_id": "police_officer",
@@ -59,7 +59,7 @@
         "salary": 2000,
         "cooldown": 75,
         "required_level": 5,
-        "required_knowledge": {"economics": 750}
+    "required_knowledge": {"economics": "advanced"}
     },
     {
         "job_id": "nurse",
@@ -67,7 +67,7 @@
         "salary": 2250,
         "cooldown": 75,
         "required_level": 5,
-        "required_knowledge": {"medicine": 750}
+    "required_knowledge": {"medicine": "advanced"}
     },
     
 
@@ -81,7 +81,7 @@
         "salary": 3500,
         "cooldown": 90,
         "required_level":15,
-        "required_knowledge": {"literature": 2000}
+    "required_knowledge": {"literature": "expert"}
     },
     {
         "job_id": "lawyer",
@@ -89,7 +89,7 @@
         "salary": 4000,
         "cooldown": 90,
         "required_level": 15,
-        "required_knowledge": {"economics": 2000}
+    "required_knowledge": {"economics": "expert"}
     },
     {
         "job_id": "doctor",
@@ -97,7 +97,7 @@
         "salary": 4500,
         "cooldown": 90,
         "required_level": 15,
-        "required_knowledge": {"medicine": 2000}     
+    "required_knowledge": {"medicine": "expert"}     
     },
     {
         "job_id": "senior_software_developer",
@@ -105,6 +105,6 @@
         "salary": 5000,
         "cooldown": 90,
         "required_level": 15,
-        "required_knowledge": {"science": 2000}     
+    "required_knowledge": {"science": "expert"}     
     }
 ]

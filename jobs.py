@@ -171,12 +171,15 @@ class JobCommands(commands.Cog):
             return
 
         missing = []
-               
-        for category, required in job.required_knowledge.items():
-            if user_knowledge.get(category, 0) < required:
-                rank_name = (await KnowledgeManager.get_knowledge_threshold(required)).capitalize()
-                missing.append(f"{category.capitalize()}: {rank_name}")
-                
+
+        for category, rank in job.required_knowledge.items():
+            req_lower = rank.lower()
+            numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(req_lower, 0)
+            display_rank = req_lower.capitalize()
+
+            if numeric_req and user_knowledge.get(category, 0) < numeric_req:
+                missing.append(f"{category.capitalize()}: {display_rank}")
+
         if missing:
             await interaction.response.send_message(f"You need these ranks in the following categories: {', '.join(missing)}", ephemeral=True)
             return
@@ -272,14 +275,18 @@ class JobCommands(commands.Cog):
                 if user_level < job.required_level:
                     requirements_list.append(f"Level {job.required_level}")
                     requirements_met = False
-                    
-                for category, required_value in job.required_knowledge.items():
-                    if required_value > 0:
+
+                for category, required_rank in job.required_knowledge.items():
+                    req_lower = required_rank.lower()
+                    numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(req_lower, 0)
+                    display_req = req_lower.capitalize()
+
+                    if numeric_req > 0:
                         user_knowledge_value = user_knowledge.get(category, 0)
-                        if user_knowledge_value < required_value:
-                            requirements_list.append(f"{required_value} Knowledge in {category.capitalize()}")
+                        if user_knowledge_value < numeric_req:
+                            requirements_list.append(f"{display_req} in {category.capitalize()}")
                             requirements_met = False
-                            
+
                 requirements = ", ".join(requirements_list) if requirements_list else "None"
                 cooldown = f"Cooldown: `{job.cooldown} min`"
                 req_met = "✅ Available" if requirements_met else "❌ Requirements not met"
@@ -344,7 +351,13 @@ class JobCommands(commands.Cog):
                 await interaction.response.send_message(embed=embed)
                 return
 
-        knowledge_categories = [cat for cat, val in job.required_knowledge.items() if val > 0]
+        knowledge_categories = []
+        for cat, val in job.required_knowledge.items():
+            req_lower = val.lower()
+            numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS[req_lower]
+
+            if numeric_req:
+                knowledge_categories.append(cat)
         quiz_category = knowledge_categories[0] if knowledge_categories else None
         bonus_money = int(job.salary * 0.20) if quiz_category else 0
 
@@ -358,7 +371,7 @@ class JobCommands(commands.Cog):
                     q_text = question["question"]
                     answer_choices = question["options"]
                     answer = question["correct"]
-
+                    from buttons import Quiz
                     view = Quiz(
                         interaction.user.id,
                         q_text,
@@ -488,6 +501,7 @@ class JobList(discord.ui.View):
         
     async def get_embed(self):
         total_pages = max(1, (len(self.jobs)+4)//5)
+        job_name = "None" # kein plan wieso es auf einmal nicht geht
 
         if self.current_job_id:
             job = await JobManager.get_job(self.current_job_id)
@@ -508,12 +522,15 @@ class JobList(discord.ui.View):
                 requirements_list.append(f"Level {job.required_level}")
                 requirements_met = False
 
-            for category, required_value in job.required_knowledge.items():
-                if required_value > 0:
+            for category, required_rank in job.required_knowledge.items():
+                req_lower = required_rank.lower()
+                numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(req_lower, 0)
+                display_req = req_lower.capitalize()
+
+                if numeric_req > 0:
                     user_knowledge_value = self.user_knowledge.get(category, 0)
-                   
-                    if user_knowledge_value < required_value:
-                        requirements_list.append(f"{required_value} Knowledge in {category.capitalize()}")
+                    if user_knowledge_value < numeric_req:
+                        requirements_list.append(f"`{display_req}` in {category.capitalize()}")
                         requirements_met = False
 
             requirements = ", ".join(requirements_list) if requirements_list else "None"
