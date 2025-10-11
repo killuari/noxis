@@ -5,7 +5,7 @@
         "salary": 500,
         "cooldown": 60,
         "required_level": 1,
-    "required_knowledge": {}
+        "required_knowledge": {}
     },
     {
         "job_id": "cashier",
@@ -13,7 +13,7 @@
         "salary": 650,
         "cooldown": 60,
         "required_level": 1,
-    "required_knowledge": {"economics": "novice"}
+        "required_knowledge": {"economics": "novice"}
     },
     {
         "job_id": "warehouse_worker",
@@ -21,7 +21,7 @@
         "salary": 800,
         "cooldown": 60,
         "required_level": 1,
-    "required_knowledge":  {"economics": "intermediate"}
+        "required_knowledge":  {"economics": "intermediate"}
     },
     {
         "job_id": "head_chef",
@@ -29,21 +29,15 @@
         "salary": 1000,
         "cooldown": 60,
         "required_level": 1,
-    "required_knowledge": {"science": "novice", "economics": "novice", "literature": "novice", "medicine": "novice"}
+        "required_knowledge": {"science": "novice", "economics": "novice", "literature": "novice", "medicine": "novice"}
     },
-    
-    
-    
-    
-    
-    
     {
         "job_id": "elementary_school_teacher",
         "name": "Elementary School Teacher",
         "salary": 1500,
         "cooldown": 75,
         "required_level": 5,
-    "required_knowledge": {"literature": "advanced"}
+        "required_knowledge": {"literature": "advanced"}
     },
    {
         "job_id": "electrician",
@@ -51,7 +45,7 @@
         "salary": 1750,
         "cooldown": 75,
         "required_level": 5,
-    "required_knowledge": {"science": "advanced"}
+        "required_knowledge": {"science": "advanced"}
     },
     {
         "job_id": "police_officer",
@@ -59,7 +53,7 @@
         "salary": 2000,
         "cooldown": 75,
         "required_level": 5,
-    "required_knowledge": {"economics": "advanced"}
+        "required_knowledge": {"economics": "advanced"}
     },
     {
         "job_id": "nurse",
@@ -67,7 +61,7 @@
         "salary": 2250,
         "cooldown": 75,
         "required_level": 5,
-    "required_knowledge": {"medicine": "advanced"}
+        "required_knowledge": {"medicine": "advanced"}
     },
     
 

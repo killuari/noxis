@@ -146,7 +146,7 @@ class DatabaseManager:
                 for col in columns_info:
                     print(f"  {col[1]} ({col[2]})")
                 
-                conn.close()
+                await conn.close()
                 return True
             
         except aiosqlite.Error as e:

@@ -66,8 +66,8 @@ class JobManager:
     
 
 class JobResign(discord.ui.View):
-    def __init__(self, interaction, timeout=15):
-        super().__init__(timeout=timeout)
+    def __init__(self, interaction):
+        super().__init__()
         self.interaction = interaction
 
     @discord.ui.button(label="Resign", style=discord.ButtonStyle.danger)
@@ -89,16 +89,6 @@ class JobResign(discord.ui.View):
         embed = discord.Embed(title="Job resignation successful", description="You have successfully resigned from your job.", color=discord.Color.orange())
         embed.set_footer(text="If you want to apply for a new job, use /work apply")
         await interaction.response.edit_message(embed=embed, view=None)
-        
-    async def on_timeout(self):
-        try:
-            await self.interaction.edit_original_response(embed=discord.Embed(
-                                                                            title="Job application canceled",
-                                                                            description="You did not respond in time.",
-                                                                            color=discord.Color.red()),
-                                                                            view=None)
-        except Exception:
-            pass
 
 
 class JobCommands(commands.Cog):
@@ -108,9 +98,17 @@ class JobCommands(commands.Cog):
         self.work_group.command(name="list", description="Shows all available jobs")(self.work_list)
         self.work_group.command(name="resign", description="Resign from your current job")(self.work_resign)
         self.work_group.command(name="start", description="Start a work shift at your job")(self.work_start)
+        self.work_group.command(name="apply", description="Apply for a new job")(self.work_apply)
         self.bot.tree.add_command(self.work_group)
 
-    @app_commands.command(name="work_apply", description="Apply for a job")
+    async def job_autocomplete(self, interaction: discord.Interaction, current: str):
+        return [
+            app_commands.Choice(name=job["name"], value=job["job_id"])
+            for job in JobManager.jobs.values()
+            if current.lower() in job["name"].lower()
+        ][:25]  # Discord erlaubt max. 25 Vorschläge
+
+    @app_commands.autocomplete(job=job_autocomplete)
     async def work_apply(self, interaction: discord.Interaction, job: str):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
@@ -204,16 +202,6 @@ class JobCommands(commands.Cog):
         embed.set_footer(text="💡The more knowledge you obtain, the more jobs you can apply for!")
         await interaction.response.send_message(embed=embed)
 
-
-    @work_apply.autocomplete("job")
-    async def job_autocomplete(self, interaction: discord.Interaction, current: str):
-        return [
-            app_commands.Choice(name=job["name"], value=job["job_id"])
-            for job in JobManager.jobs.values()
-            if current.lower() in job["name"].lower()
-        ][:25]  # Discord erlaubt max. 25 Vorschläge
-
-
     async def work_resign(self, interaction: discord.Interaction):
         if not await UserManager.user_exists(interaction.user.id):
             await get_started(interaction, interaction.user.id)
@@ -233,7 +221,7 @@ class JobCommands(commands.Cog):
                 return
 
         embed = discord.Embed(title="Job resignation",
-                              description="Are you sure you want to resign from your job?\nSign below to confirm:",
+                              description="Are you sure you want to resign from your job? There is a `1 day` cooldown to apply for a new one.\nSign below to confirm:",
                               color=discord.Color.orange())
         await interaction.response.send_message(embed=embed, view=JobResign(interaction))
 
@@ -242,64 +230,14 @@ class JobCommands(commands.Cog):
             await get_started(interaction, interaction.user.id)
             return
 
-        jobs = await JobManager.get_all_jobs()
-        user_level, _ = await LevelManager.get_lvl_exp(interaction.user.id)
-        user_knowledge = await KnowledgeManager.get_knowledge(interaction.user.id)
         async with aiosqlite.connect("database.db") as db:
             cursor = await db.cursor()
             await cursor.execute("SELECT job FROM users WHERE user_id=?", (interaction.user.id,))
             job_row = await cursor.fetchone()
             current_job_id = job_row[0] if job_row and job_row[0] else None
-
-        pages_req = len(jobs) > 5
         
-        if pages_req:
-            view = JobList(interaction, jobs, user_level, user_knowledge, current_job_id=current_job_id, page=1) 
-            embed = await view.get_embed()
-
-        else:
-            view = discord.utils.MISSING
-            if current_job_id:
-                current_job = await JobManager.get_job(current_job_id)
-                desc = f"Current job: {current_job.name}\n\nHere are the jobs you can apply for:"
-                
-            else:
-                desc = "Current job: None\n\nHere are the jobs you can apply for:"
-            embed = discord.Embed(title="Available Jobs", description=desc, color=discord.Color.from_str("#607bff"))
-            embed.set_footer(text="Page 1/1 | Use /work apply to apply for a job")
-            
-            for job in jobs:
-                requirements_list = []
-                requirements_met = True
-                
-                if user_level < job.required_level:
-                    requirements_list.append(f"Level {job.required_level}")
-                    requirements_met = False
-
-                for category, required_rank in job.required_knowledge.items():
-                    req_lower = required_rank.lower()
-                    numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(req_lower, 0)
-                    display_req = req_lower.capitalize()
-
-                    if numeric_req > 0:
-                        user_knowledge_value = user_knowledge.get(category, 0)
-                        if user_knowledge_value < numeric_req:
-                            requirements_list.append(f"{display_req} in {category.capitalize()}")
-                            requirements_met = False
-
-                requirements = ", ".join(requirements_list) if requirements_list else "None"
-                cooldown = f"Cooldown: `{job.cooldown} min`"
-                req_met = "✅ Available" if requirements_met else "❌ Requirements not met"
-                
-                embed.add_field(
-                    name=f"{job.name}",
-                    value=(
-                        f"💰 Salary: `{job.salary:,}$`\n"
-                        f"⏰ {cooldown}\n"
-                        f"📋 Requirements: {requirements}\n"
-                        f"{req_met}"),
-                    inline=False
-                )
+        view = JobList(interaction, current_job_id=current_job_id, page=1) 
+        embed = await view.get_embed()
                 
         await interaction.response.send_message(embed=embed, view=view)
         await DatabaseManager.update_cmd_used(interaction.user.id)
@@ -490,57 +428,64 @@ class JobCommands(commands.Cog):
         await DatabaseManager.update_cmd_used(interaction.user.id)
         
 class JobList(discord.ui.View):
-    def __init__(self, interaction, jobs, user_level, user_knowledge, current_job_id=None, page=1, *, timeout=300):
+    def __init__(self, interaction, current_job_id=None, page=1, timeout=300):
         super().__init__(timeout=timeout)
         self.interaction = interaction
-        self.jobs = jobs
-        self.user_level = user_level
-        self.user_knowledge = user_knowledge
         self.current_job_id = current_job_id
         self.cur_page = page
         
     async def get_embed(self):
-        total_pages = max(1, (len(self.jobs)+4)//5)
-        job_name = "None" # kein plan wieso es auf einmal nicht geht
+        self.jobs = await JobManager.get_all_jobs()
 
-        if self.current_job_id:
-            job = await JobManager.get_job(self.current_job_id)
-            job_name = job.name if job else None
+        user_level, _ = await LevelManager.get_lvl_exp(self.interaction.user.id)
+        user_knowledge = await KnowledgeManager.get_knowledge(self.interaction.user.id)
 
-        description = f"Current job: {job_name if job_name else 'None'}\n\nHere are the jobs you can apply for:"
+        total_pages = max(1, (len(self.jobs)+3)//4)
             
-        embed = discord.Embed(title="Available Jobs", description=description, color=discord.Color.from_str("#607bff"))
+        embed = discord.Embed(title="Available Jobs", description="Here are the jobs you can apply for:", color=discord.Color.from_str("#607bff"))
         embed.set_footer(text=f"Page {self.cur_page}/{total_pages} | Use /work apply to apply for a job")
-        start_idx = (self.cur_page - 1) * 5
-        end_idx = start_idx + 5
+        start_idx = (self.cur_page - 1) * 4
+        end_idx = start_idx + 4
 
         for job in self.jobs[start_idx:end_idx]:
             requirements_list = []
             requirements_met = True
 
-            if self.user_level < job.required_level:
-                requirements_list.append(f"Level {job.required_level}")
+            # get level requirement
+            requirement_str = f"\n ┌─ Level: `{job.required_level}`"
+            if user_level >= job.required_level:
+                requirement_str += " - `✅`"
+            else:
+                requirement_str += " - `❌`"     
                 requirements_met = False
 
+            requirements_list.append(requirement_str)
+
+
+            # get knowledge requirements
             for category, required_rank in job.required_knowledge.items():
-                req_lower = required_rank.lower()
-                numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(req_lower, 0)
-                display_req = req_lower.capitalize()
+                display_req = required_rank.capitalize()
+                requirement_str = f" ├─ Knowledge in `{category.capitalize()}`: `{display_req}`"
+                
+                numeric_req = KnowledgeManager.KNOWLEDGE_THRESHOLDS.get(required_rank, 0)
+                user_knowledge_value = user_knowledge.get(category, 0)
 
-                if numeric_req > 0:
-                    user_knowledge_value = self.user_knowledge.get(category, 0)
-                    if user_knowledge_value < numeric_req:
-                        requirements_list.append(f"`{display_req}` in {category.capitalize()}")
-                        requirements_met = False
+                if user_knowledge_value >= numeric_req:
+                    requirement_str += " - `✅`"
+                else:
+                    requirement_str += " - `❌`"    
+                    requirements_met = False
 
-            requirements = ", ".join(requirements_list) if requirements_list else "None"
+                requirements_list.append(requirement_str)
+                
+
+            requirements = "\n".join(requirements_list) if requirements_list else "None"
             cooldown = f"Cooldown: `{job.cooldown} min`"
 
-            if requirements_met:
-                req_met = "✅ Available"
-                
-            else:
-                req_met = "❌ Requirements not met"
+            req_met = "└─ `✅` Available" if requirements_met else "└─ `❌` Not available"
+
+            if job.job_id == self.current_job_id:
+                req_met = "└─ `🟦` Current Employment" 
 
             embed.add_field(
                 name=f"{job.name}",
@@ -568,8 +513,10 @@ class JobList(discord.ui.View):
             return
        
         self.cur_page = 1
-        embed = await self.get_embed()
-        await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.cur_page))
+
+        view = JobList(self.interaction, self.current_job_id, self.cur_page)
+        embed = await view.get_embed()
+        await interaction.response.edit_message(embed=embed, view=view)
 
     @discord.ui.button(emoji="◀", style=discord.ButtonStyle.secondary, disabled=False)
     async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -579,8 +526,10 @@ class JobList(discord.ui.View):
        
         if self.cur_page > 1:
             self.cur_page -= 1
-            embed = await self.get_embed()
-            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
+
+            view = JobList(self.interaction, self.current_job_id, self.cur_page)
+            embed = await view.get_embed()
+            await interaction.response.edit_message(embed=embed, view=view)
        
         else:
             await interaction.response.defer()
@@ -591,12 +540,14 @@ class JobList(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use these buttons", ephemeral=True)
             return
        
-        total_pages = max(1, (len(self.jobs)+4)//5)
+        total_pages = max(1, (len(self.jobs)+3)//4)
        
         if self.cur_page < total_pages:
             self.cur_page += 1
-            embed = await self.get_embed()
-            await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
+
+            view = JobList(self.interaction, self.current_job_id, self.cur_page)
+            embed = await view.get_embed()
+            await interaction.response.edit_message(embed=embed, view=view)
        
         else:
             await interaction.response.defer()
@@ -607,7 +558,9 @@ class JobList(discord.ui.View):
             await interaction.response.send_message(f"Only {self.interaction.user.name} can use these buttons", ephemeral=True)
             return
         
-        total_pages = max(1, (len(self.jobs)+4)//5)
+        total_pages = max(1, (len(self.jobs)+3)//4)
         self.cur_page = total_pages
-        embed = await self.get_embed()
-        await interaction.response.edit_message(embed=embed, view=JobList(self.interaction, self.jobs, self.user_level, self.user_knowledge, self.current_job_id, self.cur_page))
+
+        view = JobList(self.interaction, self.current_job_id, self.cur_page)
+        embed = await view.get_embed()
+        await interaction.response.edit_message(embed=embed, view=view)
