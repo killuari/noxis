@@ -21,6 +21,7 @@ class DatabaseManager:
                     inv_value INTEGER DEFAULT 0,
                     cmd_used INTEGER DEFAULT 0,
                     total_knowledge DEFAULT 0,
+                    job TEXT DEFAULT NULL,
                     PRIMARY KEY (user_id)
                 )
             """)
@@ -36,6 +37,8 @@ class DatabaseManager:
                     higherlower TIMESTAMP,
                     bankrob TIMESTAMP,
                     expedition TIMESTAMP,
+                    job TIMESTAMP,
+                    resign_cooldown TIMESTAMP,
                     PRIMARY KEY (user_id)
                 )
             """)
@@ -143,7 +146,7 @@ class DatabaseManager:
                 for col in columns_info:
                     print(f"  {col[1]} ({col[2]})")
                 
-                conn.close()
+                await conn.close()
                 return True
             
         except aiosqlite.Error as e:
