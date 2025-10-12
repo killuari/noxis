@@ -1,15 +1,15 @@
-import discord, json, aiosqlite, datetime, random
+import discord, json, aiosqlite, datetime, random, aiofiles
 from dataclasses import dataclass
 from discord import app_commands
 from discord.ext import commands
 from user_manager import UserManager
-from commands import *
 from typing import Optional, List, Dict
 from economy_manager import EconomyManager
 from database_manager import DatabaseManager
 from knowledge_manager import KnowledgeManager
 from level_manager import LevelManager
-from buttons import *
+from buttons import Quiz
+from commands import get_started
 
 @dataclass
 class Job:
@@ -309,7 +309,7 @@ class JobCommands(commands.Cog):
                     q_text = question["question"]
                     answer_choices = question["options"]
                     answer = question["correct"]
-                    from buttons import Quiz
+                    
                     view = Quiz(
                         interaction.user.id,
                         q_text,

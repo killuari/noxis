@@ -6,8 +6,6 @@ from economy_manager import *
 from inventory_manager import *
 from knowledge_manager import *
 from mini_games import *
-from jobs import JobManager
-
 
 class GetStarted(discord.ui.View):
     def __init__(self, *, timeout=None):
