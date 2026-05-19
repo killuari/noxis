@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from user_manager import *
 from buttons import *
+from database_manager import DatabaseManager
 from items import *
 from mini_games import *
 from inventory_manager import InventoryManager
