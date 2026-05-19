@@ -1,5 +1,7 @@
 .env
 .venv
+.codex/
+.agents/
 database.db
 __pycache__
 data/bets/matches_cache_bl.json

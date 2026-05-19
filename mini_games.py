@@ -1,6 +1,5 @@
 import discord, random
 from typing import List, Dict, Tuple
-from buttons import *
 from managers.economy import EconomyManager
 
 class LockpickGame:

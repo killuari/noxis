@@ -1,6 +1,6 @@
 import discord
 
-from buttons import GetStarted
+from views import GetStarted
 
 
 # This function creates an account through button interaction

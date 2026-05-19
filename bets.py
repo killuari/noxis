@@ -2,7 +2,7 @@ import discord, aiohttp, json, os, aiosqlite
 from discord import app_commands
 from discord.ext import commands, tasks
 from managers.user import UserManager
-from commands import get_started
+from cogs.shared import get_started
 from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo

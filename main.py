@@ -3,12 +3,12 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from managers.items import ItemManager
 from managers.database import DatabaseManager
-from commands import add_core_cogs
-from buttons import *
+from cogs import add_core_cogs
 from managers.inventory import InventoryManager
 from managers.expedition import ExpeditionManager
 from managers.economy import EconomyManager
 from bets import BetCommands, BetManager
+from views import GetStarted
  
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="=", intents=intents)

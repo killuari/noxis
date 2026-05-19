@@ -3,11 +3,11 @@ from typing import List, Dict
 from managers.economy import EconomyManager
 from dataclasses import dataclass
 from mini_games import LockpickGame
-from buttons import SelectItems
 from managers.items import ItemManager
 from managers.inventory import InventoryManager
 from managers.knowledge import KnowledgeManager
 from managers.level import LevelManager
+from views import SelectItems
 
 @dataclass
 class Expedition:
