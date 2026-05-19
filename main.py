@@ -1,7 +1,7 @@
 import discord, os
 from discord.ext import commands
 from dotenv import load_dotenv
-from items import *
+from managers.items import ItemManager
 from managers.database import DatabaseManager
 from commands import add_core_cogs
 from buttons import *

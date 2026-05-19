@@ -10,7 +10,8 @@ from cogs.shared import get_started
 from managers.database import DatabaseManager
 from managers.economy import EconomyManager
 from managers.inventory import InventoryManager
-from items import ItemManager, Rarity
+from managers.items import ItemManager
+from models.item import Rarity
 from managers.knowledge import KnowledgeManager
 from managers.level import LevelManager
 from managers.user import UserManager

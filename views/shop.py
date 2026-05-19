@@ -2,7 +2,7 @@ import discord, random
 
 from managers.economy import EconomyManager
 from managers.inventory import InventoryManager
-from items import Item
+from models.item import Item
 from managers.level import LevelManager
 
 

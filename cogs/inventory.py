@@ -8,7 +8,7 @@ from cogs.shared import get_started
 from managers.database import DatabaseManager
 from managers.economy import EconomyManager
 from managers.inventory import InventoryManager
-from items import ItemManager
+from managers.items import ItemManager
 from managers.level import LevelManager
 from managers.user import UserManager
 from views import Inventory

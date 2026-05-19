@@ -23,9 +23,9 @@ class BetManager:
 
     SPORT_KEYS = [BL_KEY, PL_KEY, CL_KEY]
 
-    CACHE_BL = 'bets/matches_cache_bl.json'
-    CACHE_PL = 'bets/matches_cache_pl.json'
-    CACHE_CL = 'bets/matches_cache_cl.json'
+    CACHE_BL = 'data/bets/matches_cache_bl.json'
+    CACHE_PL = 'data/bets/matches_cache_pl.json'
+    CACHE_CL = 'data/bets/matches_cache_cl.json'
     
     COMPETITION_MAP = {
         "bl": BL_KEY,

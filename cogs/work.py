@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from cogs.shared import get_started
 from managers.database import DatabaseManager
-from jobs import JobManager
+from managers.jobs import JobManager
 from managers.knowledge import KnowledgeManager
 from managers.level import LevelManager
 from managers.user import UserManager

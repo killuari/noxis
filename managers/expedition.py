@@ -4,7 +4,7 @@ from managers.economy import EconomyManager
 from dataclasses import dataclass
 from mini_games import LockpickGame
 from buttons import SelectItems
-from items import ItemManager
+from managers.items import ItemManager
 from managers.inventory import InventoryManager
 from managers.knowledge import KnowledgeManager
 from managers.level import LevelManager
@@ -317,7 +317,7 @@ class ExpeditionManager:
     }
 
     @classmethod
-    async def load_all(cls, folder="expeditions"):
+    async def load_all(cls, folder="data/expeditions"):
         cls.expeditions.clear()
         for filename in os.listdir(folder):
             if filename.endswith(".json"):
@@ -397,4 +397,3 @@ class ExpeditionManager:
                                                     view=ExpeditionView(author_id=interaction.user.id, 
                                                                         author_balance=await EconomyManager.get_total_balance(interaction.user.id), 
                                                                         current_expedition_id=expedition_id))
-        

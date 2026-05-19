@@ -60,7 +60,7 @@ class StudyCommands(commands.Cog):
             await db.commit()
         
         
-        async with aiofiles.open("study_questions.json", "r", encoding="UTF-8") as file:
+        async with aiofiles.open("data/study_questions.json", "r", encoding="UTF-8") as file:
             content = await file.read()
             questions = json.loads(content)
             num = random.randint(0,50)

@@ -3,7 +3,7 @@ from typing import Tuple
 import discord
 
 from managers.inventory import InventoryManager
-from items import ItemManager
+from managers.items import ItemManager
 
 
 class SelectItems(discord.ui.View):

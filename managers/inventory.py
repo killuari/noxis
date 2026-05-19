@@ -1,6 +1,9 @@
 import aiosqlite, json, datetime
-from items import *
+from typing import List
+
+from managers.items import ItemManager
 from managers.user import UserManager
+from models.item import Item
 
 
 class InventoryManager:
@@ -103,7 +106,6 @@ class InventoryManager:
          
         return sum(item.value * item.quantity for item in await InventoryManager.get_inventory(user_id))
     
-    
     @staticmethod
     async def update_inventory_value(user_id: int):
         value = await InventoryManager.get_inventory_value(user_id)
@@ -112,4 +114,3 @@ class InventoryManager:
             cursor = await db.cursor()
             await cursor.execute("UPDATE users SET inv_value=? WHERE user_id=?", (value, user_id))
             await db.commit()
-    

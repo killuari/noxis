@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from cogs.shared import get_started
 from managers.database import DatabaseManager
-from items import ItemManager
+from managers.items import ItemManager
 from managers.user import UserManager
 from views import ShopView
 
