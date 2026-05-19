@@ -91,6 +91,7 @@ Static content is stored in JSON files under `data/`, while dataclasses and enum
 
 * Python 3.14 or compatible Python 3.13+ interpreter
 * A Discord bot token
+* A The Odds API key for the `/bets` commands
 * `uv` is recommended for fast virtual environment creation and dependency installation
 
 ### 1. Clone the repository
@@ -118,7 +119,10 @@ Create a `.env` file in the project root:
 
 ```env
 BOT_TOKEN=your_discord_bot_token
+ODDS_API_KEY=your_the_odds_api_key
 ```
+
+The sports betting commands use [The Odds API](https://the-odds-api.com/) for odds and result data. Without `ODDS_API_KEY` in `.env`, the `/bets` commands cannot fetch fresh matches, odds, or results.
 
 ---
 
