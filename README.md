@@ -91,7 +91,7 @@ Static content is stored in JSON files under `data/`, while dataclasses and enum
 
 * Python 3.14 or compatible Python 3.13+ interpreter
 * A Discord bot token
-* A The Odds API key for the `/bets` commands
+* A The-Odds-API key for the `/bets` commands
 * `uv` is recommended for fast virtual environment creation and dependency installation
 
 ### 1. Clone the repository
