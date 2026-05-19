@@ -1,8 +1,8 @@
 import discord, random
 
-from knowledge_manager import KnowledgeManager
-from level_manager import LevelManager
-from user_manager import DEFAULT_KNOWLEDGE
+from managers.knowledge import KnowledgeManager
+from managers.level import LevelManager
+from managers.user import DEFAULT_KNOWLEDGE
 
 
 class Quiz(discord.ui.View):

@@ -2,12 +2,12 @@ import discord, os
 from discord.ext import commands
 from dotenv import load_dotenv
 from items import *
-from database_manager import DatabaseManager
+from managers.database import DatabaseManager
 from commands import add_core_cogs
 from buttons import *
-from inventory_manager import InventoryManager
-from expedition_manager import ExpeditionManager
-from economy_manager import EconomyManager
+from managers.inventory import InventoryManager
+from managers.expedition import ExpeditionManager
+from managers.economy import EconomyManager
 from bets import BetCommands, BetManager
  
 intents = discord.Intents.all()

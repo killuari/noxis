@@ -3,9 +3,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.shared import get_started
-from database_manager import DatabaseManager
+from managers.database import DatabaseManager
 from items import ItemManager
-from user_manager import UserManager
+from managers.user import UserManager
 from views import ShopView
 
 

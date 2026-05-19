@@ -7,13 +7,13 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.shared import get_started
-from database_manager import DatabaseManager
-from economy_manager import EconomyManager
-from inventory_manager import InventoryManager
-from knowledge_manager import KnowledgeManager
-from level_manager import LevelManager
+from managers.database import DatabaseManager
+from managers.economy import EconomyManager
+from managers.inventory import InventoryManager
+from managers.knowledge import KnowledgeManager
+from managers.level import LevelManager
 from mini_games import LockpickGame
-from user_manager import UserManager
+from managers.user import UserManager
 from views import SelectItems
 
 

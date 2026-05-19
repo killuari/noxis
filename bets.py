@@ -1,15 +1,15 @@
 import discord, aiohttp, json, os, aiosqlite
 from discord import app_commands
 from discord.ext import commands, tasks
-from user_manager import UserManager
+from managers.user import UserManager
 from commands import get_started
 from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
 from typing import Optional, List, Dict, Any, Tuple
 from discord import ui, TextStyle
-from economy_manager import EconomyManager
-from database_manager import DatabaseManager
+from managers.economy import EconomyManager
+from managers.database import DatabaseManager
 
 TZ = ZoneInfo("Europe/Berlin")
 

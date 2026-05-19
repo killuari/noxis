@@ -1,9 +1,9 @@
 import discord, random
 
-from economy_manager import EconomyManager
-from inventory_manager import InventoryManager
+from managers.economy import EconomyManager
+from managers.inventory import InventoryManager
 from items import Item
-from level_manager import LevelManager
+from managers.level import LevelManager
 
 
 class ShopModal(discord.ui.Modal):

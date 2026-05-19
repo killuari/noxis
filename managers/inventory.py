@@ -1,6 +1,6 @@
 import aiosqlite, json, datetime
 from items import *
-from user_manager import UserManager
+from managers.user import UserManager
 
 
 class InventoryManager:

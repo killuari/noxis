@@ -3,9 +3,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.shared import get_started
-from database_manager import DatabaseManager
-from expedition_manager import ExpeditionManager
-from user_manager import UserManager
+from managers.database import DatabaseManager
+from managers.expedition import ExpeditionManager
+from managers.user import UserManager
 
 
 class ExpeditionCommands(commands.Cog):

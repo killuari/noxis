@@ -1,5 +1,5 @@
 import aiosqlite, json, random, aiofiles
-from user_manager import *
+from managers.user import *
 
 class KnowledgeManager:
     KNOWLEDGE_THRESHOLDS = {

@@ -5,12 +5,12 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.shared import get_started
-from database_manager import DatabaseManager
-from economy_manager import EconomyManager
-from inventory_manager import InventoryManager
+from managers.database import DatabaseManager
+from managers.economy import EconomyManager
+from managers.inventory import InventoryManager
 from items import ItemManager
-from level_manager import LevelManager
-from user_manager import UserManager
+from managers.level import LevelManager
+from managers.user import UserManager
 from views import Inventory
 
 

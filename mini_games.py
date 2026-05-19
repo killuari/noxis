@@ -1,7 +1,7 @@
 import discord, random
 from typing import List, Dict, Tuple
 from buttons import *
-from economy_manager import EconomyManager
+from managers.economy import EconomyManager
 
 class LockpickGame:
     def __init__(self, user: discord.User, target: discord.User = None, callbacks: Dict = {"success_callback": None, "fail_callback": None}, expedition = False, lives: int = 3, num_length: int = 4, max_num: int = 9):

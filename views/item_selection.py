@@ -2,7 +2,7 @@ from typing import Tuple
 
 import discord
 
-from inventory_manager import InventoryManager
+from managers.inventory import InventoryManager
 from items import ItemManager
 
 

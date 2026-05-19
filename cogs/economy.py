@@ -4,9 +4,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.shared import get_started
-from database_manager import DatabaseManager
-from economy_manager import EconomyManager
-from user_manager import UserManager
+from managers.database import DatabaseManager
+from managers.economy import EconomyManager
+from managers.user import UserManager
 
 
 class EconomyCommands(commands.Cog):

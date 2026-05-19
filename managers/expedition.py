@@ -1,13 +1,13 @@
 import os, json, discord, random, aiosqlite, datetime
 from typing import List, Dict
-from economy_manager import EconomyManager
+from managers.economy import EconomyManager
 from dataclasses import dataclass
 from mini_games import LockpickGame
 from buttons import SelectItems
 from items import ItemManager
-from inventory_manager import InventoryManager
-from knowledge_manager import KnowledgeManager
-from level_manager import LevelManager
+from managers.inventory import InventoryManager
+from managers.knowledge import KnowledgeManager
+from managers.level import LevelManager
 
 @dataclass
 class Expedition:
