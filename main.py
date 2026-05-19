@@ -3,7 +3,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from items import *
 from database_manager import DatabaseManager
-from commands import BasicCommands
+from commands import add_core_cogs
 from buttons import *
 from inventory_manager import InventoryManager
 from expedition_manager import ExpeditionManager
@@ -22,7 +22,7 @@ async def on_ready():
     await ExpeditionManager.load_all()
     await ItemManager.load_all()
 
-    await client.add_cog(BasicCommands(client))  
+    await add_core_cogs(client)  
     await client.add_cog(BetCommands(client))  
     await client.tree.sync()
 
