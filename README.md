@@ -100,23 +100,7 @@ git clone https://github.com/killuari/noxis.git
 cd noxis
 ```
 
-### 2. Create a virtual environment
-
-Using `uv`:
-
-```bash
-uv venv --python 3.14 .venv
-source .venv/bin/activate
-```
-
-If `uv` is installed but not available in your shell path, call it through its full path, for example:
-
-```bash
-/home/killuari/.local/bin/uv venv --python /usr/bin/python3.14 .venv
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 uv pip install -r requirements.txt
@@ -128,7 +112,7 @@ Alternatively, with pip:
 pip install -r requirements.txt
 ```
 
-### 4. Configure environment variables
+### 3. Configure environment variables
 
 Create a `.env` file in the project root:
 
@@ -205,7 +189,7 @@ requirements.txt                # Frozen dependency snapshot
 
 ## License
 
-This repository does not currently include a license file. Add a `LICENSE` file before publishing or distributing the project under a specific license.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
