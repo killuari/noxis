@@ -1,5 +1,5 @@
 import aiosqlite, discord, aiohttp, math
-from user_manager import UserManager
+from managers.user import UserManager
 from typing import Tuple
 
 

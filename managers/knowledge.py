@@ -1,5 +1,5 @@
 import aiosqlite, json, random, aiofiles
-from user_manager import *
+from managers.user import *
 
 class KnowledgeManager:
     KNOWLEDGE_THRESHOLDS = {
@@ -81,7 +81,7 @@ class KnowledgeManager:
             
     @staticmethod
     async def get_random_tip():
-        async with aiofiles.open("random_tips.json", "r", encoding="UTF-8") as file:
+        async with aiofiles.open("data/random_tips.json", "r", encoding="UTF-8") as file:
             content = await file.read()
             tips = json.loads(content)
             num = random.randint(0, len(tips) - 1)

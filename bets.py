@@ -1,21 +1,22 @@
 import discord, aiohttp, json, os, aiosqlite
 from discord import app_commands
 from discord.ext import commands, tasks
-from user_manager import UserManager
-from commands import get_started
+from dotenv import load_dotenv
+from managers.user import UserManager
+from cogs.shared import get_started
 from statistics import mean
 from datetime import datetime, timedelta, timezone, time
 from zoneinfo import ZoneInfo
 from typing import Optional, List, Dict, Any, Tuple
 from discord import ui, TextStyle
-from economy_manager import EconomyManager
-from database_manager import DatabaseManager
+from managers.economy import EconomyManager
+from managers.database import DatabaseManager
 
 TZ = ZoneInfo("Europe/Berlin")
 
 class BetManager:
     API_BASE = 'https://api.the-odds-api.com/v4/'
-    API_KEY = '35e92ee26bf991936c0b6278a8cbe2bc'
+    API_KEY_ENV = "ODDS_API_KEY"
 
     BL_KEY = 'soccer_germany_bundesliga'
     PL_KEY = 'soccer_epl'
@@ -23,9 +24,9 @@ class BetManager:
 
     SPORT_KEYS = [BL_KEY, PL_KEY, CL_KEY]
 
-    CACHE_BL = 'bets/matches_cache_bl.json'
-    CACHE_PL = 'bets/matches_cache_pl.json'
-    CACHE_CL = 'bets/matches_cache_cl.json'
+    CACHE_BL = 'data/bets/matches_cache_bl.json'
+    CACHE_PL = 'data/bets/matches_cache_pl.json'
+    CACHE_CL = 'data/bets/matches_cache_cl.json'
     
     COMPETITION_MAP = {
         "bl": BL_KEY,
@@ -40,6 +41,14 @@ class BetManager:
     }
 
     TZ = TZ
+
+    @classmethod
+    def get_api_key(cls) -> str:
+        load_dotenv()
+        api_key = os.getenv(cls.API_KEY_ENV)
+        if not api_key:
+            raise RuntimeError(f"{cls.API_KEY_ENV} is not set. Add it to .env to use the bets commands.")
+        return api_key
 
     @staticmethod
     def parse_iso_to_utc(dt_str: Optional[str]) -> Optional[datetime]:
@@ -80,7 +89,7 @@ class BetManager:
             "regions": 'eu',
             "markets": "h2h",
             "oddsFormat": "decimal",
-            "apiKey": cls.API_KEY
+            "apiKey": cls.get_api_key()
         }
 
         async with aiohttp.ClientSession() as sess:
@@ -138,7 +147,7 @@ class BetManager:
 
         url = f"{cls.API_BASE}/sports/{sport_key}/scores"
         params = {
-            "apiKey": cls.API_KEY,
+            "apiKey": cls.get_api_key(),
             "daysFrom": 2,
             "dateFormat": "iso"
         }
